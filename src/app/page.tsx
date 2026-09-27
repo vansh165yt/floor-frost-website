@@ -1,0 +1,958 @@
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
+import NextImage from 'next/image';
+import Header from '@/components/Header';
+import DiscordAnnouncements from '@/components/DiscordAnnouncements';
+
+export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  // Live YouTube Subscribers State (Default matches Floor Frost's real count)
+  const [subStats, setSubStats] = useState({
+    subscriberCount: "1,390",
+    viewCount: "125K",
+    videoCount: "150",
+    demoMode: true
+  });
+
+  // Fetch Live Subscribers every 15s
+  useEffect(() => {
+    const fetchSubscribers = async () => {
+      try {
+        const res = await fetch('/api/subscribers');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.subscriberCount) {
+            const count = Number(data.subscriberCount);
+            const views = Number(data.viewCount);
+            setSubStats({
+              subscriberCount: count.toLocaleString(),
+              viewCount: views >= 1000000 
+                ? (views / 1000000).toFixed(1) + "M" 
+                : (views / 1000).toFixed(0) + "K",
+              videoCount: data.videoCount,
+              demoMode: data.demoMode
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Subscribers fetch error:", e);
+      }
+    };
+
+    fetchSubscribers();
+    const interval = setInterval(fetchSubscribers, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Live YouTube Videos State (Fetched automatically from @FloorFrost channel)
+  const [videoList, setVideoList] = useState<any[]>([]);
+  const [featuredVideo, setFeaturedVideo] = useState<any>(null);
+  const [isPlayingFeatured, setIsPlayingFeatured] = useState(false);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const res = await fetch('/api/videos');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.videos && data.videos.length > 0) {
+            setVideoList(data.videos);
+            setFeaturedVideo(data.latestVideo || data.videos[0]);
+          }
+        }
+      } catch (e) {
+        console.error("Videos fetch error:", e);
+      }
+    };
+
+    fetchVideos();
+    const interval = setInterval(fetchVideos, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Smooth Slow Auto-Scroll to Last Hero Frame when coming back from Social page
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('scroll') === 'end') {
+      const timer = setTimeout(() => {
+        if (containerRef.current) {
+          const targetY = containerRef.current.offsetHeight - window.innerHeight;
+          
+          // Custom Slow Smooth Scroll (2.5 Seconds Cinematic Glide)
+          const startY = window.scrollY || window.pageYOffset;
+          const distance = targetY - startY;
+          const duration = 2500; // 2.5s slow glide
+          let startTime: number | null = null;
+
+          const easeInOutCubic = (t: number) =>
+            t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+          const animateScroll = (currentTime: number) => {
+            if (startTime === null) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+            const easeProgress = easeInOutCubic(progress);
+
+            window.scrollTo(0, startY + distance * easeProgress);
+
+            if (timeElapsed < duration) {
+              requestAnimationFrame(animateScroll);
+            } else {
+              // Clean up URL search param after scroll finishes
+              window.history.replaceState({}, document.title, window.location.pathname);
+            }
+          };
+
+          requestAnimationFrame(animateScroll);
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Logo Marquee Data
+  const topLogos = [
+    { name: "MINECRAFT", icon: "🟩" },
+    { name: "GENSHIN IMPACT", icon: "✨" },
+    { name: "ELDEN RING", icon: "💍" },
+    { name: "CYBERPUNK 2077", icon: "⚡" },
+    { name: "UNREAL ENGINE 5", icon: "⚙️" },
+    { name: "NVIDIA RTX", icon: "🟢" },
+    { name: "VALORANT", icon: "🎯" },
+    { name: "TWITCH GAMING", icon: "🟣" }
+  ];
+
+  const bottomLogos = [
+    { name: "YOUTUBE GAMING", icon: "▶️" },
+    { name: "DISCORD LEGION", icon: "💬" },
+    { name: "RAZER CHROMA", icon: "🐍" },
+    { name: "PLAYSTATION 5", icon: "🎮" },
+    { name: "XBOX SERIES X", icon: "❎" },
+    { name: "STEAM VR", icon: "🥽" },
+    { name: "NINTENDO", icon: "🍄" },
+    { name: "FLOOR FROST HQ", icon: "❄️" }
+  ];
+
+  const videoCategories = ['All', 'Walkthroughs', 'Pro Strategies', 'Challenges', 'Live Streams'];
+
+  const videos = [
+    {
+      id: 1,
+      title: "Ultimate Survival & World Building Ep. 1 - Frost Kingdom!",
+      game: "Walkthroughs",
+      views: "24K views",
+      duration: "24:15",
+      category: "Walkthroughs",
+      badge: "CREATIVE SERIES",
+      color: "from-emerald-900 to-teal-900"
+    },
+    {
+      id: 2,
+      title: "Unlocking The Secret Realm - Epic Walkthrough & Secrets",
+      game: "Pro Strategies",
+      views: "18K views",
+      duration: "18:40",
+      category: "Pro Strategies",
+      badge: "EPIC EXPLORATION",
+      color: "from-purple-900 to-pink-900"
+    },
+    {
+      id: 3,
+      title: "Conquering The Final Boss - Pro Tips & Tricks",
+      game: "Challenges",
+      views: "12K views",
+      duration: "32:10",
+      category: "Challenges",
+      badge: "PRO CHALLENGE",
+      color: "from-[#200b3b] to-[#40125c]"
+    },
+    {
+      id: 4,
+      title: "Funny Gaming Moments & High-Energy Stream Compilation",
+      game: "Live Streams",
+      views: "35K views",
+      duration: "15:00",
+      category: "Live Streams",
+      badge: "FUNNY MOMENTS",
+      color: "from-blue-900 to-indigo-900"
+    }
+  ];
+
+  const filteredVideos = activeCategory === 'All' 
+    ? videos 
+    : videos.filter(v => v.category === activeCategory);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const frameCount = 150;
+    const images: HTMLImageElement[] = [];
+    const loadedImages: Set<number> = new Set();
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const getFrameSrc = (index: number) => {
+      const paddedIndex = String(index).padStart(3, '0');
+      return `/frames/frame_${paddedIndex}.png`;
+    };
+
+    // Preload frames progressively
+    for (let i = 1; i <= frameCount; i++) {
+      const img = new window.Image();
+      img.src = getFrameSrc(i);
+      img.onload = () => {
+        loadedImages.add(i);
+      };
+      images[i] = img;
+    }
+
+    let targetFrame = 1;
+    let currentFrame = 1;
+    let animationFrameId: number;
+
+    const handleResize = () => {
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    const drawImageCover = (img: HTMLImageElement) => {
+      if (!ctx || !canvas) return;
+      const cw = canvas.width;
+      const ch = canvas.height;
+
+      ctx.clearRect(0, 0, cw, ch);
+
+      const imgWidth = img.naturalWidth;
+      const imgHeight = img.naturalHeight;
+      if (!imgWidth || !imgHeight) return;
+
+      const imgRatio = imgWidth / imgHeight;
+      const canvasRatio = cw / ch;
+
+      let drawWidth = cw;
+      let drawHeight = ch;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      if (canvasRatio > imgRatio) {
+        drawHeight = cw / imgRatio;
+        offsetY = (ch - drawHeight) / 2;
+      } else {
+        drawWidth = ch * imgRatio;
+        offsetX = (cw - drawWidth) / 2;
+      }
+
+      // Subtle 4% canvas zoom to naturally crop out corner watermarks seamlessly
+      const zoom = 1.04;
+      drawWidth *= zoom;
+      drawHeight *= zoom;
+      offsetX = (cw - drawWidth) / 2;
+      offsetY = (ch - drawHeight) / 2;
+
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    };
+
+    const renderFrame = (frameIndex: number) => {
+      const imgIndex = Math.min(frameCount, Math.max(1, Math.round(frameIndex)));
+      const img = images[imgIndex];
+
+      if (img && img.complete && img.naturalWidth > 0) {
+        drawImageCover(img);
+      } else {
+        // Fallback to closest loaded frame to avoid flickering
+        let nearest = -1;
+        let minDiff = Infinity;
+        loadedImages.forEach((idx) => {
+          const diff = Math.abs(idx - imgIndex);
+          if (diff < minDiff) {
+            minDiff = diff;
+            nearest = idx;
+          }
+        });
+        if (nearest !== -1 && images[nearest]) {
+          drawImageCover(images[nearest]);
+        }
+      }
+    };
+
+    const updateScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const totalScrollable = rect.height - window.innerHeight;
+      if (totalScrollable <= 0) return;
+
+      const currentScroll = -rect.top;
+      const progress = Math.min(1, Math.max(0, currentScroll / totalScrollable));
+
+      targetFrame = 1 + progress * (frameCount - 1);
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', updateScroll, { passive: true });
+    updateScroll();
+
+    // Persistent animation loop with lerp
+    const loop = () => {
+      if (prefersReducedMotion) {
+        currentFrame = targetFrame;
+      } else {
+        // Smooth lerp easing towards target frame
+        currentFrame += (targetFrame - currentFrame) * 0.12;
+      }
+
+      renderFrame(currentFrame);
+      animationFrameId = requestAnimationFrame(loop);
+    };
+
+    loop();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', updateScroll);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  const clamp = (val: number, min: number, max: number) => Math.min(max, Math.max(min, val));
+
+  // Dynamic staggered animation progress synchronized directly with background frames
+  const headerOpacity = clamp((scrollProgress - 0.65) / 0.25, 0, 1);
+  const headerTranslateY = - (1 - headerOpacity) * 30;
+
+  const subheadOpacity = clamp((scrollProgress - 0.55) / 0.25, 0, 1);
+  const subheadScale = 0.85 + subheadOpacity * 0.15;
+  const subheadTranslateY = (1 - subheadOpacity) * 20;
+
+  const titleOpacity = clamp((scrollProgress - 0.65) / 0.25, 0, 1);
+  const titleScale = 0.9 + titleOpacity * 0.1;
+  const titleTranslateY = (1 - titleOpacity) * 35;
+
+  const descOpacity = clamp((scrollProgress - 0.75) / 0.20, 0, 1);
+  const descTranslateY = (1 - descOpacity) * 20;
+
+  const btnOpacity = clamp((scrollProgress - 0.82) / 0.18, 0, 1);
+  const btnScale = 0.85 + btnOpacity * 0.15;
+
+  const scrollHintOpacity = clamp((0.15 - scrollProgress) / 0.15, 0, 1);
+
+  return (
+    <div className="bg-[#07040d] text-white selection:bg-purple-500/30 font-sans min-h-screen animate-portal-fade">
+      
+      {/* 1. HERO SECTION WITH CANVAS SCROLL SEQUENCE */}
+      <div ref={containerRef} className="relative h-[400vh]">
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center items-center">
+          {/* Canvas for Scroll-linked Image Sequence */}
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-100 object-cover"
+          />
+
+          {/* Minimal dark gradient overlays */}
+          <div className="absolute inset-0 bg-black/15 pointer-events-none z-0" />
+          <div className="absolute bottom-0 left-0 w-full h-28 bg-gradient-to-t from-[#07040d] via-[#07040d]/60 to-transparent pointer-events-none z-10" />
+
+          {/* Glass Header with 3 Parallel Lines Hamburger Menu */}
+          <div className="absolute top-0 left-0 right-0 z-30">
+            <Header 
+              opacity={headerOpacity} 
+              translateY={headerTranslateY} 
+              pointerEvents={headerOpacity > 0.5 ? 'auto' : 'none'} 
+              activePage="home" 
+            />
+          </div>
+
+          {/* Hero Content */}
+          <main className="relative z-10 w-full max-w-4xl mx-auto px-6 text-center flex flex-col items-center justify-center gap-4 sm:gap-6 mt-6">
+            <h3 
+              className="text-xl sm:text-2xl md:text-3xl font-bold tracking-[0.25em] text-white/95 uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] transition-all duration-150 ease-out"
+              style={{
+                opacity: subheadOpacity,
+                transform: `translateY(${subheadTranslateY}px) scale(${subheadScale})`
+              }}
+            >
+              WELCOME TO THE
+            </h3>
+
+            <h1 
+              className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-100 via-purple-200 to-indigo-200 drop-shadow-[0_8px_24px_rgba(0,0,0,0.95)] leading-tight transition-all duration-150 ease-out"
+              style={{
+                opacity: titleOpacity,
+                transform: `translateY(${titleTranslateY}px) scale(${titleScale})`
+              }}
+            >
+              WORLD OF GAMES
+            </h1>
+
+            <p 
+              className="max-w-xl text-xs sm:text-sm md:text-base text-white/90 font-normal leading-relaxed drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] mt-1 transition-all duration-150 ease-out"
+              style={{
+                opacity: descOpacity,
+                transform: `translateY(${descTranslateY}px)`
+              }}
+            >
+              High-skill gameplay, epic walkthroughs, secret strategies, and funny gaming moments with Floor Frost.
+            </p>
+
+            <div
+              className="transition-all duration-150 ease-out"
+              style={{
+                opacity: btnOpacity,
+                transform: `scale(${btnScale})`,
+                pointerEvents: btnOpacity > 0.5 ? 'auto' : 'none'
+              }}
+            >
+              <a href="#videos" className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:px-9 sm:py-4 font-medium text-sm sm:text-base text-white transition-all duration-300 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 hover:scale-[1.05] shadow-[0_0_25px_rgba(219,39,119,0.7)] hover:shadow-[0_0_40px_rgba(219,39,119,1)] border border-pink-400/50 backdrop-blur-md active:scale-95 mt-3">
+                <span>Explore Content</span>
+                <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
+              </a>
+            </div>
+
+          </main>
+
+          {/* Scroll Down Indicator */}
+          <div 
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none transition-opacity duration-300"
+            style={{ opacity: scrollHintOpacity }}
+          >
+            <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase text-pink-200/90 animate-pulse drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              Scroll Down
+            </span>
+            <div className="w-5 h-9 rounded-full border-2 border-pink-300/50 flex items-start justify-center p-1 backdrop-blur-sm bg-black/30 shadow-lg">
+              <div className="w-1.5 h-2 rounded-full bg-pink-400 animate-float" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. INFINITE LOGO CAROUSEL WITH FULL-WIDTH PERSPECTIVE RIBBON & VERTICAL DIVIDERS */}
+      <section id="marquee" className="relative py-20 bg-[#050308] overflow-hidden border-t border-purple-900/30">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-96 bg-purple-900/10 rounded-full blur-[180px] pointer-events-none" />
+
+        {/* Edge Fade Gradients */}
+        <div className="absolute top-0 bottom-0 left-0 w-24 sm:w-48 bg-gradient-to-r from-[#050308] via-[#050308]/80 to-transparent pointer-events-none z-30" />
+        <div className="absolute top-0 bottom-0 right-0 w-24 sm:w-48 bg-gradient-to-l from-[#050308] via-[#050308]/80 to-transparent pointer-events-none z-30" />
+
+        <div className="w-full relative z-20">
+          
+          {/* Perspective 3D Carousel Strip Container */}
+          <div className="w-full overflow-hidden [perspective:1400px] marquee-mask">
+            <div className="flex flex-col gap-6 [transform:rotateY(-4deg)_rotateX(2deg)] transition-transform duration-500 hover:[transform:rotateY(0deg)_rotateX(0deg)]">
+              
+              {/* Top Row Marquee */}
+              <div className="relative py-4 border-y border-white/20 bg-white/[0.02] backdrop-blur-md overflow-hidden flex shadow-lg">
+                <div className="animate-marquee flex items-center">
+                  {[...topLogos, ...topLogos, ...topLogos, ...topLogos].map((logo, idx) => (
+                    <div key={idx} className="flex items-center shrink-0">
+                      <div className="px-8 sm:px-12 group cursor-pointer flex flex-col justify-center">
+                        <span className="font-sans font-black tracking-[0.2em] text-sm sm:text-lg text-zinc-100 uppercase group-hover:text-purple-300 transition-colors">
+                          {logo.name}
+                        </span>
+                        <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-0.5">
+                          OFFICIAL ECOSYSTEM
+                        </span>
+                      </div>
+                      {/* Vertical Divider Line from Reference Image */}
+                      <div className="h-10 sm:h-12 w-[1px] bg-white/20 shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bottom Row Marquee */}
+              <div className="relative py-4 border-y border-white/20 bg-white/[0.02] backdrop-blur-md overflow-hidden flex shadow-lg">
+                <div className="animate-marquee-reverse flex items-center">
+                  {[...bottomLogos, ...bottomLogos, ...bottomLogos, ...bottomLogos].map((logo, idx) => (
+                    <div key={idx} className="flex items-center shrink-0">
+                      <div className="px-8 sm:px-12 group cursor-pointer flex flex-col justify-center">
+                        <span className="font-sans font-black tracking-[0.2em] text-sm sm:text-lg text-zinc-100 uppercase group-hover:text-pink-300 transition-colors">
+                          {logo.name}
+                        </span>
+                        <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-0.5">
+                          FLOOR FROST HQ
+                        </span>
+                      </div>
+                      {/* Vertical Divider Line from Reference Image */}
+                      <div className="h-10 sm:h-12 w-[1px] bg-white/20 shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. BENTO GRID SECTION WITH ENHANCED FROSTED GLASSMORPHISM */}
+      <section className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20">
+        <div className="absolute top-1/4 right-1/4 w-[30rem] h-[30rem] bg-purple-600/20 rounded-full blur-[180px] pointer-events-none" />
+        <div className="absolute bottom-1/4 left-1/4 w-[30rem] h-[30rem] bg-pink-600/20 rounded-full blur-[180px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto flex flex-col gap-12 relative z-10">
+          <div className="flex flex-col items-start gap-3">
+            <span className="text-pink-400 font-mono text-xs uppercase tracking-[0.25em] font-bold">
+              Ecosystem & Metrics ~
+            </span>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight">
+              NEXT-GEN GAMING ARCHITECTURE
+            </h2>
+            <p className="max-w-xl text-sm sm:text-base text-zinc-400 font-light leading-relaxed">
+              Explore the technology, community impact, and content universe driving Floor Frost.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+            <div className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col justify-between gap-8 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-purple-400/70 hover:shadow-[0_0_55px_rgba(168,85,247,0.35)] hover-lift shimmer-hover transition-all duration-300">
+              <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/35 transition-all pointer-events-none" />
+              
+              <div className="flex justify-between items-start z-10">
+                <span className="px-3.5 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-300 font-mono text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                  01 / BROADCAST TECH
+                </span>
+                <span className="text-2xl">📡</span>
+              </div>
+
+              <div className="flex flex-col gap-3 z-10">
+                <h3 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white group-hover:text-purple-200 transition-colors">
+                  4K 60FPS IMMERSIVE BROADCASTING
+                </h3>
+                <p className="text-sm text-zinc-300/90 leading-relaxed font-light max-w-lg">
+                  Streamed with ultra-low latency, custom RTX ray-tracing shaders, and spatial audio processing for the ultimate viewer experience.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/[0.06] border border-white/20 backdrop-blur-xl flex flex-col sm:flex-row justify-between items-center gap-4 z-10 shadow-lg">
+                <div className="flex items-center gap-3">
+                  {/* Dynamic Realistic Equalizer Bars */}
+                  <div className="flex items-end gap-1.5 h-8">
+                    <div className="w-1.5 bg-pink-400 rounded-full animate-eq-1 shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
+                    <div className="w-1.5 bg-purple-400 rounded-full animate-eq-2 shadow-[0_0_8px_rgba(192,132,252,0.8)]" />
+                    <div className="w-1.5 bg-indigo-400 rounded-full animate-eq-3 shadow-[0_0_8px_rgba(129,140,248,0.8)]" />
+                    <div className="w-1.5 bg-pink-500 rounded-full animate-eq-4 shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
+                  </div>
+                  <span className="text-xs font-mono text-zinc-200 font-semibold">Live Stream Output</span>
+                </div>
+                <div className="flex gap-4 text-xs font-mono text-zinc-300">
+                  <span>Bitrate: <strong className="text-lime-400">45.8 Mbps</strong></span>
+                  <span>Res: <strong className="text-cyan-300">3840x2160</strong></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Card 2: Live Subscriber Count */}
+            <div className="rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300">
+              <div className="absolute -top-10 -left-10 w-44 h-44 bg-pink-500/15 rounded-full blur-2xl group-hover:bg-pink-500/30 transition-all pointer-events-none" />
+
+              <div className="flex justify-between items-start z-10">
+                <span className="px-3.5 py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 font-mono text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                  02 / AUDIENCE
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-red-600/30 border border-red-500/50 text-red-400 text-[10px] font-mono font-bold animate-pulse flex items-center gap-1 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />
+                  LIVE SUBSCRIBERS
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-2 my-auto z-10">
+                <span className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-pink-200 to-purple-300 tracking-tight font-mono drop-shadow-[0_0_20px_rgba(236,72,153,0.4)]">
+                  {subStats.subscriberCount}
+                </span>
+                <h4 className="text-lg font-bold text-white uppercase tracking-wider">COMMUNITY LEGION</h4>
+                <p className="text-xs text-zinc-300/90 leading-relaxed font-light">
+                  Real-time @FloorFrost YouTube subscribers updating live every 15s.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 pt-4 border-t border-white/15 z-10">
+                <div className="w-10 h-10 rounded-full overflow-hidden border border-purple-400 relative shadow-md">
+                  <NextImage src="/logo.png" alt="Floor Frost" fill className="object-cover" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white">@FloorFrost</p>
+                  <p className="text-[10px] font-mono text-purple-300">Verified YouTube Creator</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-indigo-400/70 hover:shadow-[0_0_55px_rgba(129,140,248,0.35)] hover-lift shimmer-hover transition-all duration-300">
+              <div className="flex justify-between items-start z-10">
+                <span className="px-3.5 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 font-mono text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                  03 / ECOSYSTEM
+                </span>
+                <span className="text-2xl">🕹️</span>
+              </div>
+
+              <div className="flex flex-col gap-3 z-10">
+                <h4 className="text-xl font-bold uppercase tracking-wider text-white">SUPPORTED PLATFORMS</h4>
+                <p className="text-xs text-zinc-300/90 leading-relaxed font-light">
+                  Multi-platform content optimization across top gaming devices.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-2 z-10">
+                {["PC Master Race", "PlayStation 5", "Steam Deck", "Mobile 4K", "Telegram Web3"].map((platform) => (
+                  <span 
+                    key={platform}
+                    className="px-3 py-1.5 rounded-full bg-white/[0.08] border border-white/15 text-xs font-mono text-zinc-200 font-medium hover:border-pink-400/60 hover:bg-white/15 hover:scale-105 transition-all backdrop-blur-md shadow-sm"
+                  >
+                    {platform}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300">
+              <div className="flex flex-col gap-3 max-w-lg z-10">
+                <span className="px-3.5 py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 font-mono text-xs font-bold uppercase tracking-wider self-start backdrop-blur-md">
+                  04 / VISION
+                </span>
+                <h3 className="text-2xl font-bold uppercase tracking-tight text-white">
+                  FLOOR FROST CONTENT REVOLUTION
+                </h3>
+                <p className="text-xs sm:text-sm text-zinc-300/90 leading-relaxed font-light">
+                  Combining high-skill gameplay, cinematic storytelling, and interactive fan rewards into one unified gaming destination.
+                </p>
+              </div>
+
+              <a 
+                href="https://discord.gg/aN5CCRT6CS" 
+                target="_blank"
+                rel="noreferrer"
+                className="px-8 py-4 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 font-bold text-xs sm:text-sm text-white shadow-[0_0_30px_rgba(219,39,119,0.5)] hover:scale-105 active:scale-95 transition-all shrink-0 border border-pink-400/40 z-10"
+              >
+                Join The Legion →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. ABOUT CREATOR SECTION WITH REAL CHANNEL BIO & DISCORD */}
+      <section id="about" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          
+          <div className="relative flex justify-center items-center">
+            <div className="absolute w-80 h-80 bg-purple-600/30 rounded-full blur-3xl animate-pulse" />
+            
+            <div className="relative z-10 w-80 sm:w-96 rounded-3xl overflow-hidden border-2 border-purple-500/50 shadow-[0_0_50px_rgba(168,85,247,0.4)] bg-gradient-to-b from-purple-950 to-zinc-950 p-4">
+              <div className="relative w-full aspect-square rounded-2xl overflow-hidden border border-purple-400/30">
+                <NextImage 
+                  src="/logo.png" 
+                  alt="Floor Frost Avatar" 
+                  fill 
+                  className="object-cover hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="mt-4 flex justify-between items-center px-2 font-mono">
+                <div>
+                  <h4 className="font-bold text-lg text-white">FLOOR FROST</h4>
+                  <p className="text-xs text-purple-400">@FloorFrost</p>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-red-600/30 border border-red-500/50 text-red-400 text-xs font-bold">
+                  LIVE CREATOR
+                </span>
+              </div>
+            </div>
+
+            <div className="absolute top-6 -left-4 sm:-left-6 z-20 px-4 py-3 rounded-2xl bg-zinc-900/90 border border-purple-500/40 backdrop-blur-xl shadow-2xl text-xs flex items-center gap-3">
+              <span className="text-2xl">🎮</span>
+              <div>
+                <p className="text-zinc-400 text-[10px] uppercase font-mono">Gaming Content</p>
+                <p className="text-lime-400 font-bold">Pro Walkthroughs</p>
+              </div>
+            </div>
+
+            <div className="absolute bottom-6 -right-4 sm:-right-6 z-20 px-4 py-3 rounded-2xl bg-zinc-900/90 border border-purple-500/40 backdrop-blur-xl shadow-2xl text-xs flex items-center gap-3">
+              <span className="text-2xl">🔥</span>
+              <div>
+                <p className="text-zinc-400 text-[10px] uppercase font-mono">Community</p>
+                <p className="text-purple-300 font-bold">Frost Legion</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-start gap-6">
+            <span className="text-purple-400 font-mono text-sm tracking-wider uppercase font-bold">
+              Meet The Creator ~
+            </span>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.05]">
+              CRAFTING UNFORGETTABLE<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">GAMING STORIES</span>
+            </h2>
+            <p className="text-base text-zinc-300 leading-relaxed font-light max-w-lg">
+              Namaste Gamers! Swagat hai <span className="text-white font-bold">Floor Frost</span> par! 🎮 Main hoon Floor Frost aur is channel par hum top-tier epic games ke adrenaline-pumping walkthroughs, secret hacks, strategies aur funny moments explore karte hain.
+            </p>
+
+            <div className="grid grid-cols-3 gap-6 w-full max-w-lg mt-2 pt-6 border-t border-purple-900/40">
+              <div>
+                <p className="text-3xl font-black text-white">{subStats.subscriberCount}</p>
+                <p className="text-xs text-zinc-400 font-mono uppercase mt-1">Live Subscribers</p>
+              </div>
+              <div>
+                <p className="text-3xl font-black text-pink-400">100%</p>
+                <p className="text-xs text-zinc-400 font-mono uppercase mt-1">Pure Gameplay</p>
+              </div>
+              <div>
+                <p className="text-3xl font-black text-purple-400">4K</p>
+                <p className="text-xs text-zinc-400 font-mono uppercase mt-1">Ultra Quality</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 5. FEATURED LATEST YOUTUBE VIDEOS & SPOTLIGHT PLAYER */}
+      <section id="videos" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#07040d] overflow-hidden border-t border-purple-900/20">
+        <div className="max-w-7xl mx-auto flex flex-col items-start gap-10">
+          
+          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                <span className="text-red-400 font-mono text-xs font-bold tracking-widest uppercase bg-red-950/60 border border-red-500/30 px-3 py-1 rounded-full">
+                  LIVE YOUTUBE FEED
+                </span>
+              </div>
+              <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white">
+                LATEST <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-pink-400 to-purple-400">UPLOADS</span>
+              </h2>
+            </div>
+
+            <a
+              href="https://youtube.com/@floorfrost"
+              target="_blank"
+              rel="noreferrer"
+              className="px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+            >
+              <span>Visit @FloorFrost YouTube</span>
+              <span>↗</span>
+            </a>
+          </div>
+
+          {/* Featured Spotlight Video Card (Latest Uploaded Video) */}
+          {featuredVideo && (
+            <div className="relative w-full group">
+              {/* Ambient Theater Backlight Glow */}
+              <div className="absolute -inset-1.5 bg-gradient-to-r from-red-600/30 via-purple-600/30 to-pink-600/30 rounded-[2.5rem] blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none -z-10" />
+
+              <div className="w-full rounded-3xl bg-gradient-to-b from-[#140b24] to-[#0c0817] border-2 border-purple-500/40 overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.25)] flex flex-col lg:flex-row group-hover:border-pink-400/80 transition-all duration-300">
+                
+                {/* Left Video Player Container */}
+                <div className="lg:w-3/5 relative aspect-video bg-black flex items-center justify-center overflow-hidden">
+                  {isPlayingFeatured ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${featuredVideo.id}?autoplay=1`}
+                      title={featuredVideo.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full border-0"
+                    />
+                  ) : (
+                    <div 
+                      onClick={() => setIsPlayingFeatured(true)}
+                      className="relative w-full h-full cursor-pointer group/thumb flex items-center justify-center"
+                    >
+                      {/* Thumbnail */}
+                      <img 
+                        src={featuredVideo.thumbnail} 
+                        alt={featuredVideo.title} 
+                        className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-500 brightness-90"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+                      {/* Big Glowing Play Button */}
+                      <div className="absolute w-20 h-20 rounded-full bg-red-600/90 border-2 border-white text-white flex items-center justify-center shadow-[0_0_40px_rgba(239,68,68,0.8)] group-hover/thumb:scale-110 group-hover/thumb:bg-red-500 transition-all">
+                        <span className="text-3xl ml-1">▶</span>
+                      </div>
+
+                      <span className="absolute bottom-4 left-4 px-3 py-1 rounded-md bg-black/80 text-white font-mono text-xs font-bold border border-white/20">
+                        CLICK TO PLAY LIVE
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Video Information */}
+                <div className="lg:w-2/5 p-8 flex flex-col justify-between gap-6">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 rounded-full bg-red-600/30 border border-red-500/40 text-red-300 font-mono text-[11px] font-bold uppercase tracking-wider animate-pulse flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-red-400" />
+                        LATEST UPLOAD
+                      </span>
+                      <span className="text-xs font-mono text-zinc-400">
+                        {featuredVideo.publishedAt}
+                      </span>
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-white leading-snug group-hover:text-purple-200 transition-colors">
+                      {featuredVideo.title}
+                    </h3>
+
+                    {featuredVideo.description && (
+                      <p className="text-xs text-zinc-300 line-clamp-3 leading-relaxed font-light">
+                        {featuredVideo.description}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
+                    <a
+                      href={featuredVideo.url || `https://www.youtube.com/watch?v=${featuredVideo.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider text-center transition-all shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                    >
+                      <span>Watch on YouTube</span>
+                      <span>↗</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Grid of 7 Recent YouTube Uploads (Excludes the #1 Latest Video) */}
+          <div className="w-full flex flex-col gap-4 mt-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold uppercase text-zinc-300 font-mono tracking-wider flex items-center gap-2">
+                <span>RECENT UPLOADS</span>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-900/60 border border-purple-500/30 text-purple-300 font-mono">
+                  7 VIDEOS
+                </span>
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+              {(videoList.length > 0 
+                ? videoList.filter((v: any) => v.id !== videoList[0]?.id).slice(0, 7) 
+                : [
+                  { id: 'J1InW-aepkY', title: 'I Transformed My Minecraft World With This 1 Shader 😱', publishedAt: '1 day ago', thumbnail: 'https://img.youtube.com/vi/J1InW-aepkY/maxresdefault.jpg' },
+                  { id: 'hX8G4eoiVFc', title: 'I Found The Most Realistic Minecraft Shader 2026', publishedAt: '2 days ago', thumbnail: 'https://img.youtube.com/vi/hX8G4eoiVFc/maxresdefault.jpg' },
+                  { id: 'EKmMj0sw38E', title: 'Minecraft Shader Comparison Which is Truly Most Realistic ?', publishedAt: '3 days ago', thumbnail: 'https://img.youtube.com/vi/EKmMj0sw38E/maxresdefault.jpg' },
+                  { id: 'hh0FgSVHVKk', title: 'I Tested The Best Minecraft Shaders 😲 #1 Will Surprise You', publishedAt: '4 days ago', thumbnail: 'https://img.youtube.com/vi/hh0FgSVHVKk/maxresdefault.jpg' },
+                  { id: 'JiFKmveIiIA', title: "I Tested 20 ULTRA Shaders So You Don't Have To ⚡😱", publishedAt: '5 days ago', thumbnail: 'https://img.youtube.com/vi/JiFKmveIiIA/maxresdefault.jpg' },
+                  { id: '8ru4SjK_UiY_7', title: 'Which Shader Is The Best Part 76! #minecraft', publishedAt: '6 days ago', thumbnail: 'https://img.youtube.com/vi/8ru4SjK_UiY/hqdefault.jpg' },
+                  { id: 'J1InW-aepkY_8', title: 'ULTRA Realistic Minecraft Gameplay & Shaders Guide', publishedAt: '7 days ago', thumbnail: 'https://img.youtube.com/vi/J1InW-aepkY/hqdefault.jpg' }
+                ]
+              ).map((video: any) => (
+                <div
+                  key={video.id}
+                  onClick={() => {
+                    setFeaturedVideo(video);
+                    setIsPlayingFeatured(true);
+                    window.scrollTo({ top: (document.getElementById('videos')?.offsetTop || 0) + 100, behavior: 'smooth' });
+                  }}
+                  className="group relative rounded-2xl overflow-hidden bg-zinc-950 border border-purple-900/40 hover:border-purple-400/80 hover:shadow-[0_0_35px_rgba(168,85,247,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer"
+                >
+                  <div className="h-44 w-full relative overflow-hidden bg-black">
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
+                    
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-12 h-12 rounded-full bg-red-600 text-white flex items-center justify-center shadow-[0_0_25px_rgba(239,68,68,0.7)] group-hover:scale-110 transition-transform">
+                        <span className="text-xl ml-0.5">▶</span>
+                      </div>
+                    </div>
+
+                    <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-mono text-zinc-300">
+                      {video.publishedAt}
+                    </span>
+                  </div>
+
+                  <div className="p-4 flex flex-col gap-2">
+                    <h4 className="text-xs font-bold text-white group-hover:text-purple-300 transition-colors line-clamp-2 leading-relaxed">
+                      {video.title}
+                    </h4>
+                    
+                    <div className="flex items-center justify-between text-[10px] font-mono text-purple-400 font-semibold pt-1">
+                      <span>Click to Play</span>
+                      <span>▶</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 5.5 LIVE DISCORD ANNOUNCEMENTS */}
+      <DiscordAnnouncements />
+
+      {/* 6. COMMUNITY & DISCORD BANNER WITH REAL LINKS */}
+      <section id="community" className="relative py-24 px-6 sm:px-12 lg:px-20 bg-[#06030a] border-t border-purple-900/20">
+        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-10 sm:p-16 relative overflow-hidden flex flex-col items-center text-center gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)]">
+          
+          <div className="absolute w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col items-center gap-4 max-w-2xl">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-purple-400 shadow-xl mb-2 relative">
+              <NextImage src="/logo.png" alt="Floor Frost Logo" fill className="object-cover" />
+            </div>
+            <span className="text-xs font-mono uppercase tracking-[0.3em] text-pink-300 font-bold">
+              JOIN THE FROST LEGION
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight">
+              NEVER MISS A GAMING ADVENTURE
+            </h2>
+            <p className="text-sm sm:text-base text-zinc-300 font-light leading-relaxed">
+              Subscribe to @FloorFrost for Minecraft and gaming walkthroughs, and join our official Discord server to connect with Floor Frost!
+            </p>
+          </div>
+
+          <div className="relative z-10 flex flex-wrap gap-4 justify-center">
+            <a 
+              href="https://youtube.com/@floorfrost" 
+              target="_blank" 
+              rel="noreferrer"
+              className="px-8 py-4 rounded-full bg-red-600 hover:bg-red-500 font-bold text-sm text-white shadow-[0_0_25px_rgba(220,38,38,0.6)] hover:scale-105 transition-all flex items-center gap-2"
+            >
+              <span>▶</span> Subscribe ({subStats.subscriberCount})
+            </a>
+            <a 
+              href="https://discord.gg/aN5CCRT6CS" 
+              target="_blank" 
+              rel="noreferrer"
+              className="px-8 py-4 rounded-full bg-indigo-600 hover:bg-indigo-500 font-bold text-sm text-white shadow-[0_0_25px_rgba(79,70,229,0.6)] hover:scale-105 transition-all flex items-center gap-2"
+            >
+              <span>💬</span> Join Official Discord
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="py-12 border-t border-purple-950 bg-[#040207] text-center text-xs text-zinc-500 font-mono flex flex-col items-center gap-2">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-6 h-6 rounded-full overflow-hidden relative">
+            <NextImage src="/logo.png" alt="Floor Frost" fill className="object-cover" />
+          </div>
+          <span className="font-bold text-zinc-300">FLOOR FROST GAMING (@FloorFrost)</span>
+        </div>
+        <p>© 2026 Floor Frost. All rights reserved. Crafted for High Quality Gaming Content.</p>
+      </footer>
+    </div>
+  );
+}

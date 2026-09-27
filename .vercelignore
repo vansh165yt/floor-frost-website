@@ -1,0 +1,6 @@
+.git
+.next
+node_modules
+*.zip
+public/extracted_150_frames.zip
+.env*.local
