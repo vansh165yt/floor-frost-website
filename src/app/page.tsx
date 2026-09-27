@@ -206,7 +206,7 @@ export default function Home() {
     for (let i = 1; i <= frameCount; i++) {
       const paddedIndex = String(i).padStart(3, '0');
       const img = new window.Image();
-      img.src = `/frames/frame_${paddedIndex}.jpg`;
+      img.src = `/frames/frame_${paddedIndex}.webp`;
 
       img.onload = () => {
         loadedImagesRef.current.add(i);
