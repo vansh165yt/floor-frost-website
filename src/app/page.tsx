@@ -11,6 +11,11 @@ export default function Home() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeCategory, setActiveCategory] = useState('All');
 
+  // Real-time Frame Preloader State (Tracks actual 150 frames loaded)
+  const [framesLoaded, setFramesLoaded] = useState(0);
+  const [isLoadingFrames, setIsLoadingFrames] = useState(true);
+  const [loaderVisible, setLoaderVisible] = useState(true);
+
   // Live YouTube Subscribers State (Default matches Floor Frost's real count)
   const [subStats, setSubStats] = useState({
     subscriberCount: "1,390",
@@ -202,18 +207,8 @@ export default function Home() {
 
     const getFrameSrc = (index: number) => {
       const paddedIndex = String(index).padStart(3, '0');
-      return `/frames/frame_${paddedIndex}.png`;
+      return `/frames/frame_${paddedIndex}.jpg`;
     };
-
-    // Preload frames progressively
-    for (let i = 1; i <= frameCount; i++) {
-      const img = new window.Image();
-      img.src = getFrameSrc(i);
-      img.onload = () => {
-        loadedImages.add(i);
-      };
-      images[i] = img;
-    }
 
     let targetFrame = 1;
     let currentFrame = 1;
@@ -265,6 +260,58 @@ export default function Home() {
 
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
     };
+
+    let loadedCount = 0;
+
+    const onAllLoaded = () => {
+      setFramesLoaded(frameCount);
+      if (images[1] && images[1].complete) {
+        handleResize();
+        drawImageCover(images[1]);
+      }
+    };
+
+    // Preload frames progressively
+    for (let i = 1; i <= frameCount; i++) {
+      const img = new window.Image();
+      img.src = getFrameSrc(i);
+      img.onload = () => {
+        loadedImages.add(i);
+        loadedCount++;
+        setFramesLoaded(loadedCount);
+        if (i === 1) {
+          handleResize();
+          drawImageCover(img);
+        }
+        if (loadedCount >= frameCount) {
+          onAllLoaded();
+        }
+      };
+      img.onerror = () => {
+        // Retry image once if network drops a request
+        setTimeout(() => {
+          const retryImg = new window.Image();
+          retryImg.src = getFrameSrc(i);
+          retryImg.onload = () => {
+            loadedImages.add(i);
+            loadedCount++;
+            setFramesLoaded(loadedCount);
+            images[i] = retryImg;
+            if (loadedCount >= frameCount) {
+              onAllLoaded();
+            }
+          };
+          retryImg.onerror = () => {
+            loadedCount++;
+            setFramesLoaded(loadedCount);
+            if (loadedCount >= frameCount) {
+              onAllLoaded();
+            }
+          };
+        }, 1000);
+      };
+      images[i] = img;
+    }
 
     const renderFrame = (frameIndex: number) => {
       const imgIndex = Math.min(frameCount, Math.max(1, Math.round(frameIndex)));
@@ -327,6 +374,50 @@ export default function Home() {
     };
   }, []);
 
+  // Real percentage calculated directly from actual loaded frames (0 to 100)
+  const currentPercentage = Math.min(100, Math.round((framesLoaded / 150) * 100));
+
+  // Lock scroll completely on both html and body while frames are loading
+  useEffect(() => {
+    if (isLoadingFrames) {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      window.scrollTo(0, 0);
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, [isLoadingFrames]);
+
+  // STRICT: Loading animation ONLY hides when ALL 150 frames have finished loading!
+  useEffect(() => {
+    if (framesLoaded >= 150) {
+      const timer = setTimeout(() => {
+        setIsLoadingFrames(false);
+        const hideTimer = setTimeout(() => {
+          setLoaderVisible(false);
+        }, 700);
+        return () => clearTimeout(hideTimer);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [framesLoaded]);
+
+  let loadingStatus = 'INITIALIZING FROST GRAPHICS CORE...';
+  if (framesLoaded >= 150) {
+    loadingStatus = 'ALL 150 FRAMES LOADED // LAUNCHING REALM';
+  } else if (currentPercentage > 75) {
+    loadingStatus = 'FINALIZING 60FPS VIEWPORT PIPELINE...';
+  } else if (currentPercentage > 45) {
+    loadingStatus = 'SYNCHRONIZING CINEMATIC SCROLL FRAMES...';
+  } else if (currentPercentage > 10) {
+    loadingStatus = 'STREAMING HIGH-RES ASSET BUFFER...';
+  }
+
   const clamp = (val: number, min: number, max: number) => Math.min(max, Math.max(min, val));
 
   // Dynamic staggered animation progress synchronized directly with background frames
@@ -351,6 +442,135 @@ export default function Home() {
 
   return (
     <div className="bg-[#07040d] text-white selection:bg-purple-500/30 font-sans min-h-screen animate-portal-fade">
+      
+      {/* INITIAL FRAME PRELOADER WITH REAL-TIME PROGRESS BAR */}
+      {loaderVisible && (
+        <div
+          className={`fixed inset-0 z-[999999] flex flex-col items-center justify-center p-6 bg-[#07040d] transition-all duration-700 ease-out select-none ${
+            isLoadingFrames ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+          }`}
+        >
+          {/* Ambient Glowing Cosmic Nebula */}
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[35rem] h-[35rem] bg-purple-600/30 rounded-full blur-[150px] pointer-events-none animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-[28rem] h-[28rem] bg-pink-600/25 rounded-full blur-[130px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.04)_0%,transparent_70%)] pointer-events-none" />
+
+          {/* Cyber Grid Lines Overlay */}
+          <div
+            className="absolute inset-0 opacity-[0.04] pointer-events-none"
+            style={{
+              backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
+              backgroundSize: '40px 40px'
+            }}
+          />
+
+          {/* Main Centered Glass Card */}
+          <div className="relative z-10 flex flex-col items-center gap-6 px-6 py-8 sm:px-10 sm:py-10 text-center max-w-lg w-full bg-black/50 border border-purple-500/25 rounded-3xl backdrop-blur-2xl shadow-[0_0_60px_rgba(168,85,247,0.2)]">
+            
+            {/* Top Micro-badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-purple-500/30 bg-purple-950/60 text-[10px] sm:text-xs font-mono tracking-widest text-purple-200 uppercase backdrop-blur-md shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <span>FLOOR FROST ENGINE // ASSET BUFFER</span>
+            </div>
+
+            {/* Concentric Spinning Cyber Rings around Logo */}
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center my-1">
+              {/* Outer Glowing Cyber Ring 1 (Clockwise) */}
+              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-purple-500 border-r-pink-500 border-b-cyan-400 animate-spin duration-1000 shadow-[0_0_25px_rgba(168,85,247,0.5)]" />
+              
+              {/* Outer Glowing Cyber Ring 2 (Counter Clockwise) */}
+              <div
+                className="absolute inset-[-8px] rounded-full border border-dashed border-purple-400/40 opacity-75"
+                style={{ animation: 'spin 3.5s linear infinite reverse' }}
+              />
+
+              {/* Pulsing Backlight Halo */}
+              <div className="absolute inset-2 bg-gradient-to-tr from-purple-600/40 via-pink-600/40 to-cyan-500/40 rounded-full blur-md animate-pulse" />
+
+              {/* Center Logo Avatar */}
+              <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-white/80 shadow-2xl relative z-10">
+                <NextImage
+                  src="/logo.png"
+                  alt="Floor Frost Logo"
+                  fill
+                  priority
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Orbiting Particle Dot */}
+              <div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{ animation: 'spin 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite' }}
+              >
+                <div className="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] -top-1.5 left-1/2 -translate-x-1/2 absolute" />
+              </div>
+            </div>
+
+            {/* Brand Title & Dynamic Phase */}
+            <div className="flex flex-col items-center gap-1.5">
+              <h2 className="text-3xl sm:text-4xl font-black tracking-widest uppercase bg-gradient-to-r from-purple-300 via-pink-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(168,85,247,0.5)]">
+                FLOOR FROST
+              </h2>
+              <div className="flex items-center gap-2 text-xs font-mono tracking-wider text-purple-300/80 uppercase">
+                <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
+                <span>{loadingStatus}</span>
+              </div>
+            </div>
+
+            {/* PROGRESS BAR SECTION - PROMINENT & CENTERED */}
+            <div className="w-full flex flex-col items-center gap-3 pt-2">
+              
+              {/* Progress Bar Container */}
+              <div className="w-full h-3.5 sm:h-4 rounded-full bg-white/10 border border-white/20 overflow-hidden relative backdrop-blur-md shadow-inner p-0.5">
+                {/* Glowing Dynamic Fill */}
+                <div
+                  className="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-400 rounded-full transition-all duration-150 ease-out relative shadow-[0_0_20px_rgba(236,72,153,0.9)]"
+                  style={{ width: `${currentPercentage}%` }}
+                >
+                  {/* Laser Leading Light */}
+                  {currentPercentage > 0 && (
+                    <div className="absolute right-0 top-0 bottom-0 w-3 bg-white shadow-[0_0_12px_#ffffff] rounded-full" />
+                  )}
+                </div>
+              </div>
+
+              {/* Indicator Details */}
+              <div className="flex justify-between items-center w-full px-1 text-[11px] sm:text-xs font-mono text-zinc-400">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <span className="text-zinc-300 font-medium">
+                    {framesLoaded >= 150 ? 'FRAMES SYNCHRONIZED' : 'DOWNLOADING SCROLL FRAMES'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-zinc-400 font-mono">
+                    {framesLoaded} / 150
+                  </span>
+                  <span className="text-cyan-300 font-bold tracking-widest">{currentPercentage}%</span>
+                </div>
+              </div>
+
+              {/* Equalizer Spectrum Bars */}
+              <div className="flex items-end justify-center gap-1.5 h-5 pt-1">
+                {[0.3, 0.6, 1.0, 0.5, 0.8, 0.4, 0.9, 0.7, 0.3].map((height, idx) => (
+                  <div
+                    key={idx}
+                    className="w-1 rounded-full bg-gradient-to-t from-purple-500 to-pink-400 animate-pulse"
+                    style={{
+                      height: `${height * 100}%`,
+                      animationDelay: `${idx * 0.1}s`,
+                      animationDuration: '0.6s'
+                    }}
+                  />
+                ))}
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
       
       {/* 1. HERO SECTION WITH CANVAS SCROLL SEQUENCE */}
       <div ref={containerRef} className="relative h-[400vh]">
