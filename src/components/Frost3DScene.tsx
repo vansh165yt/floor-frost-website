@@ -67,8 +67,8 @@ export default function Frost3DScene() {
     // 3. ULTRA-DETAILED 1024x1024 WING TEXTURE (EXACT MATCH TO REFERENCE IMAGE)
     // Features: Vibrant electric cyan center radiating into royal cobalt blue, thick black borders,
     // stained-glass radial veins, discal cell, 3 apex blue streaks, and scalloped white dots!
-    // 3. ULTRA-DETAILED 2048x2048 WING TEXTURE (EXACT MATCH TO REFERENCE IMAGE)
-    // Features: 100% Jet Black borders & spots, radiant electric cyan cells, apex blue marks, and amber scalloped dots
+    // 3. ULTRA-DETAILED 2048x2048 WING TEXTURE WITH COLOR FADE (EXACT MATCH TO REFERENCE IMAGE)
+    // Features: Smooth velvety color fade between radiant blue and jet-black, feathered veins, and organic spots
     const createReferenceWingTexture = () => {
       const canvas = document.createElement('canvas');
       canvas.width = 2048;
@@ -78,16 +78,17 @@ export default function Frost3DScene() {
 
       ctx.clearRect(0, 0, 2048, 2048);
 
-      // 1. BASE BLUE RADIANCE (Pure Vibrant Cyan & Royal Azure)
-      // High-contrast, crystal-clear blue field
+      // 1. BASE BLUE RADIANCE WITH ORGANIC COLOR FADE TO BLACK
+      // High-contrast, crystal-clear blue field that naturally fades into velvet black
       const baseGrad = ctx.createRadialGradient(480, 1260, 60, 1040, 1000, 1440);
-      baseGrad.addColorStop(0, '#f0fdff');    // White-hot radiant core
-      baseGrad.addColorStop(0.12, '#38bdf8'); // Sky bright cyan
-      baseGrad.addColorStop(0.32, '#00e5ff'); // Electric vibrant cyan
-      baseGrad.addColorStop(0.58, '#0284c7'); // Rich azure blue
-      baseGrad.addColorStop(0.80, '#0369a1'); // Royal sapphire blue
-      baseGrad.addColorStop(0.96, '#075985'); // Deep ocean blue
-      baseGrad.addColorStop(1.0, '#000000');  // Transitions directly into pitch black
+      baseGrad.addColorStop(0, '#f0fdff');    // White-hot radiant core highlight
+      baseGrad.addColorStop(0.10, '#38bdf8'); // Sky bright cyan
+      baseGrad.addColorStop(0.28, '#00e5ff'); // Electric vibrant cyan
+      baseGrad.addColorStop(0.50, '#0284c7'); // Rich azure blue
+      baseGrad.addColorStop(0.70, '#0369a1'); // Royal sapphire blue
+      baseGrad.addColorStop(0.84, '#075985'); // Deep ocean blue
+      baseGrad.addColorStop(0.92, '#0c1b33'); // Dark midnight indigo transition
+      baseGrad.addColorStop(1.0, '#000000');  // Smooth transition directly into pitch black
 
       ctx.fillStyle = baseGrad;
       ctx.fillRect(0, 0, 2048, 2048);
@@ -95,7 +96,7 @@ export default function Frost3DScene() {
       // Subtle Violet/Indigo hue near wing base (As seen in real Blue Morpho reference)
       const rootViolet = ctx.createRadialGradient(160, 1360, 30, 260, 1360, 380);
       rootViolet.addColorStop(0, 'rgba(49, 46, 129, 0.7)');
-      rootViolet.addColorStop(0.6, 'rgba(30, 58, 138, 0.4)');
+      rootViolet.addColorStop(0.5, 'rgba(30, 58, 138, 0.35)');
       rootViolet.addColorStop(1, 'transparent');
       ctx.fillStyle = rootViolet;
       ctx.fillRect(0, 900, 600, 900);
@@ -123,51 +124,94 @@ export default function Frost3DScene() {
         ctx.fill();
       });
 
-      // 3. 100% PURE JET-BLACK (#000000) SOLID PERIMETER BORDERS
-      // Costal Margin (Top edge solid pitch-black)
+      // 3. SEAMLESS COLOR FADE GRADIENT OVERLAYS (BETWEEN BLUE AND BLACK)
+      // Top Costal Margin Color Fade (smooth linear blend downward into blue)
+      const costalFade = ctx.createLinearGradient(0, 160, 0, 560);
+      costalFade.addColorStop(0, '#000000');
+      costalFade.addColorStop(0.38, '#000000');
+      costalFade.addColorStop(0.65, 'rgba(0, 0, 0, 0.78)');
+      costalFade.addColorStop(0.82, 'rgba(0, 0, 0, 0.38)');
+      costalFade.addColorStop(0.94, 'rgba(0, 20, 45, 0.15)');
+      costalFade.addColorStop(1.0, 'transparent');
+      ctx.fillStyle = costalFade;
+      ctx.fillRect(0, 0, 2048, 560);
+
+      // Outer Right Margin & Apex Color Fade (smooth linear blend leftward into blue)
+      const outerFade = ctx.createLinearGradient(2048, 0, 1250, 0);
+      outerFade.addColorStop(0, '#000000');
+      outerFade.addColorStop(0.32, '#000000');
+      outerFade.addColorStop(0.58, 'rgba(0, 0, 0, 0.85)');
+      outerFade.addColorStop(0.74, 'rgba(0, 0, 0, 0.52)');
+      outerFade.addColorStop(0.88, 'rgba(0, 0, 0, 0.22)');
+      outerFade.addColorStop(1.0, 'transparent');
+      ctx.fillStyle = outerFade;
+      ctx.fillRect(1250, 0, 798, 2048);
+
+      // Hindwing Bottom & Scalloped Margin Color Fade (smooth linear blend upward into blue)
+      const bottomFade = ctx.createLinearGradient(0, 2048, 0, 1420);
+      bottomFade.addColorStop(0, '#000000');
+      bottomFade.addColorStop(0.32, '#000000');
+      bottomFade.addColorStop(0.58, 'rgba(0, 0, 0, 0.82)');
+      bottomFade.addColorStop(0.76, 'rgba(0, 0, 0, 0.44)');
+      bottomFade.addColorStop(0.90, 'rgba(0, 0, 0, 0.16)');
+      bottomFade.addColorStop(1.0, 'transparent');
+      ctx.fillStyle = bottomFade;
+      ctx.fillRect(0, 1420, 2048, 628);
+
+      // Inner Root Pitch Black Shadow Fade (near body)
+      const rootFade = ctx.createRadialGradient(120, 1360, 40, 120, 1360, 420);
+      rootFade.addColorStop(0, '#000000');
+      rootFade.addColorStop(0.45, 'rgba(0, 0, 0, 0.85)');
+      rootFade.addColorStop(0.75, 'rgba(0, 0, 0, 0.35)');
+      rootFade.addColorStop(1.0, 'transparent');
+      ctx.fillStyle = rootFade;
+      ctx.fillRect(0, 900, 550, 950);
+
+      // 4. SOLID JET-BLACK CORE PERIMETERS (OUTER RIM)
       ctx.fillStyle = '#000000';
+
+      // Costal Leading Edge Solid Core
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.lineTo(2048, 0);
-      ctx.lineTo(2048, 420);
-      ctx.bezierCurveTo(1500, 360, 900, 310, 0, 340);
+      ctx.lineTo(2048, 360);
+      ctx.bezierCurveTo(1500, 290, 900, 240, 0, 260);
       ctx.closePath();
       ctx.fill();
 
-      // Large Forewing Apex Pitch-Black Triangle (x: 1300 -> 2048, y: 0 -> 900)
+      // Large Forewing Apex Pitch-Black Core
       ctx.beginPath();
-      ctx.moveTo(1250, 0);
+      ctx.moveTo(1360, 0);
       ctx.lineTo(2048, 0);
-      ctx.lineTo(2048, 920);
-      ctx.bezierCurveTo(1800, 850, 1500, 550, 1250, 0);
+      ctx.lineTo(2048, 860);
+      ctx.bezierCurveTo(1850, 780, 1580, 480, 1360, 0);
       ctx.closePath();
       ctx.fill();
 
-      // Outer Forewing & Hindwing Right Margin (Solid Jet Black)
+      // Outer Forewing & Hindwing Right Margin Solid Core
       ctx.beginPath();
-      ctx.moveTo(1480, 850);
+      ctx.moveTo(1640, 850);
       ctx.lineTo(2048, 850);
       ctx.lineTo(2048, 2048);
-      ctx.lineTo(1350, 2048);
-      ctx.bezierCurveTo(1450, 1700, 1520, 1300, 1480, 850);
+      ctx.lineTo(1520, 2048);
+      ctx.bezierCurveTo(1600, 1700, 1660, 1300, 1640, 850);
       ctx.closePath();
       ctx.fill();
 
-      // Hindwing Bottom & Scalloped Margin (Solid Jet Black)
+      // Hindwing Bottom Solid Core
       ctx.beginPath();
-      ctx.moveTo(0, 1650);
-      ctx.bezierCurveTo(500, 1550, 1000, 1680, 1400, 1950);
-      ctx.lineTo(1400, 2048);
+      ctx.moveTo(0, 1780);
+      ctx.bezierCurveTo(500, 1700, 1000, 1780, 1550, 2048);
       ctx.lineTo(0, 2048);
       ctx.closePath();
       ctx.fill();
 
-      // Inner Root Pitch Black Shadow
-      ctx.beginPath();
-      ctx.ellipse(120, 1360, 160, 320, 0, 0, Math.PI * 2);
-      ctx.fill();
+      // 5. ORGANIC FEATHERED BLACK SPOTS & TRANSVERSE BARS (SOFT COLOR FADE EDGES)
+      ctx.save();
+      ctx.fillStyle = '#000000';
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 38; // Soft color fade blur into the blue background
 
-      // 4. DISTINCT BLACK SPOTS & TRANSVERSE BARS (Exact reference feature!)
       // Bar/Spot 1: Jutting from costal margin into discal cell
       ctx.beginPath();
       ctx.moveTo(760, 260);
@@ -192,16 +236,16 @@ export default function Frost3DScene() {
       ctx.closePath();
       ctx.fill();
 
-      // Triangular Black Wedges/Spots along the outer margin between cells
+      // Triangular Black Wedges along the margin between cells (with feathered color fade)
       const blackMarginWedges = [
-        { x1: 1980, y1: 750, x2: 1720, y2: 800, x3: 1940, y3: 860 },
-        { x1: 1940, y1: 940, x2: 1680, y2: 990, x3: 1900, y3: 1050 },
-        { x1: 1880, y1: 1130, x2: 1630, y2: 1180, x3: 1840, y3: 1240 },
-        { x1: 1800, y1: 1320, x2: 1540, y2: 1370, x3: 1750, y3: 1430 },
-        { x1: 1700, y1: 1500, x2: 1430, y2: 1540, x3: 1630, y3: 1610 },
-        { x1: 1560, y1: 1680, x2: 1300, y2: 1710, x3: 1480, y3: 1780 },
-        { x1: 1380, y1: 1820, x2: 1140, y2: 1830, x3: 1280, y3: 1910 },
-        { x1: 1150, y1: 1910, x2: 920, y2: 1890, x3: 1040, y3: 1980 }
+        { x1: 1980, y1: 750, x2: 1680, y2: 800, x3: 1940, y3: 860 },
+        { x1: 1940, y1: 940, x2: 1640, y2: 990, x3: 1900, y3: 1050 },
+        { x1: 1880, y1: 1130, x2: 1590, y2: 1180, x3: 1840, y3: 1240 },
+        { x1: 1800, y1: 1320, x2: 1500, y2: 1370, x3: 1750, y3: 1430 },
+        { x1: 1700, y1: 1500, x2: 1400, y2: 1540, x3: 1630, y3: 1610 },
+        { x1: 1560, y1: 1680, x2: 1260, y2: 1710, x3: 1480, y3: 1780 },
+        { x1: 1380, y1: 1820, x2: 1100, y2: 1830, x3: 1280, y3: 1910 },
+        { x1: 1150, y1: 1910, x2: 880, y2: 1890, x3: 1040, y3: 1980 }
       ];
       blackMarginWedges.forEach(w => {
         ctx.beginPath();
@@ -212,7 +256,9 @@ export default function Frost3DScene() {
         ctx.fill();
       });
 
-      // 5. APEX SIGNATURE CYAN-BLUE STREAKS (Trapped inside the black triangle!)
+      ctx.restore();
+
+      // 6. APEX SIGNATURE CYAN-BLUE STREAKS (Soft luminous glow inside black triangle)
       ctx.save();
       const apexStreaks = [
         { startX: 1680, startY: 170, endX: 1910, endY: 290, width: 44, color: '#38bdf8' },
@@ -224,12 +270,14 @@ export default function Frost3DScene() {
         ctx.strokeStyle = s.color;
         ctx.lineWidth = s.width;
         ctx.lineCap = 'round';
+        ctx.shadowColor = s.color;
+        ctx.shadowBlur = 28; // Soft cyan glow fading into surrounding black
         ctx.beginPath();
         ctx.moveTo(s.startX, s.startY);
         ctx.quadraticCurveTo((s.startX + s.endX) / 2 + 25, (s.startY + s.endY) / 2 - 20, s.endX, s.endY);
         ctx.stroke();
 
-        // Bright white-cyan core
+        // White-cyan radiant core
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = s.width * 0.4;
         ctx.beginPath();
@@ -239,39 +287,69 @@ export default function Frost3DScene() {
       });
       ctx.restore();
 
-      // 6. 100% PURE JET-BLACK VEIN ARCHITECTURE (#000000)
-      ctx.strokeStyle = '#000000';
+      // 7. FEATHERED BLACK VEINS WITH SOFT FALLOFF INTO BLUE
+      const rootX = 220, rootY = 1320;
+      const veins = [
+        { startX: 820, startY: 1040, ctrlX: 1160, ctrlY: 640, endX: 1760, endY: 340, w: 11 },
+        { startX: 820, startY: 1100, ctrlX: 1260, ctrlY: 820, endX: 1860, endY: 560, w: 10 },
+        { startX: 800, startY: 1160, ctrlX: 1320, ctrlY: 1000, endX: 1900, endY: 840, w: 9.5 },
+        { startX: 760, startY: 1220, ctrlX: 1280, ctrlY: 1180, endX: 1820, endY: 1140, w: 9.5 },
+        { startX: 600, startY: 1300, ctrlX: 1160, ctrlY: 1340, endX: 1720, endY: 1400, w: 11 },
+        { startX: 500, startY: 1340, ctrlX: 1000, ctrlY: 1520, endX: 1560, endY: 1640, w: 9.5 },
+        { startX: 400, startY: 1360, ctrlX: 860, ctrlY: 1660, endX: 1320, endY: 1840, w: 8.5 },
+        { startX: 320, startY: 1380, ctrlX: 660, ctrlY: 1740, endX: 1000, endY: 1940, w: 8 },
+        { startX: 240, startY: 1400, ctrlX: 480, ctrlY: 1760, endX: 720, endY: 1960, w: 7.5 }
+      ];
+
+      // Soft Vein Shadow Pass (creates feathered gradient on either side of each vein)
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.42)';
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      const rootX = 220, rootY = 1320;
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 24;
 
-      // Discal Cell Central Closed Loop
-      ctx.lineWidth = 14;
+      // Discal Cell Soft Pass
+      ctx.lineWidth = 26;
       ctx.beginPath();
       ctx.moveTo(rootX, rootY);
       ctx.bezierCurveTo(480, 1040, 760, 960, 820, 1120);
       ctx.bezierCurveTo(800, 1260, 520, 1320, rootX, rootY);
       ctx.stroke();
 
-      // Central Discal Cell Inner Dark Spot
+      veins.forEach(v => {
+        ctx.lineWidth = v.w * 2.2;
+        ctx.beginPath();
+        ctx.moveTo(v.startX, v.startY);
+        ctx.quadraticCurveTo(v.ctrlX, v.ctrlY, v.endX, v.endY);
+        ctx.stroke();
+      });
+      ctx.restore();
+
+      // Core Jet-Black Vein Pass
+      ctx.strokeStyle = '#000000';
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // Discal Cell Central Closed Loop
+      ctx.lineWidth = 13;
+      ctx.beginPath();
+      ctx.moveTo(rootX, rootY);
+      ctx.bezierCurveTo(480, 1040, 760, 960, 820, 1120);
+      ctx.bezierCurveTo(800, 1260, 520, 1320, rootX, rootY);
+      ctx.stroke();
+
+      // Central Discal Cell Inner Dark Spot with soft fade
+      ctx.save();
       ctx.fillStyle = '#000000';
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 18;
       ctx.beginPath();
       ctx.ellipse(540, 1140, 32, 22, -0.2, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
 
-      // Bold Radiating Veins from discal cell to outer margin
-      const veins = [
-        { startX: 820, startY: 1040, ctrlX: 1160, ctrlY: 640, endX: 1760, endY: 340, w: 12 },
-        { startX: 820, startY: 1100, ctrlX: 1260, ctrlY: 820, endX: 1860, endY: 560, w: 11 },
-        { startX: 800, startY: 1160, ctrlX: 1320, ctrlY: 1000, endX: 1900, endY: 840, w: 10 },
-        { startX: 760, startY: 1220, ctrlX: 1280, ctrlY: 1180, endX: 1820, endY: 1140, w: 10 },
-        { startX: 600, startY: 1300, ctrlX: 1160, ctrlY: 1340, endX: 1720, endY: 1400, w: 12 },
-        { startX: 500, startY: 1340, ctrlX: 1000, ctrlY: 1520, endX: 1560, endY: 1640, w: 10 },
-        { startX: 400, startY: 1360, ctrlX: 860, ctrlY: 1660, endX: 1320, endY: 1840, w: 9 },
-        { startX: 320, startY: 1380, ctrlX: 660, ctrlY: 1740, endX: 1000, endY: 1940, w: 8.5 },
-        { startX: 240, startY: 1400, ctrlX: 480, ctrlY: 1760, endX: 720, endY: 1960, w: 8 }
-      ];
-
+      // Radiating core veins
       veins.forEach(v => {
         ctx.lineWidth = v.w;
         ctx.beginPath();
@@ -287,8 +365,7 @@ export default function Frost3DScene() {
         ctx.stroke();
       });
 
-      // 7. HINDWING SCALLOPED MARGIN AMBER-ORANGE & WHITE SPOTS (Exact reference feature!)
-      // Distinct row of lunar spots along the black scalloped border
+      // 8. HINDWING SCALLOPED MARGIN AMBER-ORANGE & WHITE SPOTS (Soft glow into black)
       const amberMarginSpots = [
         [1860, 680, 11], [1880, 880, 12], [1840, 1080, 12], [1760, 1280, 12],
         [1640, 1480, 13], [1480, 1660, 13], [1280, 1800, 12], [1040, 1900, 11],
@@ -296,26 +373,30 @@ export default function Frost3DScene() {
       ];
 
       amberMarginSpots.forEach(([x, y, r]) => {
-        // Outer Orange-Amber Halo
-        ctx.fillStyle = '#ea580c';
+        // Outer Orange-Amber Halo with soft fade
+        const spotGrad = ctx.createRadialGradient(x, y, r * 0.2, x, y, r * 1.3);
+        spotGrad.addColorStop(0, '#ea580c');
+        spotGrad.addColorStop(0.6, '#f97316');
+        spotGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = spotGrad;
         ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 1.3, 0, Math.PI * 2);
         ctx.fill();
 
         // Bright Yellow-Orange middle
         ctx.fillStyle = '#f59e0b';
         ctx.beginPath();
-        ctx.arc(x, y, r * 0.7, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 0.65, 0, Math.PI * 2);
         ctx.fill();
 
         // White lunar core
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(x, y, r * 0.35, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 0.32, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Forewing Outer Margin White Micro-Dots
+      // Forewing Outer Margin White Lunar Dots
       ctx.fillStyle = '#ffffff';
       const forewingDots = [
         [1990, 620, 6], [1980, 720, 6], [1950, 820, 5.5], [1910, 920, 5.5]
