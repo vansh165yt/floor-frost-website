@@ -24,7 +24,7 @@ export default function AnnouncementsPage() {
   useEffect(() => {
     const fetchAllAnnouncements = async () => {
       try {
-        const res = await fetch('/api/discord-announcements?limit=50');
+        const res = await fetch(`/api/discord-announcements?limit=50&t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.announcements && data.announcements.length > 0) {

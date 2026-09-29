@@ -8,16 +8,16 @@ import Header from '@/components/Header';
 export default function ProjectsPage() {
   // Live YouTube Subscribers State
   const [subStats, setSubStats] = useState({
-    subscriberCount: "1,490",
-    viewCount: "521K",
-    videoCount: "92"
+    subscriberCount: "1,520",
+    viewCount: "534K",
+    videoCount: "95"
   });
 
   // Fetch Live Subscribers every 15s
   useEffect(() => {
     const fetchSubscribers = async () => {
       try {
-        const res = await fetch('/api/subscribers');
+        const res = await fetch(`/api/subscribers?t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.subscriberCount) {

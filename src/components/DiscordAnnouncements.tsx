@@ -24,7 +24,7 @@ export default function DiscordAnnouncements() {
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const res = await fetch('/api/discord-announcements');
+        const res = await fetch(`/api/discord-announcements?t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.announcements && data.announcements.length > 0) {

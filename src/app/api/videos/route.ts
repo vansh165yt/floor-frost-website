@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+};
+
 export async function GET(request: NextRequest) {
   const apiKey = process.env.YOUTUBE_API_KEY;
   const channelId = process.env.YOUTUBE_CHANNEL_ID;
@@ -26,19 +35,17 @@ export async function GET(request: NextRequest) {
         { id: '8ru4SjK_UiY', title: 'Which Shader Is The Best Part 77! #minecraft #shaders', publishedAt: 'Uploaded Today', thumbnail: 'https://img.youtube.com/vi/8ru4SjK_UiY/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=8ru4SjK_UiY' },
         { id: 'J1InW-aepkY', title: 'I Transformed My Minecraft World With This 1 Shader 😱', publishedAt: '1 day ago', thumbnail: 'https://img.youtube.com/vi/J1InW-aepkY/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=J1InW-aepkY' },
         { id: 'hX8G4eoiVFc', title: 'I Found The Most Realistic Minecraft Shader 2026', publishedAt: '2 days ago', thumbnail: 'https://img.youtube.com/vi/hX8G4eoiVFc/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=hX8G4eoiVFc' },
-        { id: 'EKmMj0sw38E', title: 'Minecraft Shader Comparison Which is Truly Most Realistic ?', publishedAt: '3 days ago', thumbnail: 'https://img.youtube.com/vi/EKmMj0sw38E/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=EKmMj0sw38E' },
-        { id: 'hh0FgSVHVKk', title: 'I Tested The Best Minecraft Shaders 😲 #1 Will Surprise You', publishedAt: '4 days ago', thumbnail: 'https://img.youtube.com/vi/hh0FgSVHVKk/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=hh0FgSVHVKk' },
-        { id: 'JiFKmveIiIA', title: "I Tested 20 ULTRA Shaders So You Don't Have To ⚡😱", publishedAt: '5 days ago', thumbnail: 'https://img.youtube.com/vi/JiFKmveIiIA/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=JiFKmveIiIA' },
-        { id: '8ru4SjK_UiY_7', title: 'Which Shader Is The Best Part 76! #minecraft', publishedAt: '6 days ago', thumbnail: 'https://img.youtube.com/vi/8ru4SjK_UiY/hqdefault.jpg', url: 'https://www.youtube.com/watch?v=8ru4SjK_UiY' },
-        { id: 'J1InW-aepkY_8', title: 'ULTRA Realistic Minecraft Gameplay & Shaders Guide', publishedAt: '7 days ago', thumbnail: 'https://img.youtube.com/vi/J1InW-aepkY/hqdefault.jpg', url: 'https://www.youtube.com/watch?v=J1InW-aepkY' }
+        { id: 'EKmMj0sw38E', title: 'Minecraft Shader Comparison Which is Truly Most Realistic ?', publishedAt: '3 days ago', thumbnail: 'https://img.youtube.com/vi/EKmMj0sw38E/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=EKmMj0sw38E' }
       ]
+    }, {
+      headers: NO_CACHE_HEADERS
     });
   }
 
   try {
     const res = await fetch(
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&key=${apiKey}&maxResults=${maxResults}`,
-      { next: { revalidate: 300 } } // Cache for 5 mins
+      { cache: 'no-store' }
     );
 
     if (!res.ok) {
@@ -81,12 +88,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       latestVideo: videos[0] || null,
       videos: videos
+    }, {
+      headers: NO_CACHE_HEADERS
     });
   } catch (error: any) {
     console.error("Failed to fetch YouTube latest videos:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch YouTube videos" },
-      { status: 500 }
+      { status: 500, headers: NO_CACHE_HEADERS }
     );
   }
 }

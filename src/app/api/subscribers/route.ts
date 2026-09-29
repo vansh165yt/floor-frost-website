@@ -1,24 +1,35 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+};
+
 export async function GET() {
   const apiKey = process.env.YOUTUBE_API_KEY;
   const channelId = process.env.YOUTUBE_CHANNEL_ID;
 
-  // If API Key or Channel ID is missing, return stable subscriber count matching Floor Frost (~1,390)
+  // Fallback if environment variables are not loaded yet
   if (!apiKey || !channelId) {
     return NextResponse.json({
-      subscriberCount: "1390",
-      viewCount: "125000",
-      videoCount: "150",
+      subscriberCount: "1520",
+      viewCount: "534067",
+      videoCount: "95",
       isLive: true,
       demoMode: true
+    }, {
+      headers: NO_CACHE_HEADERS
     });
   }
 
   try {
     const res = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${apiKey}`,
-      { next: { revalidate: 30 } }
+      { cache: 'no-store' }
     );
 
     if (!res.ok) {
@@ -29,7 +40,7 @@ export async function GET() {
     const stats = data.items?.[0]?.statistics;
 
     if (!stats) {
-      return NextResponse.json({ error: "Channel not found" }, { status: 404 });
+      return NextResponse.json({ error: "Channel not found" }, { status: 404, headers: NO_CACHE_HEADERS });
     }
 
     return NextResponse.json({
@@ -38,11 +49,13 @@ export async function GET() {
       videoCount: stats.videoCount,
       isLive: true,
       demoMode: false
+    }, {
+      headers: NO_CACHE_HEADERS
     });
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Failed to fetch YouTube statistics" },
-      { status: 500 }
+      { status: 500, headers: NO_CACHE_HEADERS }
     );
   }
 }

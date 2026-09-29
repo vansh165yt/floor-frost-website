@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+};
+
 export async function GET(request: NextRequest) {
   const botToken = process.env.DISCORD_BOT_TOKEN;
   const channelId = process.env.DISCORD_CHANNEL_ID;
@@ -8,7 +17,7 @@ export async function GET(request: NextRequest) {
   const limitParam = searchParams.get('limit');
   const maxLimit = limitParam ? Math.min(100, Math.max(1, parseInt(limitParam))) : 50;
 
-  // Fallback demo announcements if botToken or channelId is not provided yet
+  // Fallback demo announcements if botToken or channelId is missing
   if (!botToken || !channelId) {
     return NextResponse.json({
       isLive: false,
@@ -34,19 +43,10 @@ export async function GET(request: NextRequest) {
           publishedAt: 'Yesterday at 5:45 PM',
           url: 'https://discord.gg/aN5CCRT6CS',
           attachments: []
-        },
-        {
-          id: 'demo-3',
-          content: '🎮 MINECRAFT ULTRA SHADER UPDATE! We just posted our top 20 realistic shader comparison guide. Head over to YouTube or join our Discord discussion!',
-          author: {
-            username: 'Floor Frost',
-            avatar: '/logo.png'
-          },
-          publishedAt: '2 days ago',
-          url: 'https://discord.gg/aN5CCRT6CS',
-          attachments: []
         }
       ]
+    }, {
+      headers: NO_CACHE_HEADERS
     });
   }
 
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
           Authorization: `Bot ${botToken}`,
           'Content-Type': 'application/json'
         },
-        next: { revalidate: 60 } // Cache Discord feed for 60s
+        cache: 'no-store'
       }
     );
 
@@ -111,6 +111,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       isLive: true,
       announcements: announcements
+    }, {
+      headers: NO_CACHE_HEADERS
     });
   } catch (error: any) {
     console.error("Discord API fetch error:", error);
@@ -130,6 +132,8 @@ export async function GET(request: NextRequest) {
           attachments: []
         }
       ]
+    }, {
+      headers: NO_CACHE_HEADERS
     });
   }
 }

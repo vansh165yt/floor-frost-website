@@ -19,14 +19,14 @@ export default function Header({
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [subStats, setSubStats] = useState({
-    subscriberCount: "1,490"
+    subscriberCount: "1,520"
   });
 
   // Fetch Live Subscribers
   useEffect(() => {
     const fetchSubscribers = async () => {
       try {
-        const res = await fetch('/api/subscribers');
+        const res = await fetch(`/api/subscribers?t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.subscriberCount) {

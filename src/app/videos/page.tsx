@@ -22,7 +22,7 @@ export default function VideosPage() {
   useEffect(() => {
     const fetchAllVideos = async () => {
       try {
-        const res = await fetch('/api/videos?limit=25');
+        const res = await fetch(`/api/videos?limit=25&t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.videos && data.videos.length > 0) {

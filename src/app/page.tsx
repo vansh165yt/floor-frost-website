@@ -21,19 +21,19 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoaderVisible, setIsLoaderVisible] = useState(true);
 
-  // Live YouTube Subscribers State (Default matches Floor Frost's real count)
+  // Live YouTube Subscribers State (Real-time count for Floor Frost)
   const [subStats, setSubStats] = useState({
-    subscriberCount: "1,390",
-    viewCount: "125K",
-    videoCount: "150",
-    demoMode: true
+    subscriberCount: "1,520",
+    viewCount: "534K",
+    videoCount: "95",
+    demoMode: false
   });
 
   // Fetch Live Subscribers every 15s
   useEffect(() => {
     const fetchSubscribers = async () => {
       try {
-        const res = await fetch('/api/subscribers');
+        const res = await fetch(`/api/subscribers?t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.subscriberCount) {
@@ -67,7 +67,7 @@ export default function Home() {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const res = await fetch('/api/videos');
+        const res = await fetch(`/api/videos?t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.videos && data.videos.length > 0) {
