@@ -613,7 +613,7 @@ export default function Home() {
           <div className="absolute bottom-0 left-0 w-full h-28 bg-gradient-to-t from-[#07040d] via-[#07040d]/60 to-transparent pointer-events-none z-10" />
 
           {/* Glass Header with 3 Parallel Lines Hamburger Menu */}
-          <div className="absolute top-0 left-0 right-0 z-30">
+          <div className="absolute top-0 left-0 right-0 z-50">
             <Header 
               opacity={headerOpacity} 
               translateY={headerTranslateY} 
@@ -623,7 +623,7 @@ export default function Home() {
           </div>
 
           {/* Hero Content */}
-          <main className="relative z-10 w-full max-w-4xl mx-auto px-6 text-center flex flex-col items-center justify-center gap-4 sm:gap-6 mt-6">
+          <main className="relative z-30 w-full max-w-4xl mx-auto px-6 text-center flex flex-col items-center justify-center gap-4 sm:gap-6 mt-6">
             <h3 
               className="text-xl sm:text-2xl md:text-3xl font-bold tracking-[0.25em] text-white/95 uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] transition-all duration-150 ease-out"
               style={{
@@ -672,7 +672,7 @@ export default function Home() {
 
           {/* Scroll Down Indicator */}
           <div 
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-none transition-opacity duration-300"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none transition-opacity duration-300"
             style={{ opacity: scrollHintOpacity }}
           >
             <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase text-pink-200/90 animate-pulse drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
@@ -693,7 +693,7 @@ export default function Home() {
         <div className="absolute top-0 bottom-0 left-0 w-24 sm:w-48 bg-gradient-to-r from-[#050308] via-[#050308]/80 to-transparent pointer-events-none z-30" />
         <div className="absolute top-0 bottom-0 right-0 w-24 sm:w-48 bg-gradient-to-l from-[#050308] via-[#050308]/80 to-transparent pointer-events-none z-30" />
 
-        <div className="w-full relative z-20">
+        <div className="w-full relative z-30">
           
           {/* Perspective 3D Carousel Strip Container */}
           <div className="w-full overflow-hidden [perspective:1400px] marquee-mask">
@@ -750,7 +750,7 @@ export default function Home() {
         <div className="absolute top-1/4 right-1/4 w-[30rem] h-[30rem] bg-purple-600/20 rounded-full blur-[180px] pointer-events-none" />
         <div className="absolute bottom-1/4 left-1/4 w-[30rem] h-[30rem] bg-pink-600/20 rounded-full blur-[180px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto flex flex-col gap-12 relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col gap-12 relative z-30">
           <div className="flex flex-col items-start gap-3">
             <span className="text-pink-400 font-mono text-xs uppercase tracking-[0.25em] font-bold">
               Ecosystem & Metrics ~
@@ -891,7 +891,7 @@ export default function Home() {
 
       {/* 4. ABOUT CREATOR SECTION WITH REAL CHANNEL BIO & DISCORD */}
       <section id="about" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-30">
           
           <div className="relative flex justify-center items-center">
             <div className="absolute w-80 h-80 bg-purple-600/30 rounded-full blur-3xl animate-pulse" />
@@ -965,7 +965,7 @@ export default function Home() {
 
       {/* 5. FEATURED LATEST YOUTUBE VIDEOS & SPOTLIGHT PLAYER */}
       <section id="videos" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#07040d] overflow-hidden border-t border-purple-900/20">
-        <div className="max-w-7xl mx-auto flex flex-col items-start gap-10">
+        <div className="max-w-7xl mx-auto flex flex-col items-start gap-10 relative z-30">
           
           <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
             <div>
@@ -1149,7 +1149,7 @@ export default function Home() {
 
       {/* 6. COMMUNITY & DISCORD BANNER WITH REAL LINKS */}
       <section id="community" className="relative py-24 px-6 sm:px-12 lg:px-20 bg-[#06030a] border-t border-purple-900/20">
-        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-10 sm:p-16 relative overflow-hidden flex flex-col items-center text-center gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)]">
+        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-10 sm:p-16 relative overflow-hidden flex flex-col items-center text-center gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)] relative z-30">
           
           <div className="absolute w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
 
