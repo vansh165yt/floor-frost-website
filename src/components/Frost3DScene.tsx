@@ -56,19 +56,17 @@ export default function Frost3DScene() {
     keySunLight.position.set(12, 18, 14);
     scene.add(keySunLight);
 
-    const rimCyanLight = new THREE.DirectionalLight(0x38bdf8, 2.6);
-    rimCyanLight.position.set(-14, -10, 10);
-    scene.add(rimCyanLight);
+    // Purple Rim Light matching website theme
+    const rimPurpleLight = new THREE.DirectionalLight(0xc084fc, 2.8);
+    rimPurpleLight.position.set(-14, -10, 10);
+    scene.add(rimPurpleLight);
 
-    const fillVioletLight = new THREE.DirectionalLight(0xc084fc, 1.8);
+    const fillVioletLight = new THREE.DirectionalLight(0xa855f7, 2.0);
     fillVioletLight.position.set(0, -12, -6);
     scene.add(fillVioletLight);
 
-    // 3. ULTRA-DETAILED 1024x1024 WING TEXTURE (EXACT MATCH TO REFERENCE IMAGE)
-    // Features: Vibrant electric cyan center radiating into royal cobalt blue, thick black borders,
-    // stained-glass radial veins, discal cell, 3 apex blue streaks, and scalloped white dots!
-    // 3. ULTRA-DETAILED 2048x2048 WING TEXTURE WITH COLOR FADE (EXACT MATCH TO REFERENCE IMAGE)
-    // Features: Smooth velvety color fade between radiant blue and jet-black, feathered veins, and organic spots
+    // 3. ULTRA-DETAILED 2048x2048 WING TEXTURE WITH COLOR FADE (WEBSITE PURPLE THEME)
+    // Features: Website purple/violet palette, smooth color fade to black, feathered veins, exact reference design
     const createReferenceWingTexture = () => {
       const canvas = document.createElement('canvas');
       canvas.width = 2048;
@@ -78,44 +76,44 @@ export default function Frost3DScene() {
 
       ctx.clearRect(0, 0, 2048, 2048);
 
-      // 1. BASE BLUE RADIANCE WITH ORGANIC COLOR FADE TO BLACK
-      // High-contrast, crystal-clear blue field that naturally fades into velvet black
+      // 1. BASE PURPLE RADIANCE WITH ORGANIC COLOR FADE TO BLACK (Website Theme)
+      // Radiant white-lilac core -> Electric violet -> Royal Purple -> Deep Amethyst -> Pitch Black
       const baseGrad = ctx.createRadialGradient(480, 1260, 60, 1040, 1000, 1440);
-      baseGrad.addColorStop(0, '#f0fdff');    // White-hot radiant core highlight
-      baseGrad.addColorStop(0.10, '#38bdf8'); // Sky bright cyan
-      baseGrad.addColorStop(0.28, '#00e5ff'); // Electric vibrant cyan
-      baseGrad.addColorStop(0.50, '#0284c7'); // Rich azure blue
-      baseGrad.addColorStop(0.70, '#0369a1'); // Royal sapphire blue
-      baseGrad.addColorStop(0.84, '#075985'); // Deep ocean blue
-      baseGrad.addColorStop(0.92, '#0c1b33'); // Dark midnight indigo transition
-      baseGrad.addColorStop(1.0, '#000000');  // Smooth transition directly into pitch black
+      baseGrad.addColorStop(0, '#faf5ff');    // White-hot radiant lilac-white highlight
+      baseGrad.addColorStop(0.10, '#f0abfc'); // Sky bright radiant lilac
+      baseGrad.addColorStop(0.28, '#e879f9'); // Electric vibrant fuchsia-violet
+      baseGrad.addColorStop(0.50, '#c084fc'); // Rich luminous royal purple (website main)
+      baseGrad.addColorStop(0.70, '#9333ea'); // Deep royal purple
+      baseGrad.addColorStop(0.84, '#6b21a8'); // Rich amethyst
+      baseGrad.addColorStop(0.92, '#2e0854'); // Dark midnight plum transition
+      baseGrad.addColorStop(1.0, '#000000');  // Smooth transition directly into velvet pitch black
 
       ctx.fillStyle = baseGrad;
       ctx.fillRect(0, 0, 2048, 2048);
 
-      // Subtle Violet/Indigo hue near wing base (As seen in real Blue Morpho reference)
+      // Subtle Velvet Violet shadow near wing base
       const rootViolet = ctx.createRadialGradient(160, 1360, 30, 260, 1360, 380);
-      rootViolet.addColorStop(0, 'rgba(49, 46, 129, 0.7)');
-      rootViolet.addColorStop(0.5, 'rgba(30, 58, 138, 0.35)');
+      rootViolet.addColorStop(0, 'rgba(88, 28, 135, 0.7)');
+      rootViolet.addColorStop(0.5, 'rgba(59, 7, 100, 0.4)');
       rootViolet.addColorStop(1, 'transparent');
       ctx.fillStyle = rootViolet;
       ctx.fillRect(0, 900, 600, 900);
 
       // 2. STAINED-GLASS WING CELLS LUMINOUS IRIDESCENT CUSHIONS
       const cellHighlights = [
-        { x: 760, y: 1100, rx: 180, ry: 90, rot: -0.35, color: '#38bdf8' },
-        { x: 1040, y: 880, rx: 220, ry: 80, rot: -0.42, color: '#00e5ff' },
-        { x: 1240, y: 700, rx: 220, ry: 70, rot: -0.48, color: '#00e5ff' },
-        { x: 1360, y: 520, rx: 200, ry: 60, rot: -0.52, color: '#38bdf8' },
-        { x: 1160, y: 1160, rx: 190, ry: 75, rot: -0.15, color: '#00e5ff' },
-        { x: 1080, y: 1400, rx: 170, ry: 70, rot: 0.15, color: '#00e5ff' },
-        { x: 880, y: 1600, rx: 150, ry: 65, rot: 0.40, color: '#38bdf8' },
-        { x: 680, y: 1720, rx: 130, ry: 60, rot: 0.60, color: '#0284c7' }
+        { x: 760, y: 1100, rx: 180, ry: 90, rot: -0.35, color: '#f0abfc' },
+        { x: 1040, y: 880, rx: 220, ry: 80, rot: -0.42, color: '#e879f9' },
+        { x: 1240, y: 700, rx: 220, ry: 70, rot: -0.48, color: '#c084fc' },
+        { x: 1360, y: 520, rx: 200, ry: 60, rot: -0.52, color: '#f0abfc' },
+        { x: 1160, y: 1160, rx: 190, ry: 75, rot: -0.15, color: '#e879f9' },
+        { x: 1080, y: 1400, rx: 170, ry: 70, rot: 0.15, color: '#c084fc' },
+        { x: 880, y: 1600, rx: 150, ry: 65, rot: 0.40, color: '#f0abfc' },
+        { x: 680, y: 1720, rx: 130, ry: 60, rot: 0.60, color: '#9333ea' }
       ];
 
       cellHighlights.forEach(c => {
         const cg = ctx.createRadialGradient(c.x, c.y, 15, c.x, c.y, c.rx);
-        cg.addColorStop(0, 'rgba(255, 255, 255, 0.55)');
+        cg.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
         cg.addColorStop(0.4, c.color);
         cg.addColorStop(1, 'transparent');
         ctx.fillStyle = cg;
@@ -124,36 +122,36 @@ export default function Frost3DScene() {
         ctx.fill();
       });
 
-      // 3. SEAMLESS COLOR FADE GRADIENT OVERLAYS (BETWEEN BLUE AND BLACK)
-      // Top Costal Margin Color Fade (smooth linear blend downward into blue)
+      // 3. SEAMLESS COLOR FADE GRADIENT OVERLAYS (BETWEEN PURPLE AND BLACK)
+      // Top Costal Margin Color Fade (smooth linear blend downward into purple)
       const costalFade = ctx.createLinearGradient(0, 160, 0, 560);
       costalFade.addColorStop(0, '#000000');
       costalFade.addColorStop(0.38, '#000000');
       costalFade.addColorStop(0.65, 'rgba(0, 0, 0, 0.78)');
       costalFade.addColorStop(0.82, 'rgba(0, 0, 0, 0.38)');
-      costalFade.addColorStop(0.94, 'rgba(0, 20, 45, 0.15)');
+      costalFade.addColorStop(0.94, 'rgba(46, 8, 84, 0.18)');
       costalFade.addColorStop(1.0, 'transparent');
       ctx.fillStyle = costalFade;
       ctx.fillRect(0, 0, 2048, 560);
 
-      // Outer Right Margin & Apex Color Fade (smooth linear blend leftward into blue)
+      // Outer Right Margin & Apex Color Fade (smooth linear blend leftward into purple)
       const outerFade = ctx.createLinearGradient(2048, 0, 1250, 0);
       outerFade.addColorStop(0, '#000000');
       outerFade.addColorStop(0.32, '#000000');
       outerFade.addColorStop(0.58, 'rgba(0, 0, 0, 0.85)');
       outerFade.addColorStop(0.74, 'rgba(0, 0, 0, 0.52)');
-      outerFade.addColorStop(0.88, 'rgba(0, 0, 0, 0.22)');
+      outerFade.addColorStop(0.88, 'rgba(46, 8, 84, 0.22)');
       outerFade.addColorStop(1.0, 'transparent');
       ctx.fillStyle = outerFade;
       ctx.fillRect(1250, 0, 798, 2048);
 
-      // Hindwing Bottom & Scalloped Margin Color Fade (smooth linear blend upward into blue)
+      // Hindwing Bottom & Scalloped Margin Color Fade (smooth linear blend upward into purple)
       const bottomFade = ctx.createLinearGradient(0, 2048, 0, 1420);
       bottomFade.addColorStop(0, '#000000');
       bottomFade.addColorStop(0.32, '#000000');
       bottomFade.addColorStop(0.58, 'rgba(0, 0, 0, 0.82)');
       bottomFade.addColorStop(0.76, 'rgba(0, 0, 0, 0.44)');
-      bottomFade.addColorStop(0.90, 'rgba(0, 0, 0, 0.16)');
+      bottomFade.addColorStop(0.90, 'rgba(46, 8, 84, 0.18)');
       bottomFade.addColorStop(1.0, 'transparent');
       ctx.fillStyle = bottomFade;
       ctx.fillRect(0, 1420, 2048, 628);
@@ -210,7 +208,7 @@ export default function Frost3DScene() {
       ctx.save();
       ctx.fillStyle = '#000000';
       ctx.shadowColor = '#000000';
-      ctx.shadowBlur = 38; // Soft color fade blur into the blue background
+      ctx.shadowBlur = 38; // Soft color fade blur into the purple background
 
       // Bar/Spot 1: Jutting from costal margin into discal cell
       ctx.beginPath();
@@ -258,12 +256,12 @@ export default function Frost3DScene() {
 
       ctx.restore();
 
-      // 6. APEX SIGNATURE CYAN-BLUE STREAKS (Soft luminous glow inside black triangle)
+      // 6. APEX SIGNATURE VIOLET-MAGENTA STREAKS (Soft luminous glow inside black triangle)
       ctx.save();
       const apexStreaks = [
-        { startX: 1680, startY: 170, endX: 1910, endY: 290, width: 44, color: '#38bdf8' },
-        { startX: 1660, startY: 280, endX: 1870, endY: 450, width: 40, color: '#00e5ff' },
-        { startX: 1620, startY: 410, endX: 1820, endY: 590, width: 36, color: '#0284c7' }
+        { startX: 1680, startY: 170, endX: 1910, endY: 290, width: 44, color: '#f0abfc' },
+        { startX: 1660, startY: 280, endX: 1870, endY: 450, width: 40, color: '#e879f9' },
+        { startX: 1620, startY: 410, endX: 1820, endY: 590, width: 36, color: '#c084fc' }
       ];
 
       apexStreaks.forEach(s => {
@@ -271,13 +269,13 @@ export default function Frost3DScene() {
         ctx.lineWidth = s.width;
         ctx.lineCap = 'round';
         ctx.shadowColor = s.color;
-        ctx.shadowBlur = 28; // Soft cyan glow fading into surrounding black
+        ctx.shadowBlur = 28; // Soft violet glow fading into surrounding black
         ctx.beginPath();
         ctx.moveTo(s.startX, s.startY);
         ctx.quadraticCurveTo((s.startX + s.endX) / 2 + 25, (s.startY + s.endY) / 2 - 20, s.endX, s.endY);
         ctx.stroke();
 
-        // White-cyan radiant core
+        // White-lilac radiant core
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = s.width * 0.4;
         ctx.beginPath();
@@ -287,7 +285,7 @@ export default function Frost3DScene() {
       });
       ctx.restore();
 
-      // 7. FEATHERED BLACK VEINS WITH SOFT FALLOFF INTO BLUE
+      // 7. FEATHERED BLACK VEINS WITH SOFT FALLOFF INTO PURPLE
       const rootX = 220, rootY = 1320;
       const veins = [
         { startX: 820, startY: 1040, ctrlX: 1160, ctrlY: 640, endX: 1760, endY: 340, w: 11 },
@@ -365,7 +363,7 @@ export default function Frost3DScene() {
         ctx.stroke();
       });
 
-      // 8. HINDWING SCALLOPED MARGIN AMBER-ORANGE & WHITE SPOTS (Soft glow into black)
+      // 8. HINDWING SCALLOPED MARGIN VIOLET-MAGENTA & WHITE SPOTS (Soft glow into black)
       const amberMarginSpots = [
         [1860, 680, 11], [1880, 880, 12], [1840, 1080, 12], [1760, 1280, 12],
         [1640, 1480, 13], [1480, 1660, 13], [1280, 1800, 12], [1040, 1900, 11],
@@ -373,18 +371,18 @@ export default function Frost3DScene() {
       ];
 
       amberMarginSpots.forEach(([x, y, r]) => {
-        // Outer Orange-Amber Halo with soft fade
+        // Outer Magenta-Violet Halo with soft fade
         const spotGrad = ctx.createRadialGradient(x, y, r * 0.2, x, y, r * 1.3);
-        spotGrad.addColorStop(0, '#ea580c');
-        spotGrad.addColorStop(0.6, '#f97316');
+        spotGrad.addColorStop(0, '#c026d3');
+        spotGrad.addColorStop(0.6, '#e879f9');
         spotGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = spotGrad;
         ctx.beginPath();
         ctx.arc(x, y, r * 1.3, 0, Math.PI * 2);
         ctx.fill();
 
-        // Bright Yellow-Orange middle
-        ctx.fillStyle = '#f59e0b';
+        // Bright Lilac-Violet middle
+        ctx.fillStyle = '#f0abfc';
         ctx.beginPath();
         ctx.arc(x, y, r * 0.65, 0, Math.PI * 2);
         ctx.fill();
@@ -504,8 +502,8 @@ export default function Frost3DScene() {
     });
 
     const eyeMat = new THREE.MeshStandardMaterial({
-      color: 0x0284c7,
-      emissive: 0x38bdf8,
+      color: 0x9333ea,
+      emissive: 0xc084fc,
       emissiveIntensity: 1.2,
       roughness: 0.05,
       metalness: 0.95
@@ -536,7 +534,7 @@ export default function Frost3DScene() {
       new THREE.Vector3(0, -0.06, 0.06)
     );
     const proboscisGeo = new THREE.TubeGeometry(proboscisCurve, 14, 0.009, 6, false);
-    const proboscis = new THREE.Mesh(proboscisGeo, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+    const proboscis = new THREE.Mesh(proboscisGeo, new THREE.MeshBasicMaterial({ color: 0xc084fc }));
     headGroup.add(proboscis);
 
     // Antennae (Matching reference: 2 slender black antennae in narrow V-shape)
@@ -554,7 +552,7 @@ export default function Frost3DScene() {
 
       const tipGeo = new THREE.SphereGeometry(0.035, 10, 10);
       tipGeo.scale(0.8, 1.4, 0.8);
-      const tipMat = new THREE.MeshBasicMaterial({ color: 0x00f5ff });
+      const tipMat = new THREE.MeshBasicMaterial({ color: 0xf0abfc });
       const tip = new THREE.Mesh(tipGeo, tipMat);
       tip.position.copy(curve.getPoint(1));
       antGroup.add(tip);
@@ -629,7 +627,7 @@ export default function Frost3DScene() {
     // Overall Butterfly Scale
     butterflyRoot.scale.set(0.95, 0.95, 0.95);
 
-    // 6. MAGICAL FROST SPARKLE TRAIL PARTICLES
+    // 6. MAGICAL FROST SPARKLE TRAIL PARTICLES (Purple Stardust)
     const trailCount = 50;
     const trailPositions = new Float32Array(trailCount * 3);
     for (let i = 0; i < trailCount * 3; i++) trailPositions[i] = -999;
@@ -638,10 +636,10 @@ export default function Frost3DScene() {
     trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
 
     const trailMat = new THREE.PointsMaterial({
-      color: 0x7dd3fc,
-      size: 0.15,
+      color: 0xc084fc,
+      size: 0.16,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.75,
       blending: THREE.AdditiveBlending
     });
 
@@ -670,7 +668,7 @@ export default function Frost3DScene() {
       targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     };
 
-    // Calculate Dynamic Flight Path Anchored in Side Rails (Never covers center content)
+    // Calculate Dynamic 3D Flight Path Anchored in Side Rails (Magnificent S-Ribbon Swoop)
     const getFlightWaypoints = () => {
       const aspect = window.innerWidth / window.innerHeight;
       const vHalfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
@@ -680,12 +678,16 @@ export default function Frost3DScene() {
       const leftRailX = -rightRailX;
 
       return [
-        new THREE.Vector3(rightRailX, 3.8, 0.4),        // 0.0: Top Hero right rail
-        new THREE.Vector3(rightRailX - 0.6, 1.2, 0.8),  // 0.2: Gliding down right
-        new THREE.Vector3(leftRailX + 0.8, -1.0, 0.2),   // 0.4: Sweeping banking turn to left rail
-        new THREE.Vector3(leftRailX, -3.2, 0.6),        // 0.6: About creator left rail
-        new THREE.Vector3(rightRailX - 0.5, -4.8, 0.0), // 0.8: Videos section right rail
-        new THREE.Vector3(rightRailX, -6.6, -0.4)       // 1.0: Community footer rail
+        new THREE.Vector3(rightRailX, 3.8, 0.4),            // 0.0: Top Hero right rail, hovering high
+        new THREE.Vector3(rightRailX - 0.9, 2.5, 1.2),      // 0.12: Elegant swoop forward toward viewer
+        new THREE.Vector3(rightRailX + 0.3, 1.0, 0.6),      // 0.25: Gliding down right side of Marquee
+        new THREE.Vector3(rightRailX * 0.3, -0.2, 1.4),     // 0.38: Dramatic diagonal glide across Bento top
+        new THREE.Vector3(leftRailX + 0.8, -1.4, 0.3),      // 0.50: Sweeping banking turn into left rail
+        new THREE.Vector3(leftRailX - 0.2, -2.6, 0.8),      // 0.62: Cruising down left rail past Discord
+        new THREE.Vector3(leftRailX + 1.2, -3.8, 1.5),      // 0.74: Soaring forward past About section
+        new THREE.Vector3(-rightRailX * 0.2, -5.0, 0.5),    // 0.84: Graceful curve crossing toward right
+        new THREE.Vector3(rightRailX - 0.5, -6.0, 1.0),     // 0.92: Gliding into Videos / Community
+        new THREE.Vector3(rightRailX - 0.2, -7.2, 0.3)      // 1.0: Gentle hover near footer
       ];
     };
 
@@ -751,19 +753,19 @@ export default function Frost3DScene() {
       const pathPos = flightCurve.getPoint(clampedP);
       const pathTangent = flightCurve.getTangent(clampedP);
 
-      // Organic low-frequency air turbulence (wind eddies)
-      const flutterNoiseX = Math.sin(elapsed * 2.2) * 0.24 + Math.cos(elapsed * 3.8) * 0.08;
-      const flutterNoiseY = Math.cos(elapsed * 2.7) * 0.20 + Math.sin(elapsed * 4.4) * 0.06;
-      const flutterNoiseZ = Math.sin(elapsed * 1.9) * 0.16;
+      // Organic natural air currents & Lissajous hovering figure-8 motion
+      const hoverSwayX = Math.sin(elapsed * 1.6) * 0.30 + Math.sin(elapsed * 3.1) * 0.10;
+      const hoverSwayY = Math.cos(elapsed * 2.0) * 0.22 + Math.sin(elapsed * 4.2) * 0.08;
+      const hoverSwayZ = Math.sin(elapsed * 1.3) * 0.18;
 
       targetPos.copy(pathPos);
-      targetPos.x += flutterNoiseX + mouseX * 0.35;
-      targetPos.y += flutterNoiseY - mouseY * 0.25;
-      targetPos.z += flutterNoiseZ;
+      targetPos.x += hoverSwayX + mouseX * 0.35;
+      targetPos.y += hoverSwayY - mouseY * 0.25;
+      targetPos.z += hoverSwayZ;
 
-      // Spring-Damper Aerodynamics (Natural inertia and air resistance)
-      const springK = 0.042;
-      const drag = 0.88;
+      // Spring-Damper Aerodynamics (Fluid inertia, natural gliding momentum)
+      const springK = 0.048;
+      const drag = 0.89;
 
       velocity.x += (targetPos.x - currentPos.x) * springK;
       velocity.y += (targetPos.y - currentPos.y) * springK;
@@ -773,7 +775,7 @@ export default function Frost3DScene() {
       currentPos.add(velocity);
 
       // Compute turning rate for asymmetric banking & heading
-      turnRate = THREE.MathUtils.clamp(velocity.x * 2.4, -1.0, 1.0);
+      turnRate = THREE.MathUtils.clamp(velocity.x * 2.5, -1.0, 1.0);
 
       // --- DYNAMIC FLAP FREQUENCY BASED ON FLIGHT STATE ---
       // When descending: slower parachute-flutter braking beats
