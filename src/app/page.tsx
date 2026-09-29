@@ -18,8 +18,41 @@ export default function Home() {
 
   const [actualLoaded, setActualLoaded] = useState(0);
   const [displayPercent, setDisplayPercent] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoaderVisible, setIsLoaderVisible] = useState(true);
+
+  // Only show loader if user has never visited home page in this session
+  const [isLoading, setIsLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return sessionStorage.getItem('frost_home_visited') !== 'true';
+      } catch (e) {
+        return true;
+      }
+    }
+    return true;
+  });
+
+  const [isLoaderVisible, setIsLoaderVisible] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return sessionStorage.getItem('frost_home_visited') !== 'true';
+      } catch (e) {
+        return true;
+      }
+    }
+    return true;
+  });
+
+  // Immediate check on mount to ensure return visits never display the loader
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem('frost_home_visited') === 'true') {
+        setIsLoading(false);
+        setIsLoaderVisible(false);
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+      }
+    } catch (e) {}
+  }, []);
 
   // Live YouTube Subscribers State (Real-time count for Floor Frost)
   const [subStats, setSubStats] = useState({
@@ -227,7 +260,11 @@ export default function Home() {
 
   // 2. Smooth Guaranteed Visual Loader Controller
   useEffect(() => {
-    if (!isLoading) return;
+    if (!isLoading) {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      return;
+    }
 
     // Lock scroll on both html and body
     document.documentElement.style.overflow = 'hidden';
@@ -257,6 +294,9 @@ export default function Home() {
 
         setTimeout(() => {
           setIsLoading(false);
+          try {
+            sessionStorage.setItem('frost_home_visited', 'true');
+          } catch (e) {}
           document.documentElement.style.overflow = '';
           document.body.style.overflow = '';
 

@@ -55,6 +55,13 @@ export default function PageLoader() {
       // Check if navigating to a different page or query
       const currentUrl = window.location.pathname + window.location.search;
       if (href !== currentUrl) {
+        // If navigating to home page and user has already visited home, skip transition loader
+        const targetPath = href.split('?')[0];
+        try {
+          if ((targetPath === '/' || targetPath === '') && sessionStorage.getItem('frost_home_visited') === 'true') {
+            return;
+          }
+        } catch (e) {}
         startLoadingAnimation();
       }
     };
