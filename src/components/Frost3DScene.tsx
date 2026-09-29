@@ -868,15 +868,24 @@ export default function Frost3DScene() {
       });
     }
 
+    // Position variables for footer right rail
+    let baseBranchX = 0;
+    let baseBranchY = -5.8;
+    let baseBranchZ = 0.2;
+
     // Function to position the branch at footer right rail
     const updateBranchPosition = () => {
       const aspect = window.innerWidth / window.innerHeight;
       const vHalfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
       const vHalfWidth = vHalfHeight * aspect;
       const rightRailX = Math.min(vHalfWidth - 1.8, Math.max(7.2, vHalfWidth * 0.72));
-      cherryBranchGroup.position.set(rightRailX + 0.4, -5.8, 0.2);
+      baseBranchX = rightRailX + 0.4;
+      baseBranchY = -5.8;
+      baseBranchZ = 0.2;
+      cherryBranchGroup.position.set(baseBranchX, baseBranchY, baseBranchZ);
     };
     updateBranchPosition();
+    cherryBranchGroup.visible = false; // Strictly hidden on homepage, emerges only at footer!
 
     // 6. MAGICAL FROST SPARKLE TRAIL PARTICLES (Purple Stardust)
     const trailCount = 50;
@@ -936,9 +945,9 @@ export default function Frost3DScene() {
         new THREE.Vector3(leftRailX + 0.8, -1.4, 0.3),      // 0.50: Sweeping banking turn into left rail
         new THREE.Vector3(leftRailX - 0.2, -2.6, 0.8),      // 0.62: Cruising down left rail past Discord
         new THREE.Vector3(leftRailX + 1.2, -3.8, 1.5),      // 0.74: Soaring forward past About section
-        new THREE.Vector3(-rightRailX * 0.2, -4.8, 0.5),    // 0.84: Graceful curve crossing toward right
-        new THREE.Vector3(rightRailX - 0.6, -5.2, 1.1),     // 0.92: Approaching Cherry Blossom branch
-        new THREE.Vector3(rightRailX - 0.4, -4.9, 1.45)     // 1.0: Touching down right on the Sakura flower!
+        new THREE.Vector3(-rightRailX * 0.2, -4.6, 0.6),    // 0.84: Graceful curve crossing toward right
+        new THREE.Vector3(rightRailX * 0.4, -5.0, 1.0),     // 0.93: Circling down toward footer area
+        new THREE.Vector3(rightRailX - 0.4, -4.9, 1.45)     // 1.0: Touching down right on the Sakura flower in the footer!
       ];
     };
 
@@ -1000,25 +1009,57 @@ export default function Frost3DScene() {
       mouseX += (targetMouseX - mouseX) * 0.04;
       mouseY += (targetMouseY - mouseY) * 0.04;
 
-      // --- 1. REALISTIC WIND SWAY ON CHERRY BLOSSOM BRANCH ---
-      const windTime = elapsed * 1.5;
-      const windSwayZ = Math.sin(windTime * 0.8) * 0.038 + Math.sin(windTime * 2.2) * 0.012;
-      const windSwayY = Math.cos(windTime * 0.6) * 0.026;
-      const windSwayX = Math.sin(windTime * 1.1) * 0.018;
+      // --- 1. FOOTER CHERRY BLOSSOM BRANCH VISIBILITY & WIND SWAY ---
+      // The blossom branch is strictly hidden across the entire website and ONLY emerges at the end of the footer!
+      let footerFactor = 0;
+      if (scrollProgress >= 0.90) {
+        const footerEl = typeof document !== 'undefined' ? document.querySelector('footer') : null;
+        if (footerEl) {
+          const rect = footerEl.getBoundingClientRect();
+          const overlap = window.innerHeight - rect.top;
+          if (overlap > 0) {
+            const footerH = Math.max(80, rect.height);
+            // Begins emerging only once the footer is well into view, reaching 1.0 at the end of the footer
+            footerFactor = Math.min(1, Math.max(0, (overlap - footerH * 0.3) / (footerH * 0.7)));
+          }
+        } else if (scrollProgress >= 0.96) {
+          footerFactor = Math.min(1, Math.max(0, (scrollProgress - 0.96) / 0.04));
+        }
+      }
 
-      cherryBranchGroup.rotation.z = windSwayZ;
-      cherryBranchGroup.rotation.y = windSwayY;
-      cherryBranchGroup.rotation.x = windSwayX;
+      const branchAppear = THREE.MathUtils.smoothstep(footerFactor, 0, 1);
 
-      // Animate loose falling petals drifting in the breeze
-      loosePetals.forEach(p => {
-        const pTime = elapsed * p.speed + p.phase;
-        p.mesh.position.x = p.basePos.x + Math.sin(pTime * 1.5) * 0.35 - (pTime % 4) * 0.15;
-        p.mesh.position.y = p.basePos.y - ((pTime * 0.6) % 2.5);
-        p.mesh.position.z = p.basePos.z + Math.cos(pTime * 1.2) * 0.25;
-        p.mesh.rotation.x = Math.sin(pTime * p.rotSpeed);
-        p.mesh.rotation.y = Math.cos(pTime * p.rotSpeed * 0.8);
-      });
+      if (branchAppear <= 0.001) {
+        cherryBranchGroup.visible = false;
+      } else {
+        cherryBranchGroup.visible = true;
+
+        // Gracefully slide up and bloom into position from bottom-right as user reaches the end of the footer
+        cherryBranchGroup.position.x = baseBranchX + (1.0 - branchAppear) * 2.8;
+        cherryBranchGroup.position.y = baseBranchY - (1.0 - branchAppear) * 4.2;
+        cherryBranchGroup.position.z = baseBranchZ;
+        cherryBranchGroup.scale.setScalar(Math.max(0.001, branchAppear));
+
+        // Realistic Wind Sway on Branch & Flowers
+        const windTime = elapsed * 1.5;
+        const windSwayZ = Math.sin(windTime * 0.8) * 0.038 + Math.sin(windTime * 2.2) * 0.012;
+        const windSwayY = Math.cos(windTime * 0.6) * 0.026;
+        const windSwayX = Math.sin(windTime * 1.1) * 0.018;
+
+        cherryBranchGroup.rotation.z = windSwayZ;
+        cherryBranchGroup.rotation.y = windSwayY;
+        cherryBranchGroup.rotation.x = windSwayX;
+
+        // Animate loose falling petals drifting in the breeze
+        loosePetals.forEach(p => {
+          const pTime = elapsed * p.speed + p.phase;
+          p.mesh.position.x = p.basePos.x + Math.sin(pTime * 1.5) * 0.35 - (pTime % 4) * 0.15;
+          p.mesh.position.y = p.basePos.y - ((pTime * 0.6) % 2.5);
+          p.mesh.position.z = p.basePos.z + Math.cos(pTime * 1.2) * 0.25;
+          p.mesh.rotation.x = Math.sin(pTime * p.rotSpeed);
+          p.mesh.rotation.y = Math.cos(pTime * p.rotSpeed * 0.8);
+        });
+      }
 
       // Get real-time dynamic world position of the flower perch (moves with the wind!)
       const flowerPerchPos = new THREE.Vector3();
@@ -1035,8 +1076,8 @@ export default function Frost3DScene() {
       const hoverSwayZ = Math.sin(elapsed * 1.3) * 0.18;
 
       // Landing transition factor (0 = free flight, 1 = landed on flower)
-      const rawLand = Math.max(0, Math.min(1, (scrollProgress - 0.88) / 0.12));
-      const landFactor = THREE.MathUtils.smoothstep(rawLand, 0, 1);
+      // Butterfly lands strictly when blossom branch emerges at the end of the footer!
+      const landFactor = THREE.MathUtils.smoothstep(footerFactor, 0, 1);
 
       targetPos.copy(pathPos);
       targetPos.x += (hoverSwayX + mouseX * 0.35) * (1.0 - landFactor * 0.8);
