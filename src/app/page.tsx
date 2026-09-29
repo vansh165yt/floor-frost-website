@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import NextImage from 'next/image';
 import Header from '@/components/Header';
 import DiscordAnnouncements from '@/components/DiscordAnnouncements';
+import Frost3DScene from '@/components/Frost3DScene';
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -468,8 +469,11 @@ export default function Home() {
   const scrollHintOpacity = clamp((0.15 - scrollProgress) / 0.15, 0, 1);
 
   return (
-    <div className="bg-[#07040d] text-white selection:bg-purple-500/30 font-sans min-h-screen">
+    <div className="bg-[#07040d] text-white selection:bg-purple-500/30 font-sans min-h-screen relative">
       
+      {/* Dynamic 3D Models Scene (Rendered on PC / Desktop Only) */}
+      <Frost3DScene />
+
       {/* 0. INITIAL FRAME PRELOADER WITH REAL-TIME PROGRESS BAR */}
       {isLoaderVisible && (
         <div
