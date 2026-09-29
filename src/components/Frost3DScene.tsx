@@ -8,10 +8,10 @@ export default function Frost3DScene() {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    // Strict Desktop detection: screen width >= 1360px so side margins exist outside the 1280px content container
+    // Enable on desktop / large screens >= 1024px
     const checkIsDesktop = () => {
-      const isLargeScreen = window.innerWidth >= 1360;
-      const isTouchOnly = 'ontouchstart' in window && window.innerWidth < 1360;
+      const isLargeScreen = window.innerWidth >= 1024;
+      const isTouchOnly = 'ontouchstart' in window && window.innerWidth < 1024;
       return isLargeScreen && !isTouchOnly;
     };
 
@@ -25,7 +25,7 @@ export default function Frost3DScene() {
     const container = containerRef.current;
     if (!container) return;
 
-    // 1. Scene, Camera, Renderer Setup
+    // 1. Scene, Camera & Renderer
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(
@@ -44,157 +44,234 @@ export default function Frost3DScene() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 1.15;
 
     container.appendChild(renderer.domElement);
 
     // 2. Lighting Setup
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
     scene.add(ambientLight);
 
-    const primaryLight = new THREE.DirectionalLight(0xd946ef, 3.2); // Neon Pink/Purple
-    primaryLight.position.set(12, 15, 10);
-    scene.add(primaryLight);
+    const pinkLight = new THREE.DirectionalLight(0xd946ef, 3.0);
+    pinkLight.position.set(10, 12, 10);
+    scene.add(pinkLight);
 
-    const secondaryLight = new THREE.DirectionalLight(0x06b6d4, 3.2); // Neon Cyan
-    secondaryLight.position.set(-12, -10, 8);
-    scene.add(secondaryLight);
+    const cyanLight = new THREE.DirectionalLight(0x06b6d4, 3.0);
+    cyanLight.position.set(-10, -8, 8);
+    scene.add(cyanLight);
 
-    const backRimLight = new THREE.PointLight(0xa855f7, 3.5, 30); // Deep Purple backlight
-    backRimLight.position.set(0, 0, -5);
-    scene.add(backRimLight);
+    // 3. BUTTERFLY 3D MODEL HIERARCHY
+    const butterflyRoot = new THREE.Group();
+    scene.add(butterflyRoot);
 
-    // 3. 3D MODEL 1: THE FROST TESSERACT (Minecraft Cyber Core) - Scaled for sleek side rail
-    const cubeGroup = new THREE.Group();
+    // Center Core Glow Light (Moves with butterfly)
+    const butterflyLight = new THREE.PointLight(0x22d3ee, 2.5, 8);
+    butterflyRoot.add(butterflyLight);
 
-    // Outer translucent Ice Cube
-    const cubeGeo = new THREE.BoxGeometry(1.6, 1.6, 1.6);
-    const cubeMat = new THREE.MeshPhysicalMaterial({
-      color: 0x06b6d4,
-      emissive: 0x083344,
-      emissiveIntensity: 0.35,
-      metalness: 0.2,
-      roughness: 0.1,
-      transmission: 0.6,
-      thickness: 1.2,
-      transparent: true,
-      opacity: 0.8,
-      wireframe: false
-    });
-    const outerCube = new THREE.Mesh(cubeGeo, cubeMat);
-    cubeGroup.add(outerCube);
-
-    // Outer glowing Wireframe edges
-    const wireGeo = new THREE.EdgesGeometry(cubeGeo);
-    const wireMat = new THREE.LineBasicMaterial({
-      color: 0x38bdf8,
-      linewidth: 2,
-      transparent: true,
-      opacity: 0.75
-    });
-    const wireframe = new THREE.LineSegments(wireGeo, wireMat);
-    cubeGroup.add(wireframe);
-
-    // Inner Glowing Core (Octahedron inside cube)
-    const innerGeo = new THREE.OctahedronGeometry(0.68, 0);
-    const innerMat = new THREE.MeshStandardMaterial({
-      color: 0xf43f5e,
-      emissive: 0xf43f5e,
-      emissiveIntensity: 1.4,
+    // --- BODY (Head, Thorax, Abdomen, Antennae) ---
+    const bodyMat = new THREE.MeshStandardMaterial({
+      color: 0x0f172a,
+      emissive: 0x38bdf8,
+      emissiveIntensity: 0.5,
       metalness: 0.8,
       roughness: 0.2
     });
-    const innerCore = new THREE.Mesh(innerGeo, innerMat);
-    cubeGroup.add(innerCore);
 
-    scene.add(cubeGroup);
-
-    // 4. 3D MODEL 2: THE FROST DIAMOND SHARD (Geodesic Ice Crystal)
-    const diamondGroup = new THREE.Group();
-
-    const diamondGeo = new THREE.IcosahedronGeometry(1.15, 0);
-    const diamondMat = new THREE.MeshStandardMaterial({
-      color: 0xa855f7,
-      emissive: 0x581c87,
-      emissiveIntensity: 0.55,
-      metalness: 0.85,
-      roughness: 0.15,
-      flatShading: true
+    const eyeMat = new THREE.MeshBasicMaterial({
+      color: 0x00f5ff
     });
-    const diamondMesh = new THREE.Mesh(diamondGeo, diamondMat);
-    diamondGroup.add(diamondMesh);
 
-    // Diamond wireframe accent ring
-    const diamondWireGeo = new THREE.EdgesGeometry(diamondGeo);
-    const diamondWireMat = new THREE.LineBasicMaterial({
+    // Thorax
+    const thoraxGeo = new THREE.SphereGeometry(0.2, 16, 16);
+    thoraxGeo.scale(0.8, 1.2, 0.7);
+    const thorax = new THREE.Mesh(thoraxGeo, bodyMat);
+    butterflyRoot.add(thorax);
+
+    // Head
+    const headGeo = new THREE.SphereGeometry(0.15, 14, 14);
+    const head = new THREE.Mesh(headGeo, bodyMat);
+    head.position.set(0, 0.32, 0.05);
+    butterflyRoot.add(head);
+
+    // Eyes
+    const eyeGeo = new THREE.SphereGeometry(0.045, 8, 8);
+    const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+    leftEye.position.set(0.07, 0.36, 0.14);
+    butterflyRoot.add(leftEye);
+
+    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+    rightEye.position.set(-0.07, 0.36, 0.14);
+    butterflyRoot.add(rightEye);
+
+    // Abdomen (Tapered)
+    const abdomenGeo = new THREE.ConeGeometry(0.14, 0.8, 14);
+    abdomenGeo.rotateX(Math.PI);
+    const abdomen = new THREE.Mesh(abdomenGeo, bodyMat);
+    abdomen.position.set(0, -0.52, 0);
+    butterflyRoot.add(abdomen);
+
+    // Antennae (Delicate curved lines with glowing tips)
+    const createAntenna = (isLeft: boolean) => {
+      const group = new THREE.Group();
+      const curve = new THREE.CubicBezierCurve3(
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(isLeft ? 0.1 : -0.1, 0.2, 0.1),
+        new THREE.Vector3(isLeft ? 0.22 : -0.22, 0.45, 0.2),
+        new THREE.Vector3(isLeft ? 0.3 : -0.3, 0.55, 0.15)
+      );
+      const points = curve.getPoints(12);
+      const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+      const lineMat = new THREE.LineBasicMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.85
+      });
+      const antennaLine = new THREE.Line(lineGeo, lineMat);
+      group.add(antennaLine);
+
+      // Glowing tip
+      const tipGeo = new THREE.SphereGeometry(0.035, 8, 8);
+      const tipMat = new THREE.MeshBasicMaterial({ color: 0x00f5ff });
+      const tip = new THREE.Mesh(tipGeo, tipMat);
+      tip.position.copy(points[points.length - 1]);
+      group.add(tip);
+
+      group.position.set(0, 0.36, 0.08);
+      return group;
+    };
+
+    butterflyRoot.add(createAntenna(true));
+    butterflyRoot.add(createAntenna(false));
+
+    // --- WINGS CREATION (Dual-wing procedural shape) ---
+    const createWingShape = () => {
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0);
+
+      // Forewing (Upper large graceful wing)
+      shape.bezierCurveTo(0.2, 0.5, 0.7, 1.2, 1.2, 1.8);
+      shape.bezierCurveTo(1.6, 2.3, 2.1, 2.5, 2.4, 2.3);
+      shape.bezierCurveTo(2.7, 2.0, 2.6, 1.4, 2.2, 0.8);
+      shape.bezierCurveTo(1.8, 0.3, 1.3, 0.05, 0.8, -0.05);
+
+      // Hindwing (Lower scalloped wing)
+      shape.bezierCurveTo(1.2, -0.3, 1.6, -0.7, 1.7, -1.3);
+      shape.bezierCurveTo(1.7, -1.9, 1.2, -2.3, 0.8, -2.1);
+      shape.bezierCurveTo(0.4, -1.8, 0.2, -1.2, 0.1, -0.6);
+      shape.bezierCurveTo(0.05, -0.3, 0.02, -0.1, 0, 0);
+
+      return shape;
+    };
+
+    const wingShape = createWingShape();
+    const wingGeo = new THREE.ShapeGeometry(wingShape);
+
+    // Glowing Holographic Frost Wing Material (Translucent with neon rim)
+    const wingMat = new THREE.MeshPhysicalMaterial({
+      color: 0x06b6d4,
+      emissive: 0xa855f7,
+      emissiveIntensity: 0.6,
+      roughness: 0.15,
+      metalness: 0.3,
+      transmission: 0.55,
+      thickness: 0.6,
+      transparent: true,
+      opacity: 0.85,
+      side: THREE.DoubleSide
+    });
+
+    // Glowing Wing Edge Lines
+    const wingEdgesGeo = new THREE.EdgesGeometry(wingGeo);
+    const wingEdgesMat = new THREE.LineBasicMaterial({
       color: 0xe879f9,
       transparent: true,
-      opacity: 0.65
-    });
-    const diamondWire = new THREE.LineSegments(diamondWireGeo, diamondWireMat);
-    diamondGroup.add(diamondWire);
-
-    // Orbiting micro satellite shards around the diamond
-    const shardGeo = new THREE.TetrahedronGeometry(0.24, 0);
-    const shardMat = new THREE.MeshStandardMaterial({
-      color: 0x22d3ee,
-      emissive: 0x0891b2,
-      emissiveIntensity: 1.1
+      opacity: 0.9,
+      linewidth: 2
     });
 
-    const shards: THREE.Mesh[] = [];
-    for (let i = 0; i < 3; i++) {
-      const shard = new THREE.Mesh(shardGeo, shardMat);
-      diamondGroup.add(shard);
-      shards.push(shard);
+    // Wing Veins (Delicate internal structural lines)
+    const createWingVeins = () => {
+      const group = new THREE.Group();
+      const veinMat = new THREE.LineBasicMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.7
+      });
+
+      const veins = [
+        [new THREE.Vector3(0, 0, 0.01), new THREE.Vector3(1.1, 0.8, 0.01), new THREE.Vector3(2.3, 2.2, 0.01)],
+        [new THREE.Vector3(0, 0, 0.01), new THREE.Vector3(1.0, 0.3, 0.01), new THREE.Vector3(2.1, 0.9, 0.01)],
+        [new THREE.Vector3(0, 0, 0.01), new THREE.Vector3(0.6, -0.4, 0.01), new THREE.Vector3(1.5, -1.4, 0.01)],
+        [new THREE.Vector3(0, 0, 0.01), new THREE.Vector3(0.3, -0.5, 0.01), new THREE.Vector3(0.8, -1.9, 0.01)]
+      ];
+
+      veins.forEach((pts) => {
+        const curve = new THREE.CatmullRomCurve3(pts);
+        const geo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(10));
+        group.add(new THREE.Line(geo, veinMat));
+      });
+
+      return group;
+    };
+
+    // Left Wing Assembly (Pivots around Y axis)
+    const leftWingHinge = new THREE.Group();
+    leftWingHinge.position.set(0.06, 0.05, 0.02);
+
+    const leftWingMesh = new THREE.Mesh(wingGeo, wingMat);
+    leftWingHinge.add(leftWingMesh);
+    leftWingHinge.add(new THREE.LineSegments(wingEdgesGeo, wingEdgesMat));
+    leftWingHinge.add(createWingVeins());
+    butterflyRoot.add(leftWingHinge);
+
+    // Right Wing Assembly (Mirrored X, Pivots around Y axis)
+    const rightWingHinge = new THREE.Group();
+    rightWingHinge.position.set(-0.06, 0.05, 0.02);
+
+    const rightWingContainer = new THREE.Group();
+    rightWingContainer.scale.set(-1, 1, 1);
+    rightWingContainer.add(new THREE.Mesh(wingGeo, wingMat));
+    rightWingContainer.add(new THREE.LineSegments(wingEdgesGeo, wingEdgesMat));
+    rightWingContainer.add(createWingVeins());
+
+    rightWingHinge.add(rightWingContainer);
+    butterflyRoot.add(rightWingHinge);
+
+    // Initial Scale of Butterfly
+    butterflyRoot.scale.set(0.85, 0.85, 0.85);
+
+    // 4. MAGICAL FAIRY DUST / FROST TRAIL PARTICLES
+    const trailCount = 55;
+    const trailPositions = new Float32Array(trailCount * 3);
+    const trailOpacities = new Float32Array(trailCount);
+    const trailLife = new Float32Array(trailCount);
+
+    for (let i = 0; i < trailCount; i++) {
+      trailPositions[i * 3] = 0;
+      trailPositions[i * 3 + 1] = 0;
+      trailPositions[i * 3 + 2] = -20;
+      trailLife[i] = Math.random();
     }
 
-    scene.add(diamondGroup);
+    const trailGeo = new THREE.BufferGeometry();
+    trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
 
-    // 5. 3D MODEL 3: THE CYBER TORUS KNOT (Holographic Reactor Ring)
-    const knotGroup = new THREE.Group();
-
-    const knotGeo = new THREE.TorusKnotGeometry(0.95, 0.28, 90, 16, 2, 3);
-    const knotMat = new THREE.MeshStandardMaterial({
-      color: 0xec4899,
-      emissive: 0x831843,
-      emissiveIntensity: 0.65,
-      metalness: 0.7,
-      roughness: 0.2
-    });
-    const knotMesh = new THREE.Mesh(knotGeo, knotMat);
-    knotGroup.add(knotMesh);
-
-    scene.add(knotGroup);
-
-    // 6. 3D AMBIENT FROST PARTICLES (Placed deep in background behind all text)
-    const particleCount = 70;
-    const particleGeo = new THREE.BufferGeometry();
-    const particlePositions = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      particlePositions[i] = (Math.random() - 0.5) * 36;
-      particlePositions[i + 1] = (Math.random() - 0.5) * 36;
-      // Positioned strictly in deep background z (-3 to -10) so they NEVER cross in front of text
-      particlePositions[i + 2] = -3 - Math.random() * 7;
-    }
-
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-
-    const particleMat = new THREE.PointsMaterial({
+    const trailMat = new THREE.PointsMaterial({
       color: 0xa5f3fc,
-      size: 0.13,
+      size: 0.16,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.7,
       blending: THREE.AdditiveBlending
     });
 
-    const particles = new THREE.Points(particleGeo, particleMat);
-    scene.add(particles);
+    const trailPoints = new THREE.Points(trailGeo, trailMat);
+    scene.add(trailPoints);
 
-    // 7. Interactive State tracking (Scroll & Mouse Parallax)
+    // 5. Scroll & Mouse Tracking
     let scrollProgress = 0;
     let targetScrollProgress = 0;
+    let lastScrollProgress = 0;
+    let scrollVelocity = 0;
 
     let mouseX = 0;
     let mouseY = 0;
@@ -211,24 +288,28 @@ export default function Frost3DScene() {
       targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     };
 
-    // Calculate dynamic safe rail positions based on current viewport
-    const getRailBounds = () => {
+    // Dynamic flight curve calculation based on viewport bounds
+    const getFlightPath = () => {
       const aspect = window.innerWidth / window.innerHeight;
       const vHalfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
       const vHalfWidth = vHalfHeight * aspect;
 
-      const screenW = window.innerWidth;
-      // Content container max width is 1280px (half = 640px)
-      const halfContentPx = Math.min(screenW * 0.46, 640);
-      const contentEdgeX = (halfContentPx / (screenW / 2)) * vHalfWidth;
+      // Safe outer rail positions (never enters central content area)
+      const rightRailX = Math.min(vHalfWidth - 1.8, Math.max(7.0, vHalfWidth * 0.72));
+      const leftRailX = -rightRailX;
 
-      // Safe barrier: model must stay strictly outside content edge with padding
-      const minSafeX = contentEdgeX + 1.8;
-      const maxSafeX = Math.max(minSafeX + 0.6, vHalfWidth - 1.4);
-      const targetRailX = minSafeX + (maxSafeX - minSafeX) * 0.5;
-
-      return { minSafeX, maxSafeX, targetRailX };
+      // Smooth 3D Spline Path across the website as user scrolls
+      return new THREE.CatmullRomCurve3([
+        new THREE.Vector3(rightRailX, 3.8, 0.5),           // 0.0: Top Hero right rail
+        new THREE.Vector3(rightRailX - 0.5, 1.2, 1.0),     // 0.2: Gliding down right
+        new THREE.Vector3(leftRailX + 0.8, -1.0, 0.2),      // 0.4: Banking towards left rail
+        new THREE.Vector3(leftRailX, -3.2, 0.8),           // 0.6: About creator left rail
+        new THREE.Vector3(rightRailX - 0.4, -4.8, 0.0),    // 0.8: Videos section right rail
+        new THREE.Vector3(rightRailX, -6.5, -0.4)          // 1.0: Community footer rail
+      ]);
     };
+
+    let flightCurve = getFlightPath();
 
     const onResize = () => {
       if (!checkIsDesktop()) {
@@ -239,6 +320,7 @@ export default function Frost3DScene() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      flightCurve = getFlightPath();
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -246,73 +328,85 @@ export default function Frost3DScene() {
     window.addEventListener('resize', onResize);
     onScroll();
 
-    // 8. Animation & Render Loop
+    // 6. Animation Loop
     let animationFrameId: number;
     const clock = new THREE.Clock();
+    let flapPhase = 0;
+    let trailIndex = 0;
 
     const animate = () => {
       const elapsed = clock.getElapsedTime();
 
-      // Smooth Lerp for scroll & mouse movement
-      scrollProgress += (targetScrollProgress - scrollProgress) * 0.08;
-      mouseX += (targetMouseX - mouseX) * 0.06;
-      mouseY += (targetMouseY - mouseY) * 0.06;
+      // Smooth scroll lerp
+      const prevScroll = scrollProgress;
+      scrollProgress += (targetScrollProgress - scrollProgress) * 0.07;
+      scrollVelocity = Math.abs(scrollProgress - prevScroll) * 50;
 
-      const { minSafeX, maxSafeX, targetRailX } = getRailBounds();
+      // Smooth mouse lerp
+      mouseX += (targetMouseX - mouseX) * 0.05;
+      mouseY += (targetMouseY - mouseY) * 0.05;
 
-      // Model 1: Frost Tesseract Animations (Right rail)
-      // Glides along the right margin rail, never cutting into center content
-      const cubeBaseY = 3.8 - scrollProgress * 11;
-      cubeGroup.position.y = cubeBaseY + Math.sin(elapsed * 1.3) * 0.25 + mouseY * 0.3;
-      
-      // Strict mathematical barrier: can only drift outwards, NEVER inwards across minSafeX
-      const cubeDesiredX = targetRailX + Math.cos(elapsed * 1.1) * 0.2 + Math.max(0, mouseX * 0.4);
-      cubeGroup.position.x = Math.max(minSafeX, Math.min(maxSafeX, cubeDesiredX));
+      // Calculate position along 3D flight path
+      const clampedProgress = Math.min(0.999, Math.max(0.001, scrollProgress));
+      const pathPoint = flightCurve.getPoint(clampedProgress);
+      const pathTangent = flightCurve.getTangent(clampedProgress);
 
-      cubeGroup.rotation.x = elapsed * 0.35 + scrollProgress * Math.PI * 3;
-      cubeGroup.rotation.y = elapsed * 0.5 + scrollProgress * Math.PI * 2.5;
-      innerCore.rotation.x = -elapsed * 1.0;
-      innerCore.rotation.y = elapsed * 1.2;
+      // Natural hovering & mouse parallax influence
+      const hoverY = Math.sin(elapsed * 2.8) * 0.18;
+      const hoverX = Math.cos(elapsed * 2.2) * 0.12;
 
-      // Model 2: Frost Diamond Shard Animations (Left rail)
-      // Floats in the left margin rail, gently ascends with scroll
-      const diamondBaseY = -5.0 + scrollProgress * 10;
-      diamondGroup.position.y = diamondBaseY + Math.cos(elapsed * 1.2) * 0.3 - mouseY * 0.3;
-      
-      // Strict mathematical barrier on left side: can only drift outwards, NEVER inwards across -minSafeX
-      const diamondDesiredX = -targetRailX + Math.sin(elapsed * 1.0) * 0.2 + Math.min(0, mouseX * 0.4);
-      diamondGroup.position.x = Math.min(-minSafeX, Math.max(-maxSafeX, diamondDesiredX));
+      butterflyRoot.position.x = pathPoint.x + hoverX + mouseX * 0.4;
+      butterflyRoot.position.y = pathPoint.y + hoverY - mouseY * 0.3;
+      butterflyRoot.position.z = pathPoint.z;
 
-      diamondGroup.rotation.y = elapsed * 0.45 + scrollProgress * Math.PI * 2.5;
-      diamondGroup.rotation.z = Math.sin(elapsed * 0.7) * 0.15 + scrollProgress * Math.PI * 1.8;
+      // Dynamic Banking & Flight Rotation
+      // Butterfly points forward along its travel tangent and banks on turns
+      const targetPitch = Math.atan2(pathTangent.y, Math.sqrt(pathTangent.x * pathTangent.x + pathTangent.z * pathTangent.z)) * 0.45;
+      const targetRoll = -pathTangent.x * 0.5 + Math.sin(elapsed * 2.0) * 0.08;
+      const targetYaw = Math.atan2(pathTangent.x, pathTangent.z) * 0.3 + mouseX * 0.2;
 
-      // Orbiting micro shards
-      shards.forEach((shard, idx) => {
-        const angle = elapsed * 2.0 + idx * ((Math.PI * 2) / 3);
-        const radius = 1.45;
-        shard.position.set(Math.cos(angle) * radius, Math.sin(angle * 1.1) * 0.6, Math.sin(angle) * radius);
-        shard.rotation.x += 0.03;
-        shard.rotation.y += 0.05;
-      });
+      butterflyRoot.rotation.x = targetPitch + 0.15;
+      butterflyRoot.rotation.y = targetYaw;
+      butterflyRoot.rotation.z = targetRoll;
 
-      // Model 3: Cyber Torus Knot Animations (Right rail lower)
-      // Glides into view in lower page sections near videos/community
-      const knotBaseY = -11.0 + scrollProgress * 14;
-      knotGroup.position.y = knotBaseY + Math.sin(elapsed * 1.4) * 0.25;
-      
-      const knotDesiredX = targetRailX - 0.2 + Math.cos(elapsed * 1.2) * 0.2 + Math.max(0, mouseX * 0.3);
-      knotGroup.position.x = Math.max(minSafeX, Math.min(maxSafeX, knotDesiredX));
+      // DYNAMIC WING FLAPPING
+      // Flaps faster when scrolling, flutters gently when resting
+      const flapFrequency = 6.0 + scrollVelocity * 14.0;
+      flapPhase += flapFrequency * 0.016;
 
-      knotGroup.rotation.x = elapsed * 0.5 + scrollProgress * Math.PI * 2.5;
-      knotGroup.rotation.y = elapsed * 0.7 + scrollProgress * Math.PI * 3;
+      const flapAmplitude = 0.65 + Math.min(0.35, scrollVelocity * 0.4);
+      const flapAngle = Math.sin(flapPhase) * flapAmplitude;
 
-      // Ambient Particles gentle drift in background
-      particles.rotation.y = elapsed * 0.03 + scrollProgress * 0.4;
-      particles.rotation.x = Math.sin(elapsed * 0.04) * 0.08;
+      // Left wing flap
+      leftWingHinge.rotation.y = flapAngle;
+      leftWingHinge.rotation.z = Math.sin(flapPhase) * 0.08;
 
-      // Subtle Parallax Camera
-      camera.position.x = mouseX * 0.4;
-      camera.position.y = -mouseY * 0.4;
+      // Right wing flap (symmetrical mirror)
+      rightWingHinge.rotation.y = -flapAngle;
+      rightWingHinge.rotation.z = -Math.sin(flapPhase) * 0.08;
+
+      // SPARKLE / FROST TRAIL EMISSION
+      if (Math.random() < 0.4 + scrollVelocity * 0.5) {
+        trailIndex = (trailIndex + 1) % trailCount;
+        const offsetLeft = Math.random() > 0.5;
+        trailPositions[trailIndex * 3] = butterflyRoot.position.x + (offsetLeft ? -0.4 : 0.4);
+        trailPositions[trailIndex * 3 + 1] = butterflyRoot.position.y - 0.2;
+        trailPositions[trailIndex * 3 + 2] = butterflyRoot.position.z - 0.1;
+      }
+
+      // Drift and fade trail particles
+      const posAttr = trailGeo.attributes.position as THREE.BufferAttribute;
+      for (let i = 0; i < trailCount; i++) {
+        if (trailPositions[i * 3 + 2] > -15) {
+          trailPositions[i * 3 + 1] -= 0.018; // Gently sink
+          trailPositions[i * 3 + 2] -= 0.03;  // Drift backwards
+        }
+      }
+      posAttr.needsUpdate = true;
+
+      // Camera subtle parallax
+      camera.position.x = mouseX * 0.3;
+      camera.position.y = -mouseY * 0.3;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
@@ -321,16 +415,16 @@ export default function Frost3DScene() {
 
     animate();
 
-    // 9. Cleanup on unmount
+    // 7. Cleanup
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('resize', onResize);
       cancelAnimationFrame(animationFrameId);
 
-      // Dispose Geometries and Materials to prevent memory leaks
-      [cubeGeo, wireGeo, innerGeo, diamondGeo, diamondWireGeo, shardGeo, knotGeo, particleGeo].forEach(g => g.dispose());
-      [cubeMat, wireMat, innerMat, diamondMat, diamondWireMat, shardMat, knotMat, particleMat].forEach(m => m.dispose());
+      // Cleanup geometries and materials
+      [thoraxGeo, headGeo, eyeGeo, abdomenGeo, wingGeo, wingEdgesGeo, trailGeo].forEach(g => g.dispose());
+      [bodyMat, eyeMat, wingMat, wingEdgesMat, trailMat].forEach(m => m.dispose());
 
       if (renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
@@ -343,7 +437,7 @@ export default function Frost3DScene() {
     <div
       ref={containerRef}
       aria-hidden="true"
-      className="fixed inset-0 pointer-events-none z-10 hidden xl:block overflow-hidden transition-opacity duration-700"
+      className="fixed inset-0 pointer-events-none z-10 hidden lg:block overflow-hidden transition-opacity duration-1000"
       style={{
         opacity: isDesktop ? 1 : 0,
         display: isDesktop ? 'block' : 'none'
