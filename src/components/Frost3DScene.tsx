@@ -25,7 +25,7 @@ export default function Frost3DScene() {
     const container = containerRef.current;
     if (!container) return;
 
-    // 1. Scene, Camera & Renderer Setup
+    // 1. Scene, Camera & WebGL Renderer
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(
@@ -48,24 +48,26 @@ export default function Frost3DScene() {
 
     container.appendChild(renderer.domElement);
 
-    // 2. High-Fidelity Studio Lighting for Butterfly Chitin
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
+    // 2. High-Fidelity Studio Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.35);
     scene.add(ambientLight);
 
-    const keySunLight = new THREE.DirectionalLight(0xffffff, 3.5);
+    const keySunLight = new THREE.DirectionalLight(0xffffff, 3.6);
     keySunLight.position.set(12, 18, 14);
     scene.add(keySunLight);
 
-    const rimCyanLight = new THREE.DirectionalLight(0x38bdf8, 2.5);
+    const rimCyanLight = new THREE.DirectionalLight(0x38bdf8, 2.6);
     rimCyanLight.position.set(-14, -10, 10);
     scene.add(rimCyanLight);
 
-    const fillPinkLight = new THREE.DirectionalLight(0xe879f9, 2.0);
-    fillPinkLight.position.set(0, -12, -6);
-    scene.add(fillPinkLight);
+    const fillVioletLight = new THREE.DirectionalLight(0xc084fc, 1.8);
+    fillVioletLight.position.set(0, -12, -6);
+    scene.add(fillVioletLight);
 
-    // 3. ULTRA-DETAILED 1024x1024 WING TEXTURE (DORSAL BLUE MORPHO WITH NATURAL CHITIN DETAILS)
-    const createWingTexture = () => {
+    // 3. ULTRA-DETAILED 1024x1024 WING TEXTURE (EXACT MATCH TO REFERENCE IMAGE)
+    // Features: Vibrant electric cyan center radiating into royal cobalt blue, thick black borders,
+    // stained-glass radial veins, discal cell, 3 apex blue streaks, and scalloped white dots!
+    const createReferenceWingTexture = () => {
       const canvas = document.createElement('canvas');
       canvas.width = 1024;
       canvas.height = 1024;
@@ -74,209 +76,153 @@ export default function Frost3DScene() {
 
       ctx.clearRect(0, 0, 1024, 1024);
 
-      // Base Iridescent Morpho Gradient
-      // Radial burst: white core -> radiant electric cyan -> deep royal sapphire -> dark indigo -> velvet black
-      const baseGrad = ctx.createRadialGradient(250, 650, 60, 500, 480, 750);
-      baseGrad.addColorStop(0, '#f0f9ff');   // Bright frost-white inner glow
-      baseGrad.addColorStop(0.15, '#38bdf8'); // Radiant Cyan
-      baseGrad.addColorStop(0.42, '#2563eb'); // Royal Blue Morpho
-      baseGrad.addColorStop(0.68, '#4f46e5'); // Deep Indigo
-      baseGrad.addColorStop(0.85, '#1e1b4b'); // Midnight Navy
-      baseGrad.addColorStop(1.0, '#05030a');  // Velvet Black margin
+      // Base Gradient: White core highlight -> Electric Cyan -> Royal Cobalt -> Deep Navy -> Black
+      const baseGrad = ctx.createRadialGradient(240, 640, 40, 520, 500, 720);
+      baseGrad.addColorStop(0, '#f0f9ff');   // Core highlight
+      baseGrad.addColorStop(0.18, '#00e5ff'); // Electric Vibrant Cyan (Matching reference image!)
+      baseGrad.addColorStop(0.42, '#0284c7'); // Bright Blue
+      baseGrad.addColorStop(0.68, '#1d4ed8'); // Royal Cobalt Blue
+      baseGrad.addColorStop(0.86, '#1e3a8a'); // Deep Navy
+      baseGrad.addColorStop(1.0, '#09090b');  // Velvet Black
 
       ctx.fillStyle = baseGrad;
       ctx.fillRect(0, 0, 1024, 1024);
 
-      // Velvet Black Outer Margins (Dark wings tips and scalloped edges)
-      const marginGrad = ctx.createLinearGradient(0, 0, 1024, 500);
-      marginGrad.addColorStop(0, 'rgba(5, 3, 10, 0.95)');
-      marginGrad.addColorStop(0.35, 'transparent');
-      marginGrad.addColorStop(0.7, 'transparent');
-      marginGrad.addColorStop(1, 'rgba(5, 3, 10, 0.95)');
-      ctx.fillStyle = marginGrad;
-      ctx.fillRect(0, 0, 1024, 1024);
+      // Stained-Glass Wing Cells Luminous Highlights
+      const cellHighlights = [
+        { x: 380, y: 550, rx: 90, ry: 45, rot: -0.35, color: '#38bdf8' },
+        { x: 520, y: 440, rx: 110, ry: 40, rot: -0.42, color: '#00e5ff' },
+        { x: 620, y: 350, rx: 110, ry: 35, rot: -0.48, color: '#00e5ff' },
+        { x: 680, y: 260, rx: 100, ry: 30, rot: -0.52, color: '#38bdf8' },
+        { x: 580, y: 580, rx: 95, ry: 38, rot: -0.15, color: '#00e5ff' },
+        { x: 540, y: 700, rx: 85, ry: 35, rot: 0.15, color: '#00e5ff' },
+        { x: 440, y: 800, rx: 75, ry: 32, rot: 0.40, color: '#38bdf8' },
+        { x: 340, y: 860, rx: 65, ry: 30, rot: 0.60, color: '#0284c7' }
+      ];
 
-      // Top leading edge dark band
-      const topBand = ctx.createLinearGradient(0, 0, 0, 220);
-      topBand.addColorStop(0, '#05030a');
+      cellHighlights.forEach(c => {
+        const cg = ctx.createRadialGradient(c.x, c.y, 10, c.x, c.y, c.rx);
+        cg.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+        cg.addColorStop(0.4, c.color);
+        cg.addColorStop(1, 'transparent');
+        ctx.fillStyle = cg;
+        ctx.beginPath();
+        ctx.ellipse(c.x, c.y, c.rx, c.ry, c.rot, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Thick Solid Black Borders (As seen in the reference image)
+      // Top leading edge solid black band
+      const topBand = ctx.createLinearGradient(0, 0, 0, 200);
+      topBand.addColorStop(0, '#09090b');
+      topBand.addColorStop(0.75, '#09090b');
       topBand.addColorStop(1, 'transparent');
       ctx.fillStyle = topBand;
-      ctx.fillRect(0, 0, 1024, 220);
+      ctx.fillRect(0, 0, 1024, 200);
 
-      // Apex Dark Patch
-      const apexGrad = ctx.createRadialGradient(880, 160, 10, 880, 160, 320);
-      apexGrad.addColorStop(0, '#05030a');
-      apexGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = apexGrad;
-      ctx.beginPath();
-      ctx.arc(880, 160, 320, 0, Math.PI * 2);
-      ctx.fill();
+      // Outer right margin thick black band
+      const rightBand = ctx.createLinearGradient(720, 0, 1024, 0);
+      rightBand.addColorStop(0, 'transparent');
+      rightBand.addColorStop(0.4, 'rgba(9, 9, 11, 0.7)');
+      rightBand.addColorStop(0.7, '#09090b');
+      rightBand.addColorStop(1, '#09090b');
+      ctx.fillStyle = rightBand;
+      ctx.fillRect(720, 0, 304, 1024);
 
-      // INTRICATE ANATOMICAL BRANCHING VEINS (Lepidoptera venation network)
-      ctx.strokeStyle = '#05030a';
-      ctx.lineCap = 'round';
-      const rootX = 120, rootY = 700;
+      // Bottom hindwing scalloped margin black band
+      const bottomBand = ctx.createLinearGradient(0, 750, 0, 1024);
+      bottomBand.addColorStop(0, 'transparent');
+      bottomBand.addColorStop(0.5, 'rgba(9, 9, 11, 0.85)');
+      bottomBand.addColorStop(0.8, '#09090b');
+      bottomBand.addColorStop(1, '#09090b');
+      ctx.fillStyle = bottomBand;
+      ctx.fillRect(0, 750, 1024, 274);
 
-      // Primary main veins
-      const mainVeins = [
-        [880, 120, 480, 280],
-        [940, 240, 560, 380],
-        [950, 400, 600, 480],
-        [880, 580, 580, 580],
-        [780, 750, 500, 680],
-        [640, 880, 420, 780],
-        [460, 940, 320, 840]
+      // Inner root dark shadow
+      const rootShadow = ctx.createRadialGradient(80, 680, 20, 80, 680, 180);
+      rootShadow.addColorStop(0, '#09090b');
+      rootShadow.addColorStop(0.8, 'rgba(9, 9, 11, 0.6)');
+      rootShadow.addColorStop(1, 'transparent');
+      ctx.fillStyle = rootShadow;
+      ctx.fillRect(0, 500, 260, 360);
+
+      // Apex Isolated Glowing Blue Streaks (Exact signature from reference image!)
+      ctx.save();
+      const apexStreaks = [
+        { startX: 840, startY: 85, endX: 950, endY: 150, width: 22, color: '#38bdf8' },
+        { startX: 830, startY: 140, endX: 935, endY: 230, width: 20, color: '#00e5ff' },
+        { startX: 810, startY: 210, endX: 910, endY: 300, width: 18, color: '#0284c7' }
       ];
 
-      mainVeins.forEach(([destX, destY, ctrlX, ctrlY], idx) => {
-        // Main vein
-        ctx.lineWidth = idx === 0 ? 6.5 : 4.0;
+      apexStreaks.forEach(s => {
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = s.width;
+        ctx.lineCap = 'round';
+        ctx.shadowColor = s.color;
+        ctx.shadowBlur = 12;
         ctx.beginPath();
-        ctx.moveTo(rootX, rootY);
-        ctx.quadraticCurveTo(ctrlX, ctrlY, destX, destY);
+        ctx.moveTo(s.startX, s.startY);
+        ctx.quadraticCurveTo((s.startX + s.endX) / 2 + 15, (s.startY + s.endY) / 2 - 10, s.endX, s.endY);
         ctx.stroke();
 
-        // Secondary cross veins and branches
-        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = s.width * 0.35;
         ctx.beginPath();
-        ctx.moveTo(ctrlX, ctrlY);
-        ctx.quadraticCurveTo(ctrlX + 70, ctrlY - 50, destX - 40, destY - 80);
-        ctx.stroke();
-
-        ctx.lineWidth = 1.6;
-        ctx.beginPath();
-        ctx.moveTo(ctrlX + 30, ctrlY);
-        ctx.quadraticCurveTo(ctrlX + 90, ctrlY + 40, destX - 20, destY + 40);
+        ctx.moveTo(s.startX + 10, s.startY + 5);
+        ctx.quadraticCurveTo((s.startX + s.endX) / 2 + 15, (s.startY + s.endY) / 2 - 10, s.endX - 10, s.endY - 5);
         ctx.stroke();
       });
+      ctx.restore();
 
-      // Discal Cell (Central closed loop near wing root)
-      ctx.lineWidth = 4.5;
+      // Bold Branching Black Vein Framework (Matching reference image)
+      ctx.strokeStyle = '#09090b';
+      ctx.lineCap = 'round';
+      const rootX = 110, rootY = 660;
+
+      // Discal Cell outline (central oval closed loop near base)
+      ctx.lineWidth = 6.0;
       ctx.beginPath();
       ctx.moveTo(rootX, rootY);
-      ctx.bezierCurveTo(280, 520, 440, 480, 420, 590);
-      ctx.bezierCurveTo(400, 660, 260, 680, rootX, rootY);
+      ctx.bezierCurveTo(240, 520, 380, 480, 410, 560);
+      ctx.bezierCurveTo(400, 630, 260, 660, rootX, rootY);
       ctx.stroke();
 
-      // ========================================================
-      // REALISTIC BLACK BUTTERFLY SPOTS (Lepidoptera Maculation)
-      // ========================================================
-
-      // 1. CENTRAL DISCAL BLACK SPOTS (Inside discal cell)
-      ctx.fillStyle = '#05030a';
-      ctx.shadowColor = '#0284c7';
-      ctx.shadowBlur = 6;
-
-      // Central prominent black spot
-      ctx.beginPath();
-      ctx.ellipse(340, 580, 26, 18, -0.35, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Discal cross-vein black bar
-      ctx.beginPath();
-      ctx.ellipse(430, 550, 20, 12, -0.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Sub-basal black dot near wing root
-      ctx.beginPath();
-      ctx.arc(220, 660, 14, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 2. POST-DISCAL ARC OF BOLD BLACK BUTTERFLY SPOTS
-      // Distinctive curved series of velvety black spots situated between veins in wing cells
-      const blackSpots = [
-        { x: 740, y: 250, rx: 25, ry: 18, rot: -0.42 }, // Sub-apical cell
-        { x: 720, y: 380, rx: 28, ry: 20, rot: -0.28 }, // Upper radial cell
-        { x: 670, y: 510, rx: 32, ry: 22, rot: -0.12 }, // Mid wing cell (Largest boldest spot)
-        { x: 610, y: 640, rx: 29, ry: 20, rot: 0.14 },  // Lower-mid cell
-        { x: 530, y: 750, rx: 27, ry: 19, rot: 0.28 },  // Hindwing upper scallop
-        { x: 430, y: 850, rx: 24, ry: 17, rot: 0.42 },  // Hindwing lower cell
-        { x: 330, y: 920, rx: 20, ry: 15, rot: 0.55 }   // Hindwing swallowtail lobe
+      // Radiating veins from discal cell to outer margin
+      const veins = [
+        { startX: 410, startY: 520, ctrlX: 580, ctrlY: 320, endX: 880, endY: 170, w: 5.5 },
+        { startX: 410, startY: 550, ctrlX: 630, ctrlY: 410, endX: 930, endY: 280, w: 5.0 },
+        { startX: 400, startY: 580, ctrlX: 660, ctrlY: 500, endX: 950, endY: 420, w: 5.0 },
+        { startX: 380, startY: 610, ctrlX: 640, ctrlY: 590, endX: 910, endY: 570, w: 4.8 },
+        { startX: 300, startY: 650, ctrlX: 580, ctrlY: 670, endX: 860, endY: 700, w: 6.0 },
+        { startX: 250, startY: 670, ctrlX: 500, ctrlY: 760, endX: 780, endY: 820, w: 4.8 },
+        { startX: 200, startY: 680, ctrlX: 430, ctrlY: 830, endX: 660, endY: 920, w: 4.5 },
+        { startX: 160, startY: 690, ctrlX: 330, ctrlY: 870, endX: 500, endY: 970, w: 4.2 },
+        { startX: 120, startY: 700, ctrlX: 240, ctrlY: 880, endX: 360, endY: 980, w: 4.0 }
       ];
 
-      blackSpots.forEach((spot) => {
-        // Subtle luminous cyan halo border around each black spot (makes it pop against blue)
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
-        ctx.lineWidth = 4.5;
+      veins.forEach(v => {
+        ctx.lineWidth = v.w;
         ctx.beginPath();
-        ctx.ellipse(spot.x, spot.y, spot.rx + 2, spot.ry + 2, spot.rot, 0, Math.PI * 2);
+        ctx.moveTo(v.startX, v.startY);
+        ctx.quadraticCurveTo(v.ctrlX, v.ctrlY, v.endX, v.endY);
         ctx.stroke();
 
-        // Solid velvety jet-black spot core
-        ctx.fillStyle = '#05030a';
+        ctx.lineWidth = v.w * 0.6;
         ctx.beginPath();
-        ctx.ellipse(spot.x, spot.y, spot.rx, spot.ry, spot.rot, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Subtle specular highlight on black spot (chitin scale sheen)
-        ctx.fillStyle = 'rgba(165, 243, 252, 0.25)';
-        ctx.beginPath();
-        ctx.arc(spot.x - spot.rx * 0.25, spot.y - spot.ry * 0.25, spot.rx * 0.3, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // 3. SUBMARGINAL BLACK CHEVRON / LUNULE SPOTS (Arrowhead spots along margin)
-      ctx.fillStyle = '#05030a';
-      const chevronSpots = [
-        [830, 210, 16],
-        [810, 330, 18],
-        [770, 460, 18],
-        [710, 580, 17],
-        [640, 700, 16],
-        [540, 810, 15]
-      ];
-      chevronSpots.forEach(([cx, cy, sz]) => {
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, sz, sz * 0.7, -0.2, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // 4. HINDWING TAIL OCELLI (Prominent eyespots on lower wing with cyan crescents)
-      const hindwingOcelli = [
-        { x: 620, y: 880, r: 24 },
-        { x: 490, y: 940, r: 21 }
-      ];
-      hindwingOcelli.forEach((ocellus) => {
-        // Outer cyan ring
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(ocellus.x, ocellus.y, ocellus.r + 2, 0, Math.PI * 2);
+        ctx.moveTo(v.ctrlX + 60, v.ctrlY + 10);
+        ctx.quadraticCurveTo(v.ctrlX + 110, v.ctrlY - 20, v.endX - 10, v.endY - 45);
         ctx.stroke();
-
-        // Deep black center
-        ctx.fillStyle = '#05030a';
-        ctx.beginPath();
-        ctx.arc(ocellus.x, ocellus.y, ocellus.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Inner electric cyan crescent
-        ctx.fillStyle = '#38bdf8';
-        ctx.beginPath();
-        ctx.arc(ocellus.x - ocellus.r * 0.25, ocellus.y - ocellus.r * 0.25, ocellus.r * 0.32, 0, Math.PI * 2);
-        ctx.fill();
       });
 
-      // 5. DOUBLE ROW OF PEARL-WHITE LUNAR ACCENT SPOTS ALONG MARGIN
+      // Scalloped Outer Margin Lunar White Dots (As seen in reference image)
       ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = '#38bdf8';
-      ctx.shadowBlur = 10;
-      const outerSpots = [
-        [940, 220, 7.5], [920, 340, 8.5], [870, 480, 8.5], [810, 610, 8.0],
-        [730, 730, 7.5], [630, 830, 7.0], [510, 900, 6.5], [890, 140, 9.0], [790, 90, 7.5]
+      ctx.shadowColor = '#fef08a';
+      ctx.shadowBlur = 8;
+      const marginDots = [
+        [930, 310, 5], [945, 410, 5], [925, 510, 5.5], [885, 620, 5.5],
+        [825, 730, 5], [745, 830, 5], [645, 905, 5], [530, 960, 4.5], [410, 975, 4]
       ];
-      outerSpots.forEach(([x, y, r]) => {
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // Inner row of delicate accent spots
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-      const innerSpots = [
-        [870, 260, 4.5], [850, 360, 5.0], [800, 480, 5.0], [740, 590, 4.5], [660, 700, 4.0]
-      ];
-      innerSpots.forEach(([x, y, r]) => {
+      marginDots.forEach(([x, y, r]) => {
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
@@ -289,38 +235,36 @@ export default function Frost3DScene() {
       return texture;
     };
 
-    const wingTexture = createWingTexture();
+    const wingTexture = createReferenceWingTexture();
 
-    // 4. UNIFIED SINGLE WING SILHOUETTE GEOMETRY (EXACTLY 1 WING LEFT, 1 WING RIGHT = 2 WINGS TOTAL!)
-    // Real complete butterfly wing outline incorporating forewing apex, scalloped margin, and swallowtail hindwing lobe
+    // 4. UNIFIED SINGLE WING SILHOUETTE (EXACTLY 2 WINGS: 1 LEFT, 1 RIGHT)
     const createSingleWingShape = () => {
       const shape = new THREE.Shape();
-      shape.moveTo(0, 0); // Root hinge attachment
+      shape.moveTo(0, 0);
 
-      // Forewing Leading Edge (Sweeps majestically up and out)
-      shape.bezierCurveTo(0.3, 0.6, 0.9, 1.6, 1.5, 2.3);
-      shape.bezierCurveTo(1.8, 2.7, 2.3, 2.9, 2.7, 2.8); // Forewing Apex
+      // Leading Edge (Sweeps upward to forewing apex)
+      shape.bezierCurveTo(0.25, 0.7, 0.8, 1.8, 1.5, 2.5);
+      shape.bezierCurveTo(1.8, 2.85, 2.3, 3.05, 2.75, 2.9); // Forewing Apex
 
-      // Forewing Outer Margin (Curving down with delicate scallops)
-      shape.bezierCurveTo(2.95, 2.5, 3.0, 1.9, 2.7, 1.3);
-      shape.bezierCurveTo(2.4, 0.8, 2.1, 0.4, 1.8, 0.15); // Outer notch between wings
+      // Forewing Outer Margin (Curving down with subtle scallops)
+      shape.bezierCurveTo(3.0, 2.55, 3.05, 1.9, 2.75, 1.3);
+      shape.bezierCurveTo(2.45, 0.8, 2.15, 0.4, 1.85, 0.15); // Outer notch between wings
 
-      // Hindwing Scalloped Outer Margin (Elegant swallowtail curve)
-      shape.bezierCurveTo(2.1, -0.2, 2.3, -0.7, 2.2, -1.3);
-      shape.bezierCurveTo(2.1, -1.9, 1.7, -2.4, 1.2, -2.2); // Swallowtail lobe
+      // Hindwing Outer Margin (Fan-shaped scalloped curve)
+      shape.bezierCurveTo(2.15, -0.2, 2.35, -0.7, 2.25, -1.3);
+      shape.bezierCurveTo(2.15, -1.9, 1.75, -2.4, 1.25, -2.25); // Hindwing lower lobe
 
-      // Hindwing Inner Margin (Returning gracefully to body root)
-      shape.bezierCurveTo(0.7, -1.9, 0.3, -1.2, 0.1, -0.5);
+      // Hindwing Inner Margin (Returning to body root)
+      shape.bezierCurveTo(0.75, -1.95, 0.35, -1.2, 0.1, -0.5);
       shape.bezierCurveTo(0.04, -0.2, 0.01, -0.08, 0, 0);
 
       return shape;
     };
 
     const singleWingShape = createSingleWingShape();
-    // Subdivided 2D geometry for realistic aerodynamic camber and vertex flexing
     const wingGeo = new THREE.ShapeGeometry(singleWingShape, 24);
 
-    // Compute bounding box and normalize UV coordinates perfectly across the wing
+    // Normalize UV coordinates perfectly across the wing geometry
     wingGeo.computeBoundingBox();
     const bb = wingGeo.boundingBox!;
     const sizeX = bb.max.x - bb.min.x;
@@ -333,7 +277,6 @@ export default function Frost3DScene() {
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const y = pos.getY(i);
-      // Perfect UV mapping to texture
       uvs.setXY(i, (x - bb.min.x) / sizeX, (y - bb.min.y) / sizeY);
 
       // Natural 3D camber arch across wing chord
@@ -359,7 +302,7 @@ export default function Frost3DScene() {
       side: THREE.DoubleSide
     });
 
-    // 5. BUTTERFLY BODY & HIERARCHY
+    // 5. BUTTERFLY BODY & HIERARCHY (Matching reference image)
     const butterflyRoot = new THREE.Group();
     scene.add(butterflyRoot);
 
@@ -413,7 +356,7 @@ export default function Frost3DScene() {
     const proboscis = new THREE.Mesh(proboscisGeo, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
     headGroup.add(proboscis);
 
-    // Antennae (2 graceful curved antennae with teardrop club tips)
+    // Antennae (Matching reference: 2 slender black antennae in narrow V-shape)
     const createAntenna = (isLeft: boolean) => {
       const antGroup = new THREE.Group();
       const curve = new THREE.CubicBezierCurve3(
@@ -470,7 +413,7 @@ export default function Frost3DScene() {
       butterflyRoot.add(createLeg(false, yOff));
     });
 
-    // Articulated Abdomen (Dynamically curls with climb/descent/turns)
+    // Articulated Abdomen (Slender, tapered black needle-like abdomen)
     const abdomenGroup = new THREE.Group();
     const abdomenGeo = new THREE.ConeGeometry(0.13, 0.82, 16);
     abdomenGeo.rotateX(Math.PI);
@@ -500,7 +443,7 @@ export default function Frost3DScene() {
     rightWingHinge.add(rightWingContainer);
     butterflyRoot.add(rightWingHinge);
 
-    // Overall Butterfly Scale (Sleek, lifelike proportions)
+    // Overall Butterfly Scale
     butterflyRoot.scale.set(0.95, 0.95, 0.95);
 
     // 6. MAGICAL FROST SPARKLE TRAIL PARTICLES
