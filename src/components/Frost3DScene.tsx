@@ -158,7 +158,106 @@ export default function Frost3DScene() {
       ctx.bezierCurveTo(400, 660, 260, 680, rootX, rootY);
       ctx.stroke();
 
-      // DOUBLE ROW OF PEARL-WHITE LUNAR ACCENT SPOTS ALONG MARGIN
+      // ========================================================
+      // REALISTIC BLACK BUTTERFLY SPOTS (Lepidoptera Maculation)
+      // ========================================================
+
+      // 1. CENTRAL DISCAL BLACK SPOTS (Inside discal cell)
+      ctx.fillStyle = '#05030a';
+      ctx.shadowColor = '#0284c7';
+      ctx.shadowBlur = 6;
+
+      // Central prominent black spot
+      ctx.beginPath();
+      ctx.ellipse(340, 580, 26, 18, -0.35, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Discal cross-vein black bar
+      ctx.beginPath();
+      ctx.ellipse(430, 550, 20, 12, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sub-basal black dot near wing root
+      ctx.beginPath();
+      ctx.arc(220, 660, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. POST-DISCAL ARC OF BOLD BLACK BUTTERFLY SPOTS
+      // Distinctive curved series of velvety black spots situated between veins in wing cells
+      const blackSpots = [
+        { x: 740, y: 250, rx: 25, ry: 18, rot: -0.42 }, // Sub-apical cell
+        { x: 720, y: 380, rx: 28, ry: 20, rot: -0.28 }, // Upper radial cell
+        { x: 670, y: 510, rx: 32, ry: 22, rot: -0.12 }, // Mid wing cell (Largest boldest spot)
+        { x: 610, y: 640, rx: 29, ry: 20, rot: 0.14 },  // Lower-mid cell
+        { x: 530, y: 750, rx: 27, ry: 19, rot: 0.28 },  // Hindwing upper scallop
+        { x: 430, y: 850, rx: 24, ry: 17, rot: 0.42 },  // Hindwing lower cell
+        { x: 330, y: 920, rx: 20, ry: 15, rot: 0.55 }   // Hindwing swallowtail lobe
+      ];
+
+      blackSpots.forEach((spot) => {
+        // Subtle luminous cyan halo border around each black spot (makes it pop against blue)
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+        ctx.lineWidth = 4.5;
+        ctx.beginPath();
+        ctx.ellipse(spot.x, spot.y, spot.rx + 2, spot.ry + 2, spot.rot, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Solid velvety jet-black spot core
+        ctx.fillStyle = '#05030a';
+        ctx.beginPath();
+        ctx.ellipse(spot.x, spot.y, spot.rx, spot.ry, spot.rot, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Subtle specular highlight on black spot (chitin scale sheen)
+        ctx.fillStyle = 'rgba(165, 243, 252, 0.25)';
+        ctx.beginPath();
+        ctx.arc(spot.x - spot.rx * 0.25, spot.y - spot.ry * 0.25, spot.rx * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 3. SUBMARGINAL BLACK CHEVRON / LUNULE SPOTS (Arrowhead spots along margin)
+      ctx.fillStyle = '#05030a';
+      const chevronSpots = [
+        [830, 210, 16],
+        [810, 330, 18],
+        [770, 460, 18],
+        [710, 580, 17],
+        [640, 700, 16],
+        [540, 810, 15]
+      ];
+      chevronSpots.forEach(([cx, cy, sz]) => {
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, sz, sz * 0.7, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 4. HINDWING TAIL OCELLI (Prominent eyespots on lower wing with cyan crescents)
+      const hindwingOcelli = [
+        { x: 620, y: 880, r: 24 },
+        { x: 490, y: 940, r: 21 }
+      ];
+      hindwingOcelli.forEach((ocellus) => {
+        // Outer cyan ring
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(ocellus.x, ocellus.y, ocellus.r + 2, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Deep black center
+        ctx.fillStyle = '#05030a';
+        ctx.beginPath();
+        ctx.arc(ocellus.x, ocellus.y, ocellus.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Inner electric cyan crescent
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(ocellus.x - ocellus.r * 0.25, ocellus.y - ocellus.r * 0.25, ocellus.r * 0.32, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 5. DOUBLE ROW OF PEARL-WHITE LUNAR ACCENT SPOTS ALONG MARGIN
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = '#38bdf8';
       ctx.shadowBlur = 10;
