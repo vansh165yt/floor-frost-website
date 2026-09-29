@@ -627,6 +627,257 @@ export default function Frost3DScene() {
     // Overall Butterfly Scale
     butterflyRoot.scale.set(0.95, 0.95, 0.95);
 
+    // 5.5 REALISTIC 3D CHERRY BLOSSOM BRANCH IN THE FOOTER (SWAYING IN WIND)
+    const cherryBranchGroup = new THREE.Group();
+    scene.add(cherryBranchGroup);
+
+    // Dark Bark Wood Material (Gnarled branch)
+    const barkMat = new THREE.MeshStandardMaterial({
+      color: 0x3b2419,
+      roughness: 0.86,
+      metalness: 0.05
+    });
+
+    // Sakura Blossom Petal Geometry with realistic cleft / notch
+    const petalShape = new THREE.Shape();
+    petalShape.moveTo(0, 0);
+    petalShape.bezierCurveTo(0.10, 0.18, 0.20, 0.42, 0.14, 0.62);
+    petalShape.bezierCurveTo(0.08, 0.72, 0.03, 0.68, 0.0, 0.64); // Classic Sakura cleft notch
+    petalShape.bezierCurveTo(-0.03, 0.68, -0.08, 0.72, -0.14, 0.62);
+    petalShape.bezierCurveTo(-0.20, 0.42, -0.10, 0.18, 0, 0);
+
+    const petalGeo = new THREE.ShapeGeometry(petalShape, 12);
+    const petalPos = petalGeo.attributes.position;
+    for (let i = 0; i < petalPos.count; i++) {
+      const py = petalPos.getY(i);
+      petalPos.setZ(i, Math.sin(py * 2.5) * 0.08);
+    }
+    petalGeo.computeVertexNormals();
+
+    // Outer Petal Material (Delicate sakura blossom pink with soft velvet sheen)
+    const petalMat = new THREE.MeshPhysicalMaterial({
+      color: 0xffe4e6,
+      roughness: 0.38,
+      clearcoat: 0.35,
+      clearcoatRoughness: 0.15,
+      emissive: 0xf472b6,
+      emissiveIntensity: 0.14,
+      side: THREE.DoubleSide
+    });
+
+    // Inner Layer Petal Material (Warm pink core)
+    const innerPetalMat = new THREE.MeshPhysicalMaterial({
+      color: 0xfbcfe8,
+      roughness: 0.35,
+      clearcoat: 0.4,
+      emissive: 0xec4899,
+      emissiveIntensity: 0.20,
+      side: THREE.DoubleSide
+    });
+
+    // Golden Stamen & Pollen Anthers
+    const stamenMat = new THREE.MeshStandardMaterial({
+      color: 0xfef08a,
+      roughness: 0.3,
+      emissive: 0xfacc15,
+      emissiveIntensity: 0.65
+    });
+    const pollenGeo = new THREE.SphereGeometry(0.02, 8, 8);
+
+    // Fresh Green Spring Leaf Buds
+    const leafShape = new THREE.Shape();
+    leafShape.moveTo(0, 0);
+    leafShape.quadraticCurveTo(0.12, 0.25, 0, 0.55);
+    leafShape.quadraticCurveTo(-0.12, 0.25, 0, 0);
+    const leafGeo = new THREE.ShapeGeometry(leafShape, 8);
+    const leafMat = new THREE.MeshStandardMaterial({
+      color: 0x4ade80,
+      roughness: 0.4,
+      metalness: 0.1,
+      side: THREE.DoubleSide
+    });
+
+    // Helper to create a single layered Sakura flower blossom
+    const createSakuraFlower = (scale = 1.0) => {
+      const flowerGroup = new THREE.Group();
+
+      // 5 Outer Petals (arranged radially with gentle cupping)
+      for (let i = 0; i < 5; i++) {
+        const angle = i * (Math.PI * 2 / 5);
+        const petalMesh = new THREE.Mesh(petalGeo, petalMat);
+        petalMesh.rotation.z = angle;
+        petalMesh.rotation.x = 0.22;
+        petalMesh.scale.set(scale, scale, scale);
+        flowerGroup.add(petalMesh);
+      }
+
+      // 5 Inner Smaller Petals
+      for (let i = 0; i < 5; i++) {
+        const angle = i * (Math.PI * 2 / 5) + (Math.PI / 5);
+        const innerMesh = new THREE.Mesh(petalGeo, innerPetalMat);
+        innerMesh.rotation.z = angle;
+        innerMesh.rotation.x = 0.32;
+        innerMesh.scale.set(scale * 0.72, scale * 0.72, scale * 0.72);
+        innerMesh.position.z = 0.02;
+        flowerGroup.add(innerMesh);
+      }
+
+      // Central Calyx & Stamen Cluster
+      const stamenCluster = new THREE.Group();
+      const stamenCount = 10;
+      for (let s = 0; s < stamenCount; s++) {
+        const sAngle = s * (Math.PI * 2 / stamenCount);
+        const sDist = 0.05 * scale;
+        const sHeight = 0.12 * scale;
+        const filament = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.004, 0.005, sHeight, 4),
+          stamenMat
+        );
+        filament.position.set(Math.cos(sAngle) * sDist, Math.sin(sAngle) * sDist, sHeight / 2);
+        filament.rotation.x = Math.PI / 2;
+        stamenCluster.add(filament);
+
+        const anther = new THREE.Mesh(pollenGeo, stamenMat);
+        anther.position.set(Math.cos(sAngle) * (sDist * 1.3), Math.sin(sAngle) * (sDist * 1.3), sHeight);
+        stamenCluster.add(anther);
+      }
+      flowerGroup.add(stamenCluster);
+
+      // Calyx Base (Burgundy cup)
+      const calyxGeo = new THREE.ConeGeometry(0.08 * scale, 0.12 * scale, 5);
+      calyxGeo.rotateX(Math.PI);
+      const calyxMat = new THREE.MeshStandardMaterial({ color: 0x4a044e, roughness: 0.6 });
+      const calyx = new THREE.Mesh(calyxGeo, calyxMat);
+      calyx.position.z = -0.06 * scale;
+      flowerGroup.add(calyx);
+
+      return flowerGroup;
+    };
+
+    // 1. Main Curved Branch Stem (Enters organically from bottom right rail)
+    const mainBranchCurve = new THREE.CubicBezierCurve3(
+      new THREE.Vector3(3.2, -2.4, -0.2),
+      new THREE.Vector3(1.8, -1.2, 0.3),
+      new THREE.Vector3(0.5, -0.3, 0.6),
+      new THREE.Vector3(-0.6, 0.5, 0.8)
+    );
+    const mainBranchGeo = new THREE.TubeGeometry(mainBranchCurve, 32, 0.14, 10, false);
+    cherryBranchGroup.add(new THREE.Mesh(mainBranchGeo, barkMat));
+
+    // 2. Secondary Twigs
+    // Twig A: Reaches forward and holds the PRIMARY LANDING SAKURA FLOWER!
+    const twigACurve = new THREE.CubicBezierCurve3(
+      new THREE.Vector3(0.5, -0.3, 0.6),
+      new THREE.Vector3(0.0, 0.2, 0.9),
+      new THREE.Vector3(-0.4, 0.6, 1.1),
+      new THREE.Vector3(-0.8, 0.9, 1.25)
+    );
+    const twigAGeo = new THREE.TubeGeometry(twigACurve, 20, 0.075, 8, false);
+    cherryBranchGroup.add(new THREE.Mesh(twigAGeo, barkMat));
+
+    // Twig B: Lower side branch with flower cluster
+    const twigBCurve = new THREE.CubicBezierCurve3(
+      new THREE.Vector3(1.8, -1.2, 0.3),
+      new THREE.Vector3(1.2, -0.7, 0.7),
+      new THREE.Vector3(0.6, -0.4, 0.8),
+      new THREE.Vector3(0.1, -0.2, 0.95)
+    );
+    const twigBGeo = new THREE.TubeGeometry(twigBCurve, 18, 0.065, 8, false);
+    cherryBranchGroup.add(new THREE.Mesh(twigBGeo, barkMat));
+
+    // Twig C: Upper graceful twig
+    const twigCCurve = new THREE.CubicBezierCurve3(
+      new THREE.Vector3(-0.6, 0.5, 0.8),
+      new THREE.Vector3(-1.0, 0.8, 0.9),
+      new THREE.Vector3(-1.4, 1.1, 1.0)
+    );
+    const twigCGeo = new THREE.TubeGeometry(twigCCurve, 14, 0.05, 8, false);
+    cherryBranchGroup.add(new THREE.Mesh(twigCGeo, barkMat));
+
+    // THE PRIMARY SAKURA LANDING BLOSSOM (Where the butterfly will perch!)
+    const landingFlower = createSakuraFlower(1.35);
+    landingFlower.position.set(-0.8, 0.9, 1.25);
+    landingFlower.rotation.set(0.35, 0.45, 0.2); // Tilted open toward camera
+    cherryBranchGroup.add(landingFlower);
+
+    // Landing Perch Anchor (Exact spot on top of the flower stamens)
+    const landingPerchAnchor = new THREE.Object3D();
+    landingPerchAnchor.position.set(0, 0, 0.18);
+    landingFlower.add(landingPerchAnchor);
+
+    // Surrounding Sakura Blossoms on the branch
+    const flower2 = createSakuraFlower(1.05);
+    flower2.position.set(0.1, -0.2, 0.95);
+    flower2.rotation.set(-0.2, 0.3, -0.4);
+    cherryBranchGroup.add(flower2);
+
+    const flower3 = createSakuraFlower(0.95);
+    flower3.position.set(-1.4, 1.1, 1.0);
+    flower3.rotation.set(0.4, -0.2, 0.6);
+    cherryBranchGroup.add(flower3);
+
+    const flower4 = createSakuraFlower(0.85);
+    flower4.position.set(0.7, -0.5, 0.75);
+    flower4.rotation.set(0.1, 0.6, -0.2);
+    cherryBranchGroup.add(flower4);
+
+    const flower5 = createSakuraFlower(0.75);
+    flower5.position.set(-0.5, 0.6, 0.85);
+    flower5.rotation.set(0.5, 0.1, 0.8);
+    cherryBranchGroup.add(flower5);
+
+    // Leaf buds
+    const createLeafPair = (pos: THREE.Vector3, rot: THREE.Euler) => {
+      const pair = new THREE.Group();
+      const l1 = new THREE.Mesh(leafGeo, leafMat);
+      l1.rotation.z = 0.4;
+      l1.scale.set(0.7, 0.7, 0.7);
+      pair.add(l1);
+      const l2 = new THREE.Mesh(leafGeo, leafMat);
+      l2.rotation.z = -0.4;
+      l2.scale.set(0.6, 0.6, 0.6);
+      pair.add(l2);
+      pair.position.copy(pos);
+      pair.rotation.copy(rot);
+      return pair;
+    };
+
+    cherryBranchGroup.add(createLeafPair(new THREE.Vector3(-0.7, 0.8, 1.15), new THREE.Euler(0.2, 0.3, 0.5)));
+    cherryBranchGroup.add(createLeafPair(new THREE.Vector3(0.2, -0.3, 0.85), new THREE.Euler(-0.2, 0.4, -0.3)));
+    cherryBranchGroup.add(createLeafPair(new THREE.Vector3(-1.2, 1.0, 0.95), new THREE.Euler(0.4, 0.1, 0.8)));
+
+    // Loose falling sakura petals drifting in the wind
+    const loosePetalsCount = 8;
+    const loosePetals: { mesh: THREE.Mesh; basePos: THREE.Vector3; speed: number; rotSpeed: number; phase: number }[] = [];
+    for (let lp = 0; lp < loosePetalsCount; lp++) {
+      const pMesh = new THREE.Mesh(petalGeo, petalMat);
+      pMesh.scale.set(0.65, 0.65, 0.65);
+      const basePos = new THREE.Vector3(
+        -0.8 + (Math.random() - 0.5) * 2.5,
+        0.5 - Math.random() * 2.0,
+        0.8 + (Math.random() - 0.5) * 1.5
+      );
+      pMesh.position.copy(basePos);
+      cherryBranchGroup.add(pMesh);
+      loosePetals.push({
+        mesh: pMesh,
+        basePos,
+        speed: 0.4 + Math.random() * 0.6,
+        rotSpeed: 1.0 + Math.random() * 2.0,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    // Function to position the branch at footer right rail
+    const updateBranchPosition = () => {
+      const aspect = window.innerWidth / window.innerHeight;
+      const vHalfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
+      const vHalfWidth = vHalfHeight * aspect;
+      const rightRailX = Math.min(vHalfWidth - 1.8, Math.max(7.2, vHalfWidth * 0.72));
+      cherryBranchGroup.position.set(rightRailX + 0.4, -5.8, 0.2);
+    };
+    updateBranchPosition();
+
     // 6. MAGICAL FROST SPARKLE TRAIL PARTICLES (Purple Stardust)
     const trailCount = 50;
     const trailPositions = new Float32Array(trailCount * 3);
@@ -668,7 +919,7 @@ export default function Frost3DScene() {
       targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     };
 
-    // Calculate Dynamic 3D Flight Path Anchored in Side Rails (Magnificent S-Ribbon Swoop)
+    // Calculate Dynamic 3D Flight Path Leading into the Sakura Blossom Perch
     const getFlightWaypoints = () => {
       const aspect = window.innerWidth / window.innerHeight;
       const vHalfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
@@ -678,16 +929,16 @@ export default function Frost3DScene() {
       const leftRailX = -rightRailX;
 
       return [
-        new THREE.Vector3(rightRailX, 3.8, 0.4),            // 0.0: Top Hero right rail, hovering high
+        new THREE.Vector3(rightRailX, 3.8, 0.4),            // 0.0: Top Hero right rail
         new THREE.Vector3(rightRailX - 0.9, 2.5, 1.2),      // 0.12: Elegant swoop forward toward viewer
         new THREE.Vector3(rightRailX + 0.3, 1.0, 0.6),      // 0.25: Gliding down right side of Marquee
         new THREE.Vector3(rightRailX * 0.3, -0.2, 1.4),     // 0.38: Dramatic diagonal glide across Bento top
         new THREE.Vector3(leftRailX + 0.8, -1.4, 0.3),      // 0.50: Sweeping banking turn into left rail
         new THREE.Vector3(leftRailX - 0.2, -2.6, 0.8),      // 0.62: Cruising down left rail past Discord
         new THREE.Vector3(leftRailX + 1.2, -3.8, 1.5),      // 0.74: Soaring forward past About section
-        new THREE.Vector3(-rightRailX * 0.2, -5.0, 0.5),    // 0.84: Graceful curve crossing toward right
-        new THREE.Vector3(rightRailX - 0.5, -6.0, 1.0),     // 0.92: Gliding into Videos / Community
-        new THREE.Vector3(rightRailX - 0.2, -7.2, 0.3)      // 1.0: Gentle hover near footer
+        new THREE.Vector3(-rightRailX * 0.2, -4.8, 0.5),    // 0.84: Graceful curve crossing toward right
+        new THREE.Vector3(rightRailX - 0.6, -5.2, 1.1),     // 0.92: Approaching Cherry Blossom branch
+        new THREE.Vector3(rightRailX - 0.4, -4.9, 1.45)     // 1.0: Touching down right on the Sakura flower!
       ];
     };
 
@@ -702,6 +953,7 @@ export default function Frost3DScene() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      updateBranchPosition();
       flightCurve = new THREE.CatmullRomCurve3(getFlightWaypoints());
     };
 
@@ -748,6 +1000,30 @@ export default function Frost3DScene() {
       mouseX += (targetMouseX - mouseX) * 0.04;
       mouseY += (targetMouseY - mouseY) * 0.04;
 
+      // --- 1. REALISTIC WIND SWAY ON CHERRY BLOSSOM BRANCH ---
+      const windTime = elapsed * 1.5;
+      const windSwayZ = Math.sin(windTime * 0.8) * 0.038 + Math.sin(windTime * 2.2) * 0.012;
+      const windSwayY = Math.cos(windTime * 0.6) * 0.026;
+      const windSwayX = Math.sin(windTime * 1.1) * 0.018;
+
+      cherryBranchGroup.rotation.z = windSwayZ;
+      cherryBranchGroup.rotation.y = windSwayY;
+      cherryBranchGroup.rotation.x = windSwayX;
+
+      // Animate loose falling petals drifting in the breeze
+      loosePetals.forEach(p => {
+        const pTime = elapsed * p.speed + p.phase;
+        p.mesh.position.x = p.basePos.x + Math.sin(pTime * 1.5) * 0.35 - (pTime % 4) * 0.15;
+        p.mesh.position.y = p.basePos.y - ((pTime * 0.6) % 2.5);
+        p.mesh.position.z = p.basePos.z + Math.cos(pTime * 1.2) * 0.25;
+        p.mesh.rotation.x = Math.sin(pTime * p.rotSpeed);
+        p.mesh.rotation.y = Math.cos(pTime * p.rotSpeed * 0.8);
+      });
+
+      // Get real-time dynamic world position of the flower perch (moves with the wind!)
+      const flowerPerchPos = new THREE.Vector3();
+      landingPerchAnchor.getWorldPosition(flowerPerchPos);
+
       // Base target along 3D flight trajectory
       const clampedP = Math.min(0.999, Math.max(0.001, scrollProgress));
       const pathPos = flightCurve.getPoint(clampedP);
@@ -758,13 +1034,20 @@ export default function Frost3DScene() {
       const hoverSwayY = Math.cos(elapsed * 2.0) * 0.22 + Math.sin(elapsed * 4.2) * 0.08;
       const hoverSwayZ = Math.sin(elapsed * 1.3) * 0.18;
 
+      // Landing transition factor (0 = free flight, 1 = landed on flower)
+      const rawLand = Math.max(0, Math.min(1, (scrollProgress - 0.88) / 0.12));
+      const landFactor = THREE.MathUtils.smoothstep(rawLand, 0, 1);
+
       targetPos.copy(pathPos);
-      targetPos.x += hoverSwayX + mouseX * 0.35;
-      targetPos.y += hoverSwayY - mouseY * 0.25;
-      targetPos.z += hoverSwayZ;
+      targetPos.x += (hoverSwayX + mouseX * 0.35) * (1.0 - landFactor * 0.8);
+      targetPos.y += (hoverSwayY - mouseY * 0.25) * (1.0 - landFactor * 0.8);
+      targetPos.z += hoverSwayZ * (1.0 - landFactor * 0.8);
+
+      // Seamlessly lock target position onto the flower's world perch point
+      targetPos.lerp(flowerPerchPos, landFactor);
 
       // Spring-Damper Aerodynamics (Fluid inertia, natural gliding momentum)
-      const springK = 0.048;
+      const springK = 0.048 + landFactor * 0.05; // Slightly stiffer spring when perching
       const drag = 0.89;
 
       velocity.x += (targetPos.x - currentPos.x) * springK;
@@ -778,48 +1061,50 @@ export default function Frost3DScene() {
       turnRate = THREE.MathUtils.clamp(velocity.x * 2.5, -1.0, 1.0);
 
       // --- DYNAMIC FLAP FREQUENCY BASED ON FLIGHT STATE ---
-      // When descending: slower parachute-flutter braking beats
-      // When climbing: vigorous, rapid power thrust flaps
-      // When resting: gentle, lazy breathing flutter
       let targetFlapFreq = 5.0;
-      if (scrollDirection > 0) {
-        // Descending
+      if (landFactor > 0.8) {
+        // While perching: slow down flaps
+        targetFlapFreq = 2.0 * (1.0 - landFactor);
+      } else if (scrollDirection > 0) {
         targetFlapFreq = 4.2 + scrollVelocity * 8.0;
       } else if (scrollDirection < 0) {
-        // Ascending
         targetFlapFreq = 8.8 + scrollVelocity * 14.0;
       } else {
-        // Hovering
         targetFlapFreq = 4.6 + Math.sin(elapsed * 1.5) * 1.2;
       }
 
       flapPhase += targetFlapFreq * 0.016;
 
-      // --- AERODYNAMIC LIFT SURGES ON DOWNSTROKE ---
-      // Downstroke pushes air down -> body surges up
-      // When ascending: high vertical lift pulses (+0.16)
-      // When descending: gentle parachute cushion (+0.05)
+      // Downstroke lift pulse (attenuated when landed)
       const downstrokePower = scrollDirection < 0 ? 0.16 : scrollDirection > 0 ? 0.05 : 0.08;
-      const downstrokeLift = Math.max(0, -Math.cos(flapPhase)) * downstrokePower;
+      const downstrokeLift = Math.max(0, -Math.cos(flapPhase)) * downstrokePower * (1.0 - landFactor);
       currentPos.y += downstrokeLift;
 
       butterflyRoot.position.copy(currentPos);
 
-      // --- 2-WING HARMONIC FLAPPING WITH DIHEDRAL & TURNING TORQUE ---
-      // In descending flight: wings hold a higher V-shape (dihedral offset) like a parachute
-      // In ascending flight: wings flap through a wider downward arc for maximum thrust
+      // --- WING HARMONIC FLAPPING & PERCHED V-WING POSTURE ---
       const baseDihedral = scrollDirection > 0 ? 0.38 : scrollDirection < 0 ? -0.1 : 0.12;
       const maxFlapAngle = scrollDirection < 0 ? 0.95 : 0.74;
 
-      // Turning aerodynamics: Outer wing beats with greater amplitude to yaw the body!
       const leftTurnMultiplier = 1.0 + turnRate * 0.35;
       const rightTurnMultiplier = 1.0 - turnRate * 0.35;
 
-      const leftFlap = Math.sin(flapPhase) * maxFlapAngle * leftTurnMultiplier + baseDihedral;
-      const rightFlap = Math.sin(flapPhase) * maxFlapAngle * rightTurnMultiplier + baseDihedral;
+      const flightLeftFlap = Math.sin(flapPhase) * maxFlapAngle * leftTurnMultiplier + baseDihedral;
+      const flightRightFlap = Math.sin(flapPhase) * maxFlapAngle * rightTurnMultiplier + baseDihedral;
+
+      // When perched on flower: wings fold upward into a resting V-shape (65° = ~1.15 rad)
+      // plus subtle gentle breathing motion every 3 seconds!
+      const breathTime = elapsed * 1.6;
+      const breathCycle = Math.sin(breathTime);
+      const breathFlutter = breathCycle > 0.35 ? Math.sin(breathTime * 4.0) * 0.10 : 0;
+      const perchedWingAngle = 1.15 + breathFlutter;
+
+      const leftFlap = THREE.MathUtils.lerp(flightLeftFlap, perchedWingAngle, landFactor);
+      const rightFlap = THREE.MathUtils.lerp(flightRightFlap, perchedWingAngle, landFactor);
 
       // Wing chord twist / angle of attack
-      const wingTwist = Math.cos(flapPhase) * 0.14;
+      const flightWingTwist = Math.cos(flapPhase) * 0.14;
+      const wingTwist = THREE.MathUtils.lerp(flightWingTwist, -0.05, landFactor);
 
       // Apply rotations to EXACTLY 2 WINGS!
       leftWingHinge.rotation.y = leftFlap;
@@ -828,10 +1113,8 @@ export default function Frost3DScene() {
       rightWingHinge.rotation.y = -rightFlap;
       rightWingHinge.rotation.z = -wingTwist;
 
-      // --- DYNAMIC AEROELASTIC WING DEFORMATION (Flexing / Bending Wingtips) ---
-      // During downstroke: wingtips flex upwards due to air resistance!
-      // During upstroke: wingtips lag downwards!
-      const flexFactor = Math.sin(flapPhase + 0.3) * 0.24;
+      // Aeroelastic wingtip flexing (attenuated when landed)
+      const flexFactor = Math.sin(flapPhase + 0.3) * 0.24 * (1.0 - landFactor);
       const posAttr = wingGeo.attributes.position;
       for (let i = 0; i < posAttr.count; i++) {
         const x = posAttr.getX(i);
@@ -840,29 +1123,28 @@ export default function Frost3DScene() {
       }
       posAttr.needsUpdate = true;
 
-      // --- REALISTIC TURNING, CLIMBING & DESCENDING ATTITUDE (Pitch, Yaw, Roll) ---
-      // 1. PITCH:
-      // When climbing (ascending): nose points UP at 35°-45°!
-      // When descending: body maintains parachute attitude (nearly level +12° to +18°), floating down like a leaf!
+      // --- FLIGHT ATTITUDE & PERCHED ORIENTATION ---
       let targetPitch = 0.12;
       if (scrollDirection < 0 || velocity.y > 0.04) {
-        // Climbing up
         targetPitch = 0.68;
       } else if (scrollDirection > 0 || velocity.y < -0.04) {
-        // Descending down (parachuting flat, NOT nosediving)
         targetPitch = 0.18 + Math.sin(elapsed * 3.2) * 0.08;
       }
 
-      // 2. YAW & HEADING:
-      // Head and body dynamically point along travel direction with smooth dampening
-      const targetYaw = Math.atan2(velocity.x + pathTangent.x * 0.45, 1.0) * 0.75 + mouseX * 0.2;
+      const flightYaw = Math.atan2(velocity.x + pathTangent.x * 0.45, 1.0) * 0.75 + mouseX * 0.2;
+      const flightRoll = -velocity.x * 2.2 + Math.sin(elapsed * 2.4) * 0.06;
 
-      // 3. ROLL & BANKING:
-      // Deep aerodynamic banking into turns (up to 45°-60° on sharp turns)
-      const targetRoll = -velocity.x * 2.2 + Math.sin(elapsed * 2.4) * 0.06;
+      // When landed: align naturally with the tilted landing flower surface!
+      const perchedPitch = 0.32;
+      const perchedYaw = 0.50;
+      const perchedRoll = 0.08;
+
+      const targetYaw = THREE.MathUtils.lerp(flightYaw, perchedYaw, landFactor);
+      const targetRoll = THREE.MathUtils.lerp(flightRoll, perchedRoll, landFactor);
+      const finalPitchTarget = THREE.MathUtils.lerp(targetPitch, perchedPitch, landFactor);
 
       // Smoothly interpolate attitude
-      currentPitch += (targetPitch - currentPitch) * 0.08;
+      currentPitch += (finalPitchTarget - currentPitch) * 0.08;
       currentYaw += (targetYaw - currentYaw) * 0.08;
       currentRoll += (targetRoll - currentRoll) * 0.08;
 
@@ -870,18 +1152,18 @@ export default function Frost3DScene() {
       butterflyRoot.rotation.y = currentYaw;
       butterflyRoot.rotation.z = currentRoll;
 
-      // Head articulates into turns first
-      headGroup.rotation.y = (turnRate * 0.35 - headGroup.rotation.y) * 0.15;
+      // Head articulates into turns
+      headGroup.rotation.y = (turnRate * 0.35 - headGroup.rotation.y) * 0.15 * (1.0 - landFactor);
       headGroup.rotation.x = (currentPitch * 0.3 - headGroup.rotation.x) * 0.15;
 
-      // Abdomen dynamic momentum: droops down when climbing, tilts up when parachuting down, swivels on turns
-      const targetAbdomenPitch = scrollDirection < 0 ? 0.38 : scrollDirection > 0 ? -0.12 : 0.15;
-      const targetAbdomenYaw = -turnRate * 0.45;
+      // Abdomen dynamic momentum
+      const targetAbdomenPitch = landFactor > 0.5 ? 0.25 : scrollDirection < 0 ? 0.38 : scrollDirection > 0 ? -0.12 : 0.15;
+      const targetAbdomenYaw = -turnRate * 0.45 * (1.0 - landFactor);
       abdomenGroup.rotation.x += (targetAbdomenPitch - abdomenGroup.rotation.x) * 0.1;
       abdomenGroup.rotation.y += (targetAbdomenYaw - abdomenGroup.rotation.y) * 0.1;
 
-      // --- EMIT FROST FAIRY SPARKLES FROM WINGTIPS ---
-      if (Math.random() < 0.35 + scrollVelocity * 0.4) {
+      // --- EMIT FROST FAIRY SPARKLES FROM WINGTIPS (Only when flying) ---
+      if (landFactor < 0.6 && Math.random() < 0.35 + scrollVelocity * 0.4) {
         trailIndex = (trailIndex + 1) % trailCount;
         const side = Math.random() > 0.5 ? 0.35 : -0.35;
         trailPositions[trailIndex * 3] = currentPos.x + side;
@@ -918,9 +1200,9 @@ export default function Frost3DScene() {
       cancelAnimationFrame(animationFrameId);
 
       // Dispose geometries, textures & materials
-      [wingGeo, headGeo, eyeGeo, thoraxGeo, abdomenGeo, trailGeo].forEach(g => g.dispose());
+      [wingGeo, headGeo, eyeGeo, thoraxGeo, abdomenGeo, trailGeo, mainBranchGeo, twigAGeo, twigBGeo, twigCGeo, petalGeo, leafGeo, pollenGeo].forEach(g => g.dispose());
       wingTexture.dispose();
-      [wingMat, bodyMat, eyeMat, trailMat].forEach(m => m.dispose());
+      [wingMat, bodyMat, eyeMat, trailMat, barkMat, petalMat, innerPetalMat, stamenMat, leafMat].forEach(m => m.dispose());
 
       if (renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
