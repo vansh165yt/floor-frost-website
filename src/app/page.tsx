@@ -370,17 +370,6 @@ export default function Home() {
     let currentFrame = 1;
     let animationFrameId: number;
 
-    const handleResize = () => {
-      if (!canvas) return;
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      renderFrame(currentFrame);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
     const drawImageCover = (img: HTMLImageElement): boolean => {
       if (!ctx || !canvas) return false;
       const cw = canvas.width;
@@ -445,6 +434,17 @@ export default function Home() {
 
       return false;
     };
+
+    const handleResize = () => {
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      renderFrame(currentFrame);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
 
     let lastRenderedFrameIndex = -1;
     let isLoopRunning = false;
