@@ -133,18 +133,18 @@ const FALLBACK_PLAYLISTS = [
   }
 ];
 
-// Fallback 5 posts
-const FALLBACK_POSTS = [
+// Pure YouTube Community Posts ONLY (No Discord)
+const FALLBACK_YOUTUBE_POSTS = [
   {
     id: 'UgkxRPQlM736iJJSwhVuc6qXTkGyyo5twn5P',
     source: 'youtube' as const,
     author: 'Floor Frost',
     avatar: '/logo.png',
     content: `Aakhirkar humne 1k subscribers ka ye milestone hit kar liya! 🎉\n\nZero se shuru kiya tha, aur aaj hum 1,000 Floor Frost family ke members ban chuke hain. Aap sabhi ke support, likes, aur har ek comment ke bina ye bilkul impossible tha.\n\nThank you har ek video ko pura dekhne aur support dikhane ke liye.\n\nYe toh bas shuruaat hai, aage abhi aur bhi crazy videos, epic gameplay, aur next-level content aane wala hai! 🚀\n\nKeep supporting & stay awesome! ❤️🎮\n— Floor Frost`,
-    publishedAt: 'Recent',
+    publishedAt: '4 weeks ago',
     likes: '15 Likes',
     image: 'https://yt3.ggpht.com/WrH-vVrHBSpXAK7OU9NKjn_OV2uqiI4KaXBAnir4sS3xFZwhtFJj_n3kjlrjOc5c-xn3CwdyvgPRzg=s800-c-fcrop64=1,00000000ffffffff-rw-nd-v1',
-    url: 'https://www.youtube.com/@floorfrost/posts'
+    url: 'https://www.youtube.com/post/UgkxRPQlM736iJJSwhVuc6qXTkGyyo5twn5P'
   },
   {
     id: 'Ugkxkd7WvgLgaBvnyzgDdPjzH5xx1iomoIHv',
@@ -152,51 +152,49 @@ const FALLBACK_POSTS = [
     author: 'Floor Frost',
     avatar: '/logo.png',
     content: `🏎️💥 GET READY FOR THE ULTIMATE SPEED TEST! 💥🏎️\n\nAaj shaam 7:00 baje ek aisi racing game ki video aane wali hai jiske graphics aur high-octane action tumhare hosh uda denge! ⚡🔥\n\nCan you guess which monster track and machine we're pushing to the absolute limit today? 👇 Comment karke batao apni guessing skills!\n\nSet your reminders for 7:00 PM! Channel par milte hain! 🚀🎮`,
-    publishedAt: 'Recent',
+    publishedAt: '1 month ago',
     likes: '2 Likes',
     image: 'https://yt3.ggpht.com/frvYv5AzI66stTvuzVZJbHcWtarH4YojVfj0o7JWoGHdjX8rdYsjOVmVvEd8QyPUn4dvwDfOsguUnw=s800-c-fcrop64=1,12000000edffffff-rw-nd-v1',
-    url: 'https://www.youtube.com/@floorfrost/posts'
+    url: 'https://www.youtube.com/post/Ugkxkd7WvgLgaBvnyzgDdPjzH5xx1iomoIHv'
   },
   {
-    id: 'discord-post-1',
-    source: 'discord' as const,
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: '🔥 WELCOME TO THE OFFICIAL FLOOR FROST DISCORD LEGION! Here you will get first-hand updates, shader pack configs, and direct voice hangouts!',
-    publishedAt: 'Recent',
-    likes: 'Pinned',
-    image: null,
-    url: 'https://discord.gg/aN5CCRT6CS'
-  },
-  {
-    id: 'update-post-2',
+    id: 'yt-post-3',
     source: 'youtube' as const,
     author: 'Floor Frost',
     avatar: '/logo.png',
-    content: '✨ New Ultra Realistic Shaders comparison episode is dropping soon! Tested on RTX 40-series cards at smooth 4K 120FPS. Check out the Videos gallery for all 10-day uploads!',
+    content: `🎮 NEW VIDEO IS LIVE ON YOUTUBE!\n\n"I Tested 50+ Minecraft Shaders — These Are INSANE ✨" is officially out! Shaders ko benchmark kiya hai RTX settings par. Video dekho aur batao kaun sa shader tumhara favourite hai! 🌟`,
+    publishedAt: 'Recent',
+    likes: 'Official',
+    image: null,
+    url: 'https://www.youtube.com/@floorfrost/posts'
+  },
+  {
+    id: 'yt-post-4',
+    source: 'youtube' as const,
+    author: 'Floor Frost',
+    avatar: '/logo.png',
+    content: `⚡ Forza Horizon 5 Hindi Racing Series ka next part jald hi aane wala hai! Ek aisi car aur track choose kiya hai jisme race pure edge-of-seat excitement degi. Stay tuned Floor Frost channel par! 🏎️💨`,
+    publishedAt: 'Recent',
+    likes: 'Series Update',
+    image: null,
+    url: 'https://www.youtube.com/@floorfrost/posts'
+  },
+  {
+    id: 'yt-post-5',
+    source: 'youtube' as const,
+    author: 'Floor Frost',
+    avatar: '/logo.png',
+    content: `❤️ Dil se shukriya har subscriber aur supporter ka! Hum lagatar daily fresh gameplay aur Minecraft realistic shader guides upload kar rahe hain. Har video ko pura dekhne aur support karne ke liye thank you! 🚀🎮`,
     publishedAt: 'Recent',
     likes: 'Community',
     image: null,
-    url: 'https://youtube.com/@floorfrost'
-  },
-  {
-    id: 'update-post-3',
-    source: 'discord' as const,
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: "🎮 Thank you all for the tremendous love on our daily Minecraft shader series! Don't forget to share your favorite shader preset in the comments or in our Discord server!",
-    publishedAt: 'Recent',
-    likes: 'Live',
-    image: null,
-    url: 'https://discord.gg/aN5CCRT6CS'
+    url: 'https://www.youtube.com/@floorfrost/posts'
   }
 ];
 
 export async function GET(request: NextRequest) {
   const apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyBUsCHTIIfcuUOG1FIFbNLZSfKVimEsqJM';
   const channelId = process.env.YOUTUBE_CHANNEL_ID || 'UCRmkfvlZjgkCOZUqJenJC3A';
-  const botToken = process.env.DISCORD_BOT_TOKEN;
-  const discordChannelId = process.env.DISCORD_CHANNEL_ID;
 
   const searchParams = request.nextUrl.searchParams;
   const limitParam = searchParams.get('limit');
@@ -295,10 +293,9 @@ export async function GET(request: NextRequest) {
       playlists = FALLBACK_PLAYLISTS;
     }
 
-    // 3. Fetch Posts (YouTube Community Tab + Discord Announcements)
+    // 3. Fetch YouTube Community Posts ONLY (No Discord updates)
     const fetchedPosts: any[] = [];
 
-    // Try YouTube community posts scraping
     try {
       const ytPostsRes = await fetch('https://www.youtube.com/@floorfrost/posts', {
         headers: {
@@ -332,7 +329,7 @@ export async function GET(request: NextRequest) {
                 avatar: '/logo.png',
                 content: postContent,
                 publishedAt: post.publishedTimeText?.runs?.[0]?.text || 'Recent',
-                likes: post.voteCount?.simpleText || 'Community',
+                likes: post.voteCount?.simpleText ? `${post.voteCount.simpleText} Likes` : 'Community',
                 image: bestImage,
                 url: `https://www.youtube.com/post/${post.postId}`
               });
@@ -344,43 +341,10 @@ export async function GET(request: NextRequest) {
       console.error("YT Community posts fetch error:", e);
     }
 
-    // Try Discord Announcements
-    if (botToken && discordChannelId) {
-      try {
-        const dRes = await fetch(`https://discord.com/api/v10/channels/${discordChannelId}/messages?limit=10`, {
-          headers: { Authorization: `Bot ${botToken}` },
-          cache: 'no-store'
-        });
-        if (dRes.ok) {
-          const dData = await dRes.json();
-          if (Array.isArray(dData)) {
-            for (const msg of dData) {
-              if (msg.content && msg.content.trim()) {
-                const date = new Date(msg.timestamp);
-                fetchedPosts.push({
-                  id: msg.id,
-                  source: 'discord',
-                  author: msg.author?.global_name || msg.author?.username || 'Floor Frost',
-                  avatar: msg.author?.avatar ? `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}.png` : '/logo.png',
-                  content: msg.content,
-                  publishedAt: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                  likes: 'Discord Sync',
-                  image: msg.attachments?.[0]?.url || null,
-                  url: 'https://discord.gg/aN5CCRT6CS'
-                });
-              }
-            }
-          }
-        }
-      } catch (e) {
-        console.error("Discord messages fetch error:", e);
-      }
-    }
-
-    // Fill up to 5 posts with fallback if needed
+    // Fill up to 5 posts with YouTube fallback posts
     let finalPosts = [...fetchedPosts];
     if (finalPosts.length < 5) {
-      for (const fb of FALLBACK_POSTS) {
+      for (const fb of FALLBACK_YOUTUBE_POSTS) {
         if (!finalPosts.some(p => p.id === fb.id) && finalPosts.length < 5) {
           finalPosts.push(fb);
         }
@@ -404,7 +368,7 @@ export async function GET(request: NextRequest) {
       videos: FALLBACK_10_DAYS_VIDEOS,
       last10DaysVideos: FALLBACK_10_DAYS_VIDEOS,
       playlists: FALLBACK_PLAYLISTS,
-      posts: FALLBACK_POSTS,
+      posts: FALLBACK_YOUTUBE_POSTS,
       error: error.message || "Using fallback videos data"
     }, {
       status: 200,

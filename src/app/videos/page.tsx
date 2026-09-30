@@ -25,7 +25,7 @@ interface Playlist {
 
 interface Post {
   id: string;
-  source: 'youtube' | 'discord';
+  source: 'youtube';
   author: string;
   avatar: string;
   content: string;
@@ -149,18 +149,18 @@ const INITIAL_PLAYLISTS: Playlist[] = [
   }
 ];
 
-// Initial 5 Posts
-const INITIAL_POSTS: Post[] = [
+// Initial 5 Pure YouTube Community Posts
+const INITIAL_YOUTUBE_POSTS: Post[] = [
   {
     id: 'UgkxRPQlM736iJJSwhVuc6qXTkGyyo5twn5P',
     source: 'youtube',
     author: 'Floor Frost',
     avatar: '/logo.png',
     content: `Aakhirkar humne 1k subscribers ka ye milestone hit kar liya! 🎉\n\nZero se shuru kiya tha, aur aaj hum 1,000 Floor Frost family ke members ban chuke hain. Aap sabhi ke support, likes, aur har ek comment ke bina ye bilkul impossible tha.\n\nThank you har ek video ko pura dekhne aur support dikhane ke liye.\n\nYe toh bas shuruaat hai, aage abhi aur bhi crazy videos, epic gameplay, aur next-level content aane wala hai! 🚀\n\nKeep supporting & stay awesome! ❤️🎮\n— Floor Frost`,
-    publishedAt: 'Recent',
+    publishedAt: '4 weeks ago',
     likes: '15 Likes',
     image: 'https://yt3.ggpht.com/WrH-vVrHBSpXAK7OU9NKjn_OV2uqiI4KaXBAnir4sS3xFZwhtFJj_n3kjlrjOc5c-xn3CwdyvgPRzg=s800-c-fcrop64=1,00000000ffffffff-rw-nd-v1',
-    url: 'https://www.youtube.com/@floorfrost/posts'
+    url: 'https://www.youtube.com/post/UgkxRPQlM736iJJSwhVuc6qXTkGyyo5twn5P'
   },
   {
     id: 'Ugkxkd7WvgLgaBvnyzgDdPjzH5xx1iomoIHv',
@@ -168,50 +168,50 @@ const INITIAL_POSTS: Post[] = [
     author: 'Floor Frost',
     avatar: '/logo.png',
     content: `🏎️💥 GET READY FOR THE ULTIMATE SPEED TEST! 💥🏎️\n\nAaj shaam 7:00 baje ek aisi racing game ki video aane wali hai jiske graphics aur high-octane action tumhare hosh uda denge! ⚡🔥\n\nCan you guess which monster track and machine we're pushing to the absolute limit today? 👇 Comment karke batao apni guessing skills!\n\nSet your reminders for 7:00 PM! Channel par milte hain! 🚀🎮`,
-    publishedAt: 'Recent',
+    publishedAt: '1 month ago',
     likes: '2 Likes',
     image: 'https://yt3.ggpht.com/frvYv5AzI66stTvuzVZJbHcWtarH4YojVfj0o7JWoGHdjX8rdYsjOVmVvEd8QyPUn4dvwDfOsguUnw=s800-c-fcrop64=1,12000000edffffff-rw-nd-v1',
-    url: 'https://www.youtube.com/@floorfrost/posts'
+    url: 'https://www.youtube.com/post/Ugkxkd7WvgLgaBvnyzgDdPjzH5xx1iomoIHv'
   },
   {
-    id: 'discord-post-1',
-    source: 'discord',
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: '🔥 WELCOME TO THE OFFICIAL FLOOR FROST DISCORD LEGION! Here you will get first-hand updates, shader pack configs, and direct voice hangouts!',
-    publishedAt: 'Recent',
-    likes: 'Pinned',
-    image: null,
-    url: 'https://discord.gg/aN5CCRT6CS'
-  },
-  {
-    id: 'update-post-2',
+    id: 'yt-post-3',
     source: 'youtube',
     author: 'Floor Frost',
     avatar: '/logo.png',
-    content: '✨ New Ultra Realistic Shaders comparison episode is dropping soon! Tested on RTX 40-series cards at smooth 4K 120FPS. Check out the Videos gallery for all 10-day uploads!',
+    content: `🎮 NEW VIDEO IS LIVE ON YOUTUBE!\n\n"I Tested 50+ Minecraft Shaders — These Are INSANE ✨" is officially out! Shaders ko benchmark kiya hai RTX settings par. Video dekho aur batao kaun sa shader tumhara favourite hai! 🌟`,
+    publishedAt: 'Recent',
+    likes: 'Official Post',
+    image: null,
+    url: 'https://www.youtube.com/@floorfrost/posts'
+  },
+  {
+    id: 'yt-post-4',
+    source: 'youtube',
+    author: 'Floor Frost',
+    avatar: '/logo.png',
+    content: `⚡ Forza Horizon 5 Hindi Racing Series ka next part jald hi aane wala hai! Ek aisi car aur track choose kiya hai jisme race pure edge-of-seat excitement degi. Stay tuned Floor Frost channel par! 🏎️💨`,
+    publishedAt: 'Recent',
+    likes: 'Series Update',
+    image: null,
+    url: 'https://www.youtube.com/@floorfrost/posts'
+  },
+  {
+    id: 'yt-post-5',
+    source: 'youtube',
+    author: 'Floor Frost',
+    avatar: '/logo.png',
+    content: `❤️ Dil se shukriya har subscriber aur supporter ka! Hum lagatar daily fresh gameplay aur Minecraft realistic shader guides upload kar rahe hain. Har video ko pura dekhne aur support karne ke liye thank you! 🚀🎮`,
     publishedAt: 'Recent',
     likes: 'Community',
     image: null,
-    url: 'https://youtube.com/@floorfrost'
-  },
-  {
-    id: 'update-post-3',
-    source: 'discord',
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: "🎮 Thank you all for the tremendous love on our daily Minecraft shader series! Don't forget to share your favorite shader preset in the comments or in our Discord server!",
-    publishedAt: 'Recent',
-    likes: 'Live',
-    image: null,
-    url: 'https://discord.gg/aN5CCRT6CS'
+    url: 'https://www.youtube.com/@floorfrost/posts'
   }
 ];
 
 export default function VideosPage() {
   const [last10DaysVideos, setLast10DaysVideos] = useState<Video[]>(INITIAL_10_DAYS_VIDEOS);
   const [playlists, setPlaylists] = useState<Playlist[]>(INITIAL_PLAYLISTS);
-  const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
+  const [posts, setPosts] = useState<Post[]>(INITIAL_YOUTUBE_POSTS);
   const [activeVideo, setActiveVideo] = useState<Video>(INITIAL_10_DAYS_VIDEOS[0]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
@@ -291,51 +291,51 @@ export default function VideosPage() {
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="px-3.5 py-1.5 rounded-full bg-red-600/20 border border-red-500/40 text-red-300 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase backdrop-blur-md flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-              OFFICIAL VIDEOS HUB
+              OFFICIAL YOUTUBE HUB
             </span>
-            <span className="px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase backdrop-blur-md">
+            <span className="px-3.5 py-1.5 rounded-full bg-purple-600/25 border border-purple-400/40 text-purple-200 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase backdrop-blur-md">
               ⚡ {last10DaysVideos.length} VIDEOS (LAST 10 DAYS)
             </span>
-            <span className="px-3.5 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-300 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase backdrop-blur-md">
+            <span className="px-3.5 py-1.5 rounded-full bg-indigo-600/25 border border-indigo-400/40 text-indigo-200 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase backdrop-blur-md">
               📁 {playlists.length} PLAYLISTS
             </span>
-            <span className="px-3.5 py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase backdrop-blur-md">
-              💬 {posts.length} POSTS
+            <span className="px-3.5 py-1.5 rounded-full bg-pink-600/25 border border-pink-400/40 text-pink-200 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase backdrop-blur-md">
+              💬 {posts.length} YOUTUBE POSTS
             </span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white leading-tight">
-            FLOOR FROST <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-pink-300 to-purple-300">VIDEOS & HUB</span>
+            FLOOR FROST <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-pink-300 to-purple-300">VIDEOS &amp; HUB</span>
           </h1>
 
           <p className="max-w-2xl text-sm sm:text-base text-zinc-300 leading-relaxed font-light">
-            Watch the latest 10-day video releases, explore all playlists, and check the newest community posts directly from Floor Frost!
+            Watch the latest 10-day video releases, explore all official playlists, and check the newest community posts directly from Floor Frost!
           </p>
 
           {/* Quick Jump Buttons */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
               onClick={() => scrollToArea('videos-area')}
-              className="px-4 py-2.5 rounded-xl bg-amber-500/20 border border-amber-400/40 hover:border-amber-400 text-amber-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(245,158,11,0.2)] flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-purple-600/20 border border-purple-400/40 hover:border-purple-400 text-purple-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center gap-2 cursor-pointer"
             >
               <span>⚡ Videos (Last 10 Days)</span>
-              <span className="px-1.5 py-0.5 rounded bg-amber-500/40 text-[10px]">{last10DaysVideos.length}</span>
+              <span className="px-1.5 py-0.5 rounded bg-purple-500/40 text-[10px] text-white">{last10DaysVideos.length}</span>
             </button>
 
             <button
               onClick={() => scrollToArea('playlists-area')}
-              className="px-4 py-2.5 rounded-xl bg-purple-500/20 border border-purple-400/40 hover:border-purple-400 text-purple-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-indigo-600/20 border border-indigo-400/40 hover:border-indigo-400 text-indigo-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(99,102,241,0.2)] flex items-center gap-2 cursor-pointer"
             >
               <span>📁 All Playlists</span>
-              <span className="px-1.5 py-0.5 rounded bg-purple-500/40 text-[10px]">{playlists.length}</span>
+              <span className="px-1.5 py-0.5 rounded bg-indigo-500/40 text-[10px] text-white">{playlists.length}</span>
             </button>
 
             <button
               onClick={() => scrollToArea('posts-area')}
-              className="px-4 py-2.5 rounded-xl bg-pink-500/20 border border-pink-400/40 hover:border-pink-400 text-pink-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(236,72,153,0.2)] flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-pink-600/20 border border-pink-400/40 hover:border-pink-400 text-pink-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(236,72,153,0.2)] flex items-center gap-2 cursor-pointer"
             >
               <span>💬 Posts Area (Last 5)</span>
-              <span className="px-1.5 py-0.5 rounded bg-pink-500/40 text-[10px]">{posts.length}</span>
+              <span className="px-1.5 py-0.5 rounded bg-pink-500/40 text-[10px] text-white">{posts.length}</span>
             </button>
 
             <a
@@ -377,7 +377,7 @@ export default function VideosPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
 
-                  <div className="absolute w-20 h-20 rounded-full bg-red-600/90 border-2 border-white text-white flex items-center justify-center shadow-[0_0_40px_rgba(239,68,68,0.8)] group-hover/thumb:scale-110 group-hover/thumb:bg-red-500 transition-all">
+                  <div className="absolute w-20 h-20 rounded-full bg-red-600 text-white flex items-center justify-center shadow-[0_0_40px_rgba(239,68,68,0.8)] group-hover/thumb:scale-110 group-hover/thumb:bg-red-500 transition-all">
                     <span className="text-3xl ml-1">▶</span>
                   </div>
 
@@ -385,7 +385,7 @@ export default function VideosPage() {
                     <span className="px-3 py-1 rounded-md bg-black/85 text-white font-mono text-xs font-bold border border-white/20 backdrop-blur-md">
                       CLICK TO PLAY
                     </span>
-                    <span className="px-2.5 py-1 rounded-md bg-amber-500 text-black font-mono text-[11px] font-black uppercase shadow-lg">
+                    <span className="px-2.5 py-1 rounded-md bg-red-600 text-white font-mono text-[11px] font-bold uppercase shadow-lg border border-red-400/40">
                       ⚡ LAST 10 DAYS
                     </span>
                   </div>
@@ -401,7 +401,7 @@ export default function VideosPage() {
                     <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
                     PLAYING NOW
                   </span>
-                  <span className="text-xs font-mono text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
+                  <span className="text-xs font-mono text-purple-300 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">
                     {activeVideo.publishedAt}
                   </span>
                 </div>
@@ -442,26 +442,26 @@ export default function VideosPage() {
         </div>
 
         {/* ============================================================ */}
-        {/* 1. VIDEOS AREA (LAST 10 DAYS VIDEOS) */}
+        {/* 1. VIDEOS AREA (LAST 10 DAYS VIDEOS) - SIGNATURE COSMIC PALETTE */}
         {/* ============================================================ */}
         <section id="videos-area" className="flex flex-col gap-6 w-full scroll-mt-24">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-amber-500/10 border-2 border-amber-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(245,158,11,0.15)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-red-950/20 via-purple-950/25 to-[#120a24] border-2 border-purple-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(168,85,247,0.18)]">
             <div className="flex items-center gap-3">
-              <span className="text-3xl p-2.5 rounded-2xl bg-amber-500/20 border border-amber-500/40 shadow-inner">⚡</span>
+              <span className="text-2xl p-2.5 rounded-2xl bg-purple-600/20 border border-purple-500/40 shadow-inner text-purple-300">⚡</span>
               <div>
-                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-amber-200 font-sans flex items-center gap-2.5">
+                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-white font-sans flex items-center gap-2.5">
                   <span>VIDEOS AREA — LAST 10 DAYS</span>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/30 border border-amber-400/50 text-amber-200 font-mono font-bold">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-600/30 border border-purple-400/50 text-purple-200 font-mono font-bold">
                     {last10DaysVideos.length} VIDEOS
                   </span>
                 </h2>
-                <p className="text-xs text-amber-200/80 font-light mt-0.5">
+                <p className="text-xs text-zinc-300 font-light mt-0.5">
                   Ye sabhi videos Floor Frost YouTube channel par pichle 10 dino ke andar upload hui hain
                 </p>
               </div>
             </div>
 
-            <span className="text-xs font-mono text-amber-300 bg-amber-500/20 px-3 py-1.5 rounded-xl border border-amber-400/30 self-start sm:self-auto">
+            <span className="text-xs font-mono text-purple-300 bg-purple-500/20 px-3 py-1.5 rounded-xl border border-purple-400/30 self-start sm:self-auto">
               CLICK ANY VIDEO TO PLAY ABOVE
             </span>
           </div>
@@ -474,8 +474,8 @@ export default function VideosPage() {
                 onClick={() => handlePlayVideo(video)}
                 className={`group relative rounded-2xl overflow-hidden bg-zinc-950 border transition-all duration-300 shadow-xl flex flex-col cursor-pointer hover-lift ${
                   activeVideo.id === video.id
-                    ? 'border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.5)] ring-2 ring-amber-400/50'
-                    : 'border-amber-500/30 hover:border-amber-400/80 hover:shadow-[0_0_30px_rgba(245,158,11,0.35)]'
+                    ? 'border-purple-400 shadow-[0_0_35px_rgba(168,85,247,0.5)] ring-2 ring-purple-400/50'
+                    : 'border-purple-900/40 hover:border-pink-500/80 hover:shadow-[0_0_30px_rgba(236,72,153,0.35)]'
                 }`}
               >
                 <div className="h-48 w-full relative overflow-hidden bg-black">
@@ -487,30 +487,30 @@ export default function VideosPage() {
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
                   
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-12 h-12 rounded-full bg-amber-500 text-black font-bold flex items-center justify-center shadow-[0_0_25px_rgba(245,158,11,0.8)] group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-full bg-red-600 text-white font-bold flex items-center justify-center shadow-[0_0_25px_rgba(239,68,68,0.8)] group-hover:scale-110 transition-transform">
                       <span className="text-xl ml-0.5">▶</span>
                     </div>
                   </div>
 
                   <div className="absolute top-2.5 left-2.5">
-                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-black text-[10px] font-mono font-black uppercase tracking-wider shadow-md flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
+                    <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider shadow-md flex items-center gap-1 border border-red-400/40">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                       LAST 10 DAYS
                     </span>
                   </div>
 
-                  <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/85 text-[10px] font-mono text-amber-200 border border-amber-500/30 backdrop-blur-md">
+                  <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/85 text-[10px] font-mono text-zinc-300 border border-white/10 backdrop-blur-md">
                     {video.publishedAt}
                   </span>
                 </div>
 
                 <div className="p-4 flex flex-col justify-between gap-3 grow bg-gradient-to-b from-zinc-950 to-[#0e091b]">
-                  <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-amber-200 transition-colors line-clamp-2 leading-relaxed">
+                  <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-purple-300 transition-colors line-clamp-2 leading-relaxed">
                     {video.title}
                   </h3>
                   
-                  <div className="flex items-center justify-between text-[10px] font-mono text-amber-400 font-semibold pt-2 border-t border-white/10">
-                    <span className="flex items-center gap-1">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-purple-400 font-semibold pt-2 border-t border-white/10">
+                    <span className="flex items-center gap-1 group-hover:text-purple-300">
                       <span>▶</span>
                       <span>Click to Play</span>
                     </span>
@@ -536,7 +536,7 @@ export default function VideosPage() {
         <section id="playlists-area" className="flex flex-col gap-6 w-full scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-purple-900/15 border-2 border-purple-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(168,85,247,0.15)]">
             <div className="flex items-center gap-3">
-              <span className="text-3xl p-2.5 rounded-2xl bg-purple-500/20 border border-purple-500/40 shadow-inner">📁</span>
+              <span className="text-2xl p-2.5 rounded-2xl bg-purple-500/20 border border-purple-500/40 shadow-inner text-purple-300">📁</span>
               <div>
                 <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-purple-200 font-sans flex items-center gap-2.5">
                   <span>PLAYLISTS AREA — ALL PLAYLISTS</span>
@@ -623,12 +623,12 @@ export default function VideosPage() {
         </section>
 
         {/* ============================================================ */}
-        {/* 3. POSTS AREA (LAST 5 POSTS) */}
+        {/* 3. POSTS AREA (LAST 5 YOUTUBE COMMUNITY POSTS ONLY) */}
         {/* ============================================================ */}
         <section id="posts-area" className="flex flex-col gap-6 w-full scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-pink-950/20 border-2 border-pink-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(236,72,153,0.15)]">
             <div className="flex items-center gap-3">
-              <span className="text-3xl p-2.5 rounded-2xl bg-pink-500/20 border border-pink-500/40 shadow-inner">💬</span>
+              <span className="text-2xl p-2.5 rounded-2xl bg-pink-500/20 border border-pink-500/40 shadow-inner text-pink-300">💬</span>
               <div>
                 <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-pink-200 font-sans flex items-center gap-2.5">
                   <span>POSTS AREA</span>
@@ -637,7 +637,7 @@ export default function VideosPage() {
                   </span>
                 </h2>
                 <p className="text-xs text-pink-200/80 font-light mt-0.5">
-                  Floor Frost ke official community posts, 1k milestones aur latest broadcasts
+                  Floor Frost official YouTube community tab posts and milestone announcements
                 </p>
               </div>
             </div>
@@ -647,22 +647,14 @@ export default function VideosPage() {
                 href="https://www.youtube.com/@floorfrost/posts"
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs font-mono text-pink-300 hover:text-white px-3 py-1.5 rounded-xl bg-pink-500/20 border border-pink-400/30 hover:bg-pink-500/30 transition-all flex items-center gap-1 shrink-0"
+                className="text-xs font-mono text-pink-300 hover:text-white px-3.5 py-1.5 rounded-xl bg-pink-500/20 border border-pink-400/30 hover:bg-pink-500/30 transition-all flex items-center gap-1.5 shrink-0"
               >
-                <span>YouTube Community ↗</span>
-              </a>
-              <a
-                href="https://discord.gg/aN5CCRT6CS"
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs font-mono text-indigo-300 hover:text-white px-3 py-1.5 rounded-xl bg-indigo-500/20 border border-indigo-400/30 hover:bg-indigo-500/30 transition-all flex items-center gap-1 shrink-0"
-              >
-                <span>Discord ↗</span>
+                <span>YouTube Community Tab ↗</span>
               </a>
             </div>
           </div>
 
-          {/* List of Last 5 Posts */}
+          {/* List of Last 5 YouTube Posts */}
           <div className="flex flex-col gap-6 w-full">
             {posts.map((post, idx) => (
               <div
@@ -682,17 +674,13 @@ export default function VideosPage() {
                         <h3 className="text-base font-bold text-white group-hover:text-pink-300 transition-colors">
                           {post.author}
                         </h3>
-                        <span className="w-4 h-4 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] font-bold" title="Verified Creator">
+                        <span className="w-4 h-4 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-bold" title="Official YouTube Creator">
                           ✓
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                          post.source === 'youtube'
-                            ? 'bg-red-600/30 border border-red-500/40 text-red-300'
-                            : 'bg-indigo-600/30 border border-indigo-500/40 text-indigo-300'
-                        }`}>
-                          {post.source === 'youtube' ? 'YouTube Community Post' : 'Discord Legion Broadcast'}
+                        <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider bg-red-600/20 border border-red-500/40 text-red-300">
+                          YouTube Community Post
                         </span>
                       </div>
                     </div>
@@ -720,7 +708,7 @@ export default function VideosPage() {
                   <div className="z-10 rounded-2xl overflow-hidden border border-white/15 max-h-[32rem] bg-black/50 relative shadow-xl">
                     <img
                       src={post.image}
-                      alt="Community post attachment"
+                      alt="YouTube community post graphic"
                       className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
                     />
                   </div>
@@ -729,8 +717,8 @@ export default function VideosPage() {
                 {/* Post Footer Action */}
                 <div className="pt-3 border-t border-white/10 z-10 flex flex-wrap items-center justify-between gap-3">
                   <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
-                    FLOOR FROST COMMUNITY FEED
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    FLOOR FROST YOUTUBE COMMUNITY FEED
                   </span>
 
                   <a
@@ -739,7 +727,7 @@ export default function VideosPage() {
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-pink-300 hover:text-white transition-colors px-4 py-2 rounded-full bg-pink-500/10 border border-pink-500/30 hover:bg-pink-500/20"
                   >
-                    <span>View Official Post</span>
+                    <span>View Post on YouTube</span>
                     <span>↗</span>
                   </a>
                 </div>
@@ -751,7 +739,7 @@ export default function VideosPage() {
 
         {/* Footer Signature */}
         <div className="text-center pt-8 text-xs font-mono tracking-widest text-zinc-500 uppercase border-t border-white/5">
-          FLOOR FROST VIDEOS, PLAYLISTS & COMMUNITY ECOSYSTEM // {new Date().getFullYear()}
+          FLOOR FROST VIDEOS, PLAYLISTS &amp; COMMUNITY // {new Date().getFullYear()}
         </div>
 
       </div>
