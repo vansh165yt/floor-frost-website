@@ -245,3 +245,109 @@ body {
 .animate-neon-pulse {
   animation: neonPulse 2.5s ease-in-out infinite;
 }
+
+/* Fluid Moving Gradient Shimmer for Headlines */
+@keyframes fluidGradientText {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-text-shimmer {
+  background-size: 200% auto;
+  animation: fluidGradientText 5s ease-in-out infinite;
+}
+
+/* Smooth Staggered Entrance Fade-Up */
+@keyframes fadeUpEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUpEntrance 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+/* Animation Delays for Staggered Reveals */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Crystal Obsidian Glass Card Shimmer */
+.shimmer-glass-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    rgba(236, 72, 153, 0.12) 50%,
+    rgba(168, 85, 247, 0.12) 60%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  transition: left 0.75s ease;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.shimmer-glass-card:hover::before {
+  left: 200%;
+}
+
+/* Multi-layer Pulsing Halo Ring */
+@keyframes haloPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 14px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.animate-halo-pulse {
+  animation: haloPulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Subtle Floating Breathing Ambient Glow */
+@keyframes ambientBreathe {
+  0%, 100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1.08) translate(10px, -15px);
+    opacity: 0.4;
+  }
+}
+
+.animate-ambient-breathe {
+  animation: ambientBreathe 9s ease-in-out infinite;
+}
+

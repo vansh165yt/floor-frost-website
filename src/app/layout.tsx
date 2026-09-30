@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 import PageLoader from "@/components/PageLoader";
+import CosmicEffects from "@/components/CosmicEffects";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,6 +34,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <PageLoader />
         </Suspense>
+        <CosmicEffects />
         {children}
       </body>
     </html>

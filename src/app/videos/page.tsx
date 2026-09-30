@@ -230,10 +230,10 @@ export default function VideosPage() {
   return (
     <div className="min-h-screen bg-[#07040d] text-white font-sans selection:bg-purple-500/30 pb-28 relative overflow-hidden animate-portal-fade">
       
-      {/* Ambient Cosmic Dark Glow Orbs */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[55rem] h-[55rem] bg-purple-900/25 rounded-full blur-[220px] pointer-events-none" />
-      <div className="absolute top-[35%] right-[-10%] w-[45rem] h-[45rem] bg-pink-900/20 rounded-full blur-[200px] pointer-events-none" />
-      <div className="absolute bottom-10 left-[-10%] w-[50rem] h-[50rem] bg-indigo-950/35 rounded-full blur-[220px] pointer-events-none" />
+      {/* Ambient Cosmic Dark Glow Orbs with Subtle Breathing Animation */}
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[55rem] h-[55rem] bg-purple-900/25 rounded-full blur-[220px] pointer-events-none animate-ambient-breathe" />
+      <div className="absolute top-[35%] right-[-10%] w-[45rem] h-[45rem] bg-pink-900/20 rounded-full blur-[200px] pointer-events-none animate-ambient-breathe" style={{ animationDelay: '-4s' }} />
+      <div className="absolute bottom-10 left-[-10%] w-[50rem] h-[50rem] bg-indigo-950/35 rounded-full blur-[220px] pointer-events-none animate-ambient-breathe" style={{ animationDelay: '-2s' }} />
 
       {/* Cyber Grid */}
       <div 
@@ -272,7 +272,7 @@ export default function VideosPage() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white leading-tight">
-            FLOOR FROST <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-pink-300 to-purple-300">VIDEOS &amp; HUB</span>
+            FLOOR FROST <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-pink-400 via-purple-300 to-indigo-300 animate-text-shimmer">VIDEOS &amp; HUB</span>
           </h1>
 
           <p className="max-w-2xl text-sm sm:text-base text-zinc-300 leading-relaxed font-light">
@@ -435,11 +435,12 @@ export default function VideosPage() {
 
           {/* Grid of 10-Day Videos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-            {last10DaysVideos.map((video) => (
+            {last10DaysVideos.map((video, idx) => (
               <div
                 key={video.id}
                 onClick={() => handlePlayVideo(video)}
-                className={`group relative rounded-2xl overflow-hidden bg-zinc-950 border transition-all duration-300 shadow-xl flex flex-col cursor-pointer hover-lift ${
+                style={{ animationDelay: `${idx * 70}ms` }}
+                className={`group relative rounded-2xl overflow-hidden bg-zinc-950 border transition-all duration-300 shadow-xl flex flex-col cursor-pointer hover-lift shimmer-glass-card animate-fade-up ${
                   activeVideo.id === video.id
                     ? 'border-purple-400 shadow-[0_0_35px_rgba(168,85,247,0.5)] ring-2 ring-purple-400/50'
                     : 'border-purple-900/40 hover:border-pink-500/80 hover:shadow-[0_0_30px_rgba(236,72,153,0.35)]'
@@ -530,13 +531,14 @@ export default function VideosPage() {
 
           {/* Grid of Playlists */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-            {playlists.map((playlist) => (
+            {playlists.map((playlist, idx) => (
               <a
                 key={playlist.id}
                 href={playlist.url}
                 target="_blank"
                 rel="noreferrer"
-                className="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#120a24] to-[#080512] border-2 border-purple-500/30 hover:border-purple-400 p-6 flex flex-col sm:flex-row gap-5 shadow-[0_10px_35px_rgba(168,85,247,0.15)] hover:shadow-[0_0_45px_rgba(168,85,247,0.4)] transition-all duration-300 hover-lift"
+                style={{ animationDelay: `${idx * 120}ms` }}
+                className="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#120a24] to-[#080512] border-2 border-purple-500/30 hover:border-purple-400 p-6 flex flex-col sm:flex-row gap-5 shadow-[0_10px_35px_rgba(168,85,247,0.15)] hover:shadow-[0_0_45px_rgba(168,85,247,0.4)] transition-all duration-300 hover-lift shimmer-glass-card animate-fade-up"
               >
                 {/* Playlist Thumbnail with Overlay */}
                 <div className="sm:w-44 h-36 sm:h-auto rounded-2xl overflow-hidden relative bg-black shrink-0 border border-purple-500/30 group-hover:border-purple-400/70 transition-colors">
@@ -626,7 +628,8 @@ export default function VideosPage() {
             {posts.map((post, idx) => (
               <div
                 key={post.id || idx}
-                className="group rounded-3xl bg-gradient-to-b from-[#130b24]/95 to-[#090614]/95 border-2 border-pink-500/30 p-6 sm:p-8 flex flex-col gap-5 shadow-[0_10px_35px_rgba(236,72,153,0.15)] hover:border-pink-400 hover:shadow-[0_0_50px_rgba(236,72,153,0.35)] transition-all duration-300 hover-lift relative overflow-hidden"
+                style={{ animationDelay: `${idx * 140}ms` }}
+                className="group rounded-3xl bg-gradient-to-b from-[#130b24]/95 to-[#090614]/95 border-2 border-pink-500/30 p-6 sm:p-8 flex flex-col gap-5 shadow-[0_10px_35px_rgba(236,72,153,0.15)] hover:border-pink-400 hover:shadow-[0_0_50px_rgba(236,72,153,0.35)] transition-all duration-300 hover-lift shimmer-glass-card animate-fade-up relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-pink-600/10 to-purple-600/10 rounded-full blur-3xl pointer-events-none group-hover:from-pink-600/20 transition-all" />
 
