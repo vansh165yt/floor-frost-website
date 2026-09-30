@@ -1411,18 +1411,34 @@ export default function Home() {
 
       {/* 6. COMMUNITY & DISCORD BANNER WITH REAL LINKS */}
       <section id="community" className="relative py-24 px-6 sm:px-12 lg:px-20 bg-[#06030a] border-t border-purple-900/20 content-auto">
-        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-10 sm:p-16 relative overflow-hidden flex flex-col items-center text-center gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)] relative z-30 tilt-card scroll-scale-in">
+        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-10 sm:p-16 relative overflow-hidden flex flex-col items-center text-center gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)] z-30 tilt-card scroll-scale-in border-beam-card">
           <div className="tilt-glare" />
           <div className="absolute w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
 
+          {/* Floating Cyber Status Badges */}
+          <div className="hidden lg:flex absolute top-10 left-10 px-4 py-2 rounded-2xl bg-black/60 border border-purple-400/40 backdrop-blur-md items-center gap-2 text-xs font-mono text-purple-200 animate-float shadow-lg pointer-events-none">
+            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
+            <span>DISCORD // 500+ ONLINE</span>
+          </div>
+          <div className="hidden lg:flex absolute bottom-10 right-10 px-4 py-2 rounded-2xl bg-black/60 border border-pink-400/40 backdrop-blur-md items-center gap-2 text-xs font-mono text-pink-200 animate-float-slow shadow-lg pointer-events-none">
+            <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
+            <span>YOUTUBE // 4K 60FPS</span>
+          </div>
+
           <div className="relative z-10 flex flex-col items-center gap-4 max-w-2xl">
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-purple-400 shadow-xl mb-2 relative">
-              <NextImage src="/logo.png" alt="Floor Frost Logo" fill className="object-cover" />
+            {/* Spinning Cyber Avatar Rings */}
+            <div className="relative mb-2 flex items-center justify-center">
+              <div className="absolute -inset-2.5 rounded-full border border-dashed border-purple-500/50 animate-[spin_8s_linear_infinite]" />
+              <div className="absolute -inset-5 rounded-full border border-pink-500/30 animate-[spin_15s_linear_infinite_reverse]" />
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.5)] relative">
+                <NextImage src="/logo.png" alt="Floor Frost Logo" fill className="object-cover" />
+              </div>
             </div>
+
             <span className="text-xs font-mono uppercase tracking-[0.3em] text-pink-300 font-bold">
               JOIN THE FROST LEGION
             </span>
-            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight">
+            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight animate-chromatic-shimmer">
               NEVER MISS A GAMING ADVENTURE
             </h2>
             <p className="text-sm sm:text-base text-zinc-300 font-light leading-relaxed">
@@ -1430,22 +1446,24 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="relative z-10 flex flex-wrap gap-4 justify-center">
+          <div className="relative z-10 flex flex-wrap gap-5 justify-center">
             <a 
               href="https://youtube.com/@floorfrost" 
               target="_blank" 
               rel="noreferrer"
-              className="px-8 py-4 rounded-full bg-red-600 hover:bg-red-500 font-bold text-sm text-white shadow-[0_0_25px_rgba(220,38,38,0.6)] hover:scale-105 transition-all flex items-center gap-2 magnetic-btn"
+              className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 font-bold text-sm text-white shadow-[0_0_30px_rgba(220,38,38,0.5)] hover:shadow-[0_0_45px_rgba(220,38,38,0.8)] transition-all flex items-center gap-3 magnetic-btn border border-red-400/40"
             >
-              <span>▶</span> Subscribe ({subStats.subscriberCount})
+              <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">▶</span>
+              <span>Subscribe (<AnimatedCounter value={subStats.subscriberCount} />)</span>
             </a>
             <a 
               href="https://discord.gg/aN5CCRT6CS" 
               target="_blank" 
               rel="noreferrer"
-              className="px-8 py-4 rounded-full bg-indigo-600 hover:bg-indigo-500 font-bold text-sm text-white shadow-[0_0_25px_rgba(79,70,229,0.6)] hover:scale-105 transition-all flex items-center gap-2 magnetic-btn"
+              className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 font-bold text-sm text-white shadow-[0_0_30px_rgba(79,70,229,0.5)] hover:shadow-[0_0_45px_rgba(79,70,229,0.8)] transition-all flex items-center gap-3 magnetic-btn border border-indigo-400/40"
             >
-              <span>💬</span> Join Official Discord
+              <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">💬</span>
+              <span>Join Official Discord</span>
             </a>
           </div>
 
