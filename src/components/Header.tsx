@@ -132,6 +132,11 @@ export default function Header({
               Announcements
             </Link>
           )}
+          {activePage !== 'videos' && (
+            <Link href="/videos" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow">
+              Videos
+            </Link>
+          )}
         </nav>
 
         {/* Right Section: Subs Badge + 3 Parallel Lines Hamburger Toggle */}

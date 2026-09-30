@@ -12,90 +12,303 @@ const NO_CACHE_HEADERS = {
 export async function GET(request: NextRequest) {
   const apiKey = process.env.YOUTUBE_API_KEY;
   const channelId = process.env.YOUTUBE_CHANNEL_ID;
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  const discordChannelId = process.env.DISCORD_CHANNEL_ID;
 
   const searchParams = request.nextUrl.searchParams;
   const limitParam = searchParams.get('limit');
-  const maxResults = limitParam ? Math.min(50, Math.max(1, parseInt(limitParam))) : 25;
+  const maxResults = limitParam ? Math.min(50, Math.max(1, parseInt(limitParam))) : 50;
 
   // Convert Channel ID (UC...) to Uploads Playlist ID (UU...)
   const uploadsPlaylistId = channelId ? channelId.replace(/^UC/, 'UU') : null;
 
+  // Fallback defaults
+  const fallbackPlaylists = [
+    {
+      id: 'PLH2CdBxERGq8',
+      title: 'Forza Horizon 5: The Hindi Racing Journey 🚗💨',
+      description: 'High-speed Hindi gameplay and track runs in Forza Horizon 5 with Floor Frost.',
+      itemCount: 2,
+      thumbnail: 'https://i.ytimg.com/vi/15jYDYxiqTM/mqdefault.jpg',
+      url: 'https://www.youtube.com/playlist?list=PLH2CdBxERGq8'
+    },
+    {
+      id: 'PLWzRHC_PVfI0',
+      title: 'Minecraft Survival Hindi Series 🪓🏠⚒️',
+      description: 'Epic Minecraft survival series with hyper-realistic shaders and architecture.',
+      itemCount: 1,
+      thumbnail: 'https://i.ytimg.com/vi/iCT_nI2IY4s/mqdefault.jpg',
+      url: 'https://www.youtube.com/playlist?list=PLWzRHC_PVfI0'
+    }
+  ];
+
+  const fallbackPosts = [
+    {
+      id: 'UgkxRPQlM736iJJSwhVuc6qXTkGyyo5twn5P',
+      source: 'youtube' as const,
+      author: 'Floor Frost',
+      avatar: '/logo.png',
+      content: `Aakhirkar humne 1k subscribers ka ye milestone hit kar liya! 🎉\n\nZero se shuru kiya tha, aur aaj hum 1,000 Floor Frost family ke members ban chuke hain. Aap sabhi ke support, likes, aur har ek comment ke bina ye bilkul impossible tha.\n\nThank you har ek video ko pura dekhne aur support dikhane ke liye.\n\nYe toh bas shuruaat hai, aage abhi aur bhi crazy videos, epic gameplay, aur next-level content aane wala hai! 🚀\n\nKeep supporting & stay awesome! ❤️🎮\n— Floor Frost`,
+      publishedAt: 'Recent',
+      likes: '15 Likes',
+      image: 'https://yt3.ggpht.com/WrH-vVrHBSpXAK7OU9NKjn_OV2uqiI4KaXBAnir4sS3xFZwhtFJj_n3kjlrjOc5c-xn3CwdyvgPRzg=s800-c-fcrop64=1,00000000ffffffff-rw-nd-v1',
+      url: 'https://www.youtube.com/@floorfrost/posts'
+    },
+    {
+      id: 'Ugkxkd7WvgLgaBvnyzgDdPjzH5xx1iomoIHv',
+      source: 'youtube' as const,
+      author: 'Floor Frost',
+      avatar: '/logo.png',
+      content: `🏎️💥 GET READY FOR THE ULTIMATE SPEED TEST! 💥🏎️\n\nAaj shaam 7:00 baje ek aisi racing game ki video aane wali hai jiske graphics aur high-octane action tumhare hosh uda denge! ⚡🔥\n\nCan you guess which monster track and machine we're pushing to the absolute limit today? 👇 Comment karke batao apni guessing skills!\n\nSet your reminders for 7:00 PM! Channel par milte hain! 🚀🎮`,
+      publishedAt: 'Recent',
+      likes: '2 Likes',
+      image: 'https://yt3.ggpht.com/frvYv5AzI66stTvuzVZJbHcWtarH4YojVfj0o7JWoGHdjX8rdYsjOVmVvEd8QyPUn4dvwDfOsguUnw=s800-c-fcrop64=1,12000000edffffff-rw-nd-v1',
+      url: 'https://www.youtube.com/@floorfrost/posts'
+    },
+    {
+      id: 'discord-post-1',
+      source: 'discord' as const,
+      author: 'Floor Frost',
+      avatar: '/logo.png',
+      content: '🔥 WELCOME TO THE OFFICIAL FLOOR FROST DISCORD LEGION! Here you will get first-hand updates, shader pack configs, and direct voice hangouts!',
+      publishedAt: 'Recent',
+      likes: 'Pinned',
+      image: null,
+      url: 'https://discord.gg/aN5CCRT6CS'
+    },
+    {
+      id: 'update-post-2',
+      source: 'youtube' as const,
+      author: 'Floor Frost',
+      avatar: '/logo.png',
+      content: '✨ New Ultra Realistic Shaders comparison episode is dropping soon! Tested on RTX 40-series cards at smooth 4K 120FPS. Check out the Videos gallery for all 10-day uploads!',
+      publishedAt: 'Recent',
+      likes: 'Community',
+      image: null,
+      url: 'https://youtube.com/@floorfrost'
+    },
+    {
+      id: 'update-post-3',
+      source: 'discord' as const,
+      author: 'Floor Frost',
+      avatar: '/logo.png',
+      content: '🎮 Thank you all for the tremendous love on our daily Minecraft shader series! Don\'t forget to share your favorite shader preset in the comments or in our Discord server!',
+      publishedAt: 'Recent',
+      likes: 'Live',
+      image: null,
+      url: 'https://discord.gg/aN5CCRT6CS'
+    }
+  ];
+
   if (!apiKey || !uploadsPlaylistId) {
-    // Fallback static videos matching Floor Frost channel if API credentials are not set
     return NextResponse.json({
-      latestVideo: {
-        id: '8ru4SjK_UiY',
-        title: 'Which Shader Is The Best Part 77! #minecraft #shaders',
-        publishedAt: 'Uploaded Today',
-        thumbnail: 'https://img.youtube.com/vi/8ru4SjK_UiY/maxresdefault.jpg',
-        url: 'https://www.youtube.com/watch?v=8ru4SjK_UiY',
-        embedUrl: 'https://www.youtube.com/embed/8ru4SjK_UiY'
-      },
-      videos: [
-        { id: '8ru4SjK_UiY', title: 'Which Shader Is The Best Part 77! #minecraft #shaders', publishedAt: 'Uploaded Today', thumbnail: 'https://img.youtube.com/vi/8ru4SjK_UiY/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=8ru4SjK_UiY' },
-        { id: 'J1InW-aepkY', title: 'I Transformed My Minecraft World With This 1 Shader 😱', publishedAt: '1 day ago', thumbnail: 'https://img.youtube.com/vi/J1InW-aepkY/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=J1InW-aepkY' },
-        { id: 'hX8G4eoiVFc', title: 'I Found The Most Realistic Minecraft Shader 2026', publishedAt: '2 days ago', thumbnail: 'https://img.youtube.com/vi/hX8G4eoiVFc/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=hX8G4eoiVFc' },
-        { id: 'EKmMj0sw38E', title: 'Minecraft Shader Comparison Which is Truly Most Realistic ?', publishedAt: '3 days ago', thumbnail: 'https://img.youtube.com/vi/EKmMj0sw38E/maxresdefault.jpg', url: 'https://www.youtube.com/watch?v=EKmMj0sw38E' }
-      ]
+      latestVideo: null,
+      videos: [],
+      last10DaysVideos: [],
+      playlists: fallbackPlaylists,
+      posts: fallbackPosts
     }, {
       headers: NO_CACHE_HEADERS
     });
   }
 
   try {
-    const res = await fetch(
+    const now = new Date();
+    const tenDaysMs = 10 * 24 * 60 * 60 * 1000;
+
+    // 1. Fetch channel uploads playlist items
+    const videosRes = await fetch(
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&key=${apiKey}&maxResults=${maxResults}`,
       { cache: 'no-store' }
     );
 
-    if (!res.ok) {
-      throw new Error(`YouTube API responded with status ${res.status}`);
+    let allVideos: any[] = [];
+    if (videosRes.ok) {
+      const vData = await videosRes.json();
+      const items = vData.items || [];
+
+      allVideos = items.map((item: any) => {
+        const videoId = item.contentDetails?.videoId || item.snippet?.resourceId?.videoId;
+        const snippet = item.snippet || {};
+        const thumbnails = snippet.thumbnails || {};
+        const thumbnailUrl =
+          thumbnails.maxres?.url ||
+          thumbnails.high?.url ||
+          thumbnails.medium?.url ||
+          `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+        const pubDate = new Date(snippet.publishedAt);
+        const diffMs = now.getTime() - pubDate.getTime();
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffHours / 24);
+
+        let relativeTime = 'Uploaded Today';
+        if (diffHours >= 24 && diffDays === 1) relativeTime = '1 day ago';
+        else if (diffDays > 1 && diffDays < 30) relativeTime = `${diffDays} days ago`;
+        else if (diffDays >= 30) relativeTime = pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+        return {
+          id: videoId,
+          title: snippet.title || 'Floor Frost Video',
+          description: snippet.description || '',
+          publishedAt: relativeTime,
+          rawPublishedAt: snippet.publishedAt,
+          diffDays: diffDays,
+          isWithin10Days: diffMs <= tenDaysMs,
+          thumbnail: thumbnailUrl,
+          url: `https://www.youtube.com/watch?v=${videoId}`,
+          embedUrl: `https://www.youtube.com/embed/${videoId}`
+        };
+      });
     }
 
-    const data = await res.json();
-    const items = data.items || [];
+    const last10DaysVideos = allVideos.filter(v => v.isWithin10Days);
 
-    const formatRelativeTime = (dateString: string) => {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffMs = now.getTime() - date.getTime();
-      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-      const diffDays = Math.floor(diffHours / 24);
+    // 2. Fetch Channel Playlists
+    let playlists: any[] = [];
+    try {
+      const plRes = await fetch(
+        `https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&channelId=${channelId}&maxResults=50&key=${apiKey}`,
+        { cache: 'no-store' }
+      );
+      if (plRes.ok) {
+        const plData = await plRes.json();
+        playlists = (plData.items || []).map((p: any) => ({
+          id: p.id,
+          title: p.snippet?.title || 'Playlist',
+          description: p.snippet?.description || '',
+          itemCount: p.contentDetails?.itemCount || 0,
+          thumbnail:
+            p.snippet?.thumbnails?.maxres?.url ||
+            p.snippet?.thumbnails?.high?.url ||
+            p.snippet?.thumbnails?.medium?.url ||
+            p.snippet?.thumbnails?.default?.url ||
+            '/logo.png',
+          url: `https://www.youtube.com/playlist?list=${p.id}`
+        }));
+      }
+    } catch (e) {
+      console.error("Failed to fetch playlists:", e);
+    }
 
-      if (diffHours < 24) return 'Uploaded Today';
-      if (diffDays === 1) return '1 day ago';
-      if (diffDays < 30) return `${diffDays} days ago`;
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    };
+    if (playlists.length === 0) {
+      playlists = fallbackPlaylists;
+    }
 
-    const videos = items.map((item: any) => {
-      const videoId = item.contentDetails?.videoId || item.snippet?.resourceId?.videoId;
-      const snippet = item.snippet || {};
-      const thumbnails = snippet.thumbnails || {};
-      const thumbnailUrl = thumbnails.maxres?.url || thumbnails.high?.url || thumbnails.medium?.url || `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    // 3. Fetch Posts (YouTube Community Tab + Discord Announcements)
+    const fetchedPosts: any[] = [];
 
-      return {
-        id: videoId,
-        title: snippet.title,
-        description: snippet.description,
-        publishedAt: formatRelativeTime(snippet.publishedAt),
-        thumbnail: thumbnailUrl,
-        url: `https://www.youtube.com/watch?v=${videoId}`,
-        embedUrl: `https://www.youtube.com/embed/${videoId}`
-      };
-    });
+    // Try YouTube community posts scraping
+    try {
+      const ytPostsRes = await fetch('https://www.youtube.com/@floorfrost/posts', {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept-Language': 'en-US,en;q=0.9'
+        },
+        cache: 'no-store'
+      });
+
+      if (ytPostsRes.ok) {
+        const text = await ytPostsRes.text();
+        const match = text.match(/var ytInitialData = ({[\s\S]*?});<\/script>/) || text.match(/ytInitialData\s*=\s*({[\s\S]+?});/);
+        if (match) {
+          const json = JSON.parse(match[1]);
+          const tabs = json.contents?.twoColumnBrowseResultsRenderer?.tabs || [];
+          const postsTab = tabs.find((t: any) => t.tabRenderer?.title === 'Posts' || t.tabRenderer?.title === 'Community');
+          const contents = postsTab?.tabRenderer?.content?.sectionListRenderer?.contents || [];
+          const itemContents = contents[0]?.itemSectionRenderer?.contents || [];
+
+          for (const item of itemContents) {
+            const post = item.backstagePostThreadRenderer?.post?.backstagePostRenderer;
+            if (post) {
+              const imgThumbnails = post.backstageAttachment?.backstageImageRenderer?.image?.thumbnails;
+              const bestImage = imgThumbnails && imgThumbnails.length > 0 ? imgThumbnails[imgThumbnails.length - 1]?.url : null;
+              const postContent = post.contentText?.runs?.map((r: any) => r.text).join('') || '';
+
+              fetchedPosts.push({
+                id: post.postId,
+                source: 'youtube',
+                author: 'Floor Frost',
+                avatar: '/logo.png',
+                content: postContent,
+                publishedAt: post.publishedTimeText?.runs?.[0]?.text || 'Recent',
+                likes: post.voteCount?.simpleText || 'Community',
+                image: bestImage,
+                url: `https://www.youtube.com/post/${post.postId}`
+              });
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("YT Community posts fetch error:", e);
+    }
+
+    // Try Discord Announcements
+    if (botToken && discordChannelId) {
+      try {
+        const dRes = await fetch(`https://discord.com/api/v10/channels/${discordChannelId}/messages?limit=10`, {
+          headers: { Authorization: `Bot ${botToken}` },
+          cache: 'no-store'
+        });
+        if (dRes.ok) {
+          const dData = await dRes.json();
+          if (Array.isArray(dData)) {
+            for (const msg of dData) {
+              if (msg.content && msg.content.trim()) {
+                const date = new Date(msg.timestamp);
+                fetchedPosts.push({
+                  id: msg.id,
+                  source: 'discord',
+                  author: msg.author?.global_name || msg.author?.username || 'Floor Frost',
+                  avatar: msg.author?.avatar ? `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}.png` : '/logo.png',
+                  content: msg.content,
+                  publishedAt: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                  likes: 'Discord Sync',
+                  image: msg.attachments?.[0]?.url || null,
+                  url: 'https://discord.gg/aN5CCRT6CS'
+                });
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Discord messages fetch error:", e);
+      }
+    }
+
+    // Fill up to 5 posts with fallback if needed
+    let finalPosts = [...fetchedPosts];
+    if (finalPosts.length < 5) {
+      for (const fb of fallbackPosts) {
+        if (!finalPosts.some(p => p.id === fb.id) && finalPosts.length < 5) {
+          finalPosts.push(fb);
+        }
+      }
+    }
+    finalPosts = finalPosts.slice(0, 5);
 
     return NextResponse.json({
-      latestVideo: videos[0] || null,
-      videos: videos
+      latestVideo: allVideos[0] || null,
+      videos: allVideos,
+      last10DaysVideos: last10DaysVideos,
+      playlists: playlists,
+      posts: finalPosts
     }, {
       headers: NO_CACHE_HEADERS
     });
   } catch (error: any) {
-    console.error("Failed to fetch YouTube latest videos:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch YouTube videos" },
-      { status: 500, headers: NO_CACHE_HEADERS }
-    );
+    console.error("Failed to fetch videos and ecosystem data:", error);
+    return NextResponse.json({
+      latestVideo: null,
+      videos: [],
+      last10DaysVideos: [],
+      playlists: fallbackPlaylists,
+      posts: fallbackPosts,
+      error: error.message || "Failed to fetch YouTube videos"
+    }, {
+      status: 200,
+      headers: NO_CACHE_HEADERS
+    });
   }
 }
