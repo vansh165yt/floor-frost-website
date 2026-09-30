@@ -451,6 +451,8 @@ export default function VideosPage() {
                   <img
                     src={video.thumbnail}
                     alt={video.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
@@ -547,6 +549,8 @@ export default function VideosPage() {
                   <img
                     src={playlist.thumbnail}
                     alt={playlist.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -640,7 +644,7 @@ export default function VideosPage() {
                 <div className="flex justify-between items-start gap-4 pb-4 border-b border-white/10 z-10">
                   <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-pink-500 relative shadow-md shrink-0">
-                      <img src={post.avatar || '/logo.png'} alt={post.author} className="w-full h-full object-cover" />
+                      <img src={post.avatar || '/logo.png'} alt={post.author} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
@@ -682,6 +686,8 @@ export default function VideosPage() {
                     <img
                       src={post.image}
                       alt="YouTube community post graphic"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
                     />
                   </div>

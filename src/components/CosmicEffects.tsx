@@ -9,7 +9,7 @@ export default function CosmicEffects() {
   const [isPointerDevice, setIsPointerDevice] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // 1. Mouse Tracking for Interactive Ambient Spotlight Glow
+  // 1. Mouse Tracking for Interactive Ambient Spotlight Glow (Idle-Aware)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -17,49 +17,78 @@ export default function CosmicEffects() {
       setIsPointerDevice(true);
     }
 
-    let rafId: number;
+    let rafId: number | null = null;
     let targetX = -1000;
     let targetY = -1000;
     let currentX = -1000;
     let currentY = -1000;
+    let isMoving = false;
+
+    const animateGlow = () => {
+      // Smooth lerp
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
+      setMousePos({ x: Math.round(currentX), y: Math.round(currentY) });
+
+      // If close enough to target, idle RAF to conserve 100% CPU when mouse is stationary
+      if (Math.abs(targetX - currentX) > 0.2 || Math.abs(targetY - currentY) > 0.2) {
+        rafId = requestAnimationFrame(animateGlow);
+      } else {
+        isMoving = false;
+        rafId = null;
+      }
+    };
 
     const handleMouseMove = (e: MouseEvent) => {
       targetX = e.clientX;
       targetY = e.clientY;
+
+      if (!isMoving) {
+        isMoving = true;
+        if (!rafId) {
+          rafId = requestAnimationFrame(animateGlow);
+        }
+      }
     };
 
     const handleMouseLeave = () => {
       targetX = -1000;
       targetY = -1000;
-    };
-
-    const animateGlow = () => {
-      currentX += (targetX - currentX) * 0.12;
-      currentY += (targetY - currentY) * 0.12;
-      setMousePos({ x: Math.round(currentX), y: Math.round(currentY) });
-      rafId = requestAnimationFrame(animateGlow);
+      if (!isMoving) {
+        isMoving = true;
+        if (!rafId) {
+          rafId = requestAnimationFrame(animateGlow);
+        }
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
-    rafId = requestAnimationFrame(animateGlow);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
-      cancelAnimationFrame(rafId);
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 
-  // 2. Scroll Progress & Back to Top Visibility
+  // 2. Throttled Scroll Progress & Back to Top Visibility
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalScroll > 0) {
-        const currentProgress = (window.scrollY / totalScroll) * 100;
-        setScrollProgress(Math.min(100, Math.max(0, currentProgress)));
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+          if (totalScroll > 0) {
+            const currentProgress = (window.scrollY / totalScroll) * 100;
+            setScrollProgress(Math.min(100, Math.max(0, currentProgress)));
+          }
+          setShowBackToTop(window.scrollY > 400);
+          ticking = false;
+        });
+        ticking = true;
       }
-      setShowBackToTop(window.scrollY > 400);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -67,7 +96,7 @@ export default function CosmicEffects() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 3. Automated IntersectionObserver Scroll Reveal Engine
+  // 3. Automated IntersectionObserver Scroll Reveal Engine (Debounced)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -82,15 +111,14 @@ export default function CosmicEffects() {
         });
       },
       {
-        threshold: 0.1,
-        rootMargin: '0px 0px -30px 0px'
+        threshold: 0.08,
+        rootMargin: '0px 0px -20px 0px'
       }
     );
 
     const observeElements = () => {
       const elements = document.querySelectorAll(revealSelectors);
       elements.forEach((el) => {
-        // If element is already revealed, skip
         if (!el.classList.contains('is-revealed')) {
           observer.observe(el);
         }
@@ -99,9 +127,10 @@ export default function CosmicEffects() {
 
     observeElements();
 
-    // Watch for dynamically rendered DOM nodes (e.g. YouTube API data)
+    let debounceTimer: ReturnType<typeof setTimeout>;
     const mutationObserver = new MutationObserver(() => {
-      observeElements();
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(observeElements, 100);
     });
 
     mutationObserver.observe(document.body, {
@@ -110,6 +139,7 @@ export default function CosmicEffects() {
     });
 
     return () => {
+      clearTimeout(debounceTimer);
       observer.disconnect();
       mutationObserver.disconnect();
     };
@@ -120,25 +150,45 @@ export default function CosmicEffects() {
     if (typeof window === 'undefined') return;
     if (!window.matchMedia('(pointer: fine)').matches) return;
 
-    const handlePointerMove = (e: PointerEvent) => {
-      const target = (e.target as HTMLElement)?.closest('.tilt-card, [data-tilt]') as HTMLElement | null;
-      if (!target) return;
+    let targetElement: HTMLElement | null = null;
+    let targetRect: DOMRect | null = null;
+    let pendingX = 0;
+    let pendingY = 0;
+    let rafId: number | null = null;
 
-      const rect = target.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+    const updateTilt = () => {
+      if (!targetElement || !targetRect) return;
 
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
+      const x = pendingX - targetRect.left;
+      const y = pendingY - targetRect.top;
+      const centerX = targetRect.width / 2;
+      const centerY = targetRect.height / 2;
 
-      // Max tilt angle 6 degrees for subtle high-end feel
       const maxTilt = 6;
       const rotateX = -((y - centerY) / centerY) * maxTilt;
       const rotateY = ((x - centerX) / centerX) * maxTilt;
 
-      target.style.setProperty('--mouse-x', `${x}px`);
-      target.style.setProperty('--mouse-y', `${y}px`);
-      target.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
+      targetElement.style.setProperty('--mouse-x', `${x}px`);
+      targetElement.style.setProperty('--mouse-y', `${y}px`);
+      targetElement.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
+      rafId = null;
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const target = (e.target as HTMLElement)?.closest('.tilt-card, [data-tilt]') as HTMLElement | null;
+      if (!target) return;
+
+      if (target !== targetElement) {
+        targetElement = target;
+        targetRect = target.getBoundingClientRect();
+      }
+
+      pendingX = e.clientX;
+      pendingY = e.clientY;
+
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateTilt);
+      }
     };
 
     const handlePointerLeave = (e: PointerEvent) => {
@@ -146,6 +196,10 @@ export default function CosmicEffects() {
       if (!target) return;
 
       target.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      if (target === targetElement) {
+        targetElement = null;
+        targetRect = null;
+      }
     };
 
     document.addEventListener('pointermove', handlePointerMove, { passive: true });
@@ -154,6 +208,7 @@ export default function CosmicEffects() {
     return () => {
       document.removeEventListener('pointermove', handlePointerMove);
       document.removeEventListener('pointerout', handlePointerLeave);
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -170,7 +225,6 @@ export default function CosmicEffects() {
       const x = e.clientX - (rect.left + rect.width / 2);
       const y = e.clientY - (rect.top + rect.height / 2);
 
-      // Magnetic pull factor (max 6px offset)
       const pullX = Math.max(-6, Math.min(6, x * 0.22));
       const pullY = Math.max(-6, Math.min(6, y * 0.22));
 
@@ -193,7 +247,7 @@ export default function CosmicEffects() {
     };
   }, []);
 
-  // 6. Subtle Twinkling Cosmic Micro-Stars Particles Canvas
+  // 6. Subtle Twinkling Cosmic Micro-Stars Canvas (Visibility-Aware)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -203,6 +257,7 @@ export default function CosmicEffects() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
     let animationFrameId: number;
+    let isTabVisible = !document.hidden;
 
     const handleResize = () => {
       if (!canvas) return;
@@ -210,9 +265,19 @@ export default function CosmicEffects() {
       height = canvas.height = window.innerHeight;
     };
 
-    window.addEventListener('resize', handleResize);
+    const handleVisibilityChange = () => {
+      isTabVisible = !document.hidden;
+      if (isTabVisible) {
+        animationFrameId = requestAnimationFrame(render);
+      } else {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
 
-    const particleCount = Math.min(50, Math.floor(window.innerWidth / 28));
+    window.addEventListener('resize', handleResize, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const particleCount = Math.min(45, Math.floor(window.innerWidth / 30));
     const colors = [
       'rgba(168, 85, 247, ',  // Purple
       'rgba(236, 72, 153, ',  // Pink
@@ -249,6 +314,7 @@ export default function CosmicEffects() {
 
     let tick = 0;
     const render = () => {
+      if (!isTabVisible) return;
       tick++;
       ctx.clearRect(0, 0, width, height);
 
@@ -280,6 +346,7 @@ export default function CosmicEffects() {
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -334,10 +401,8 @@ export default function CosmicEffects() {
           className="fixed bottom-6 right-6 z-50 p-3 sm:p-3.5 rounded-full bg-[#120a24]/85 border-2 border-purple-500/50 hover:border-pink-400 text-white shadow-[0_0_30px_rgba(168,85,247,0.4),0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-xl hover:scale-110 active:scale-95 transition-all duration-300 group cursor-pointer animate-portal-fade flex items-center justify-center magnetic-btn"
         >
           <div className="relative flex items-center justify-center">
-            {/* Ambient Aura Ring */}
             <span className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 opacity-60 blur-sm group-hover:opacity-100 transition-opacity" />
             
-            {/* Arrow Up SVG */}
             <svg
               className="w-5 h-5 relative z-10 fill-none stroke-current stroke-[2.5] text-purple-200 group-hover:text-white group-hover:-translate-y-0.5 transition-transform"
               viewBox="0 0 24 24"

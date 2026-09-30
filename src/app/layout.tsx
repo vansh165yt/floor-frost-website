@@ -30,6 +30,14 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preconnect" href="https://i.ytimg.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://img.youtube.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cdn.discordapp.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://i.ytimg.com" />
+        <link rel="dns-prefetch" href="https://img.youtube.com" />
+        <link rel="dns-prefetch" href="https://cdn.discordapp.com" />
+      </head>
       <body className="min-h-full flex flex-col bg-[#07040d]">
         <Suspense fallback={null}>
           <PageLoader />

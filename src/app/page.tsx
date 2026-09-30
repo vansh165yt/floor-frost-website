@@ -398,9 +398,44 @@ export default function Home() {
       }
     };
 
+    let lastRenderedFrameIndex = -1;
+    let isLoopRunning = false;
+
+    // Intelligent animation loop with lerp (sleeps when stationary to preserve 100% CPU/GPU)
+    const loop = () => {
+      if (prefersReducedMotion) {
+        currentFrame = targetFrame;
+      } else {
+        currentFrame += (targetFrame - currentFrame) * 0.12;
+      }
+
+      const roundedFrame = Math.round(currentFrame);
+      if (roundedFrame !== lastRenderedFrameIndex) {
+        renderFrame(currentFrame);
+        lastRenderedFrameIndex = roundedFrame;
+      }
+
+      if (Math.abs(targetFrame - currentFrame) > 0.01) {
+        animationFrameId = requestAnimationFrame(loop);
+      } else {
+        isLoopRunning = false;
+      }
+    };
+
+    const startLoop = () => {
+      if (!isLoopRunning && !document.hidden) {
+        isLoopRunning = true;
+        animationFrameId = requestAnimationFrame(loop);
+      }
+    };
+
     const updateScroll = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
+      
+      // If hero container is completely scrolled past above viewport, skip frame computation
+      if (rect.bottom < 0) return;
+
       const totalScrollable = rect.height - window.innerHeight;
       if (totalScrollable <= 0) return;
 
@@ -409,28 +444,28 @@ export default function Home() {
 
       targetFrame = 1 + progress * (frameCount - 1);
       setScrollProgress(progress);
+      startLoop();
+    };
+
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        lastRenderedFrameIndex = -1;
+        startLoop();
+      } else {
+        cancelAnimationFrame(animationFrameId);
+        isLoopRunning = false;
+      }
     };
 
     window.addEventListener('scroll', updateScroll, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibility);
     updateScroll();
-
-    // Persistent animation loop with lerp
-    const loop = () => {
-      if (prefersReducedMotion) {
-        currentFrame = targetFrame;
-      } else {
-        currentFrame += (targetFrame - currentFrame) * 0.12;
-      }
-
-      renderFrame(currentFrame);
-      animationFrameId = requestAnimationFrame(loop);
-    };
-
-    loop();
+    startLoop();
 
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', updateScroll);
+      document.removeEventListener('visibilitychange', handleVisibility);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -1130,6 +1165,8 @@ export default function Home() {
                     <img
                       src={video.thumbnail}
                       alt={video.title}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />

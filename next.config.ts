@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
   async headers() {
     return [
       {
@@ -12,9 +15,20 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/logo.png",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
     ];
   },
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60 * 60 * 24 * 7, // Cache optimized images for 7 days
     remotePatterns: [
       {
         protocol: "https",
