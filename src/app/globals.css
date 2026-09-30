@@ -407,54 +407,54 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Scroll Reveal: Fade Up Entrance */
+/* Ultra-Smooth Scroll Reveals (Hardware-Accelerated 3D Transforms) */
 .scroll-fade-up {
   opacity: 0;
-  transform: translateY(30px);
-  filter: blur(6px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(0, 32px, 0) scale(0.98);
+  filter: blur(8px);
+  transition: opacity 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.85s cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: opacity, transform, filter;
 }
 
 /* Scroll Reveal: Scale In Entrance */
 .scroll-scale-in {
   opacity: 0;
-  transform: scale(0.92) translateY(24px);
-  filter: blur(8px);
-  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(0, 24px, 0) scale(0.92);
+  filter: blur(10px);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: opacity, transform, filter;
 }
 
 /* Scroll Reveal: Slide Left Entrance */
 .scroll-slide-left {
   opacity: 0;
-  transform: translateX(-35px);
-  filter: blur(6px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(-35px, 0, 0) scale(0.98);
+  filter: blur(8px);
+  transition: opacity 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.85s cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: opacity, transform, filter;
 }
 
 /* Scroll Reveal: Slide Right Entrance */
 .scroll-slide-right {
   opacity: 0;
-  transform: translateX(35px);
-  filter: blur(6px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(35px, 0, 0) scale(0.98);
+  filter: blur(8px);
+  transition: opacity 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.85s cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: opacity, transform, filter;
 }
 
 /* Revealed State Triggered dynamically on Scroll */
 .is-revealed {
   opacity: 1 !important;
-  transform: translate(0, 0) scale(1) !important;
+  transform: translate3d(0, 0, 0) scale(1) !important;
   filter: blur(0px) !important;
   will-change: auto !important;
 }
@@ -476,11 +476,11 @@ html {
 [data-reveal-delay="400"] { transition-delay: 400ms; }
 [data-reveal-delay="500"] { transition-delay: 500ms; }
 
-/* 3D Perspective Tilt Card with Specular Glare */
+/* 3D Perspective Tilt Card with Specular Glare & Holographic Sheen */
 .tilt-card {
   transform-style: preserve-3d;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.35s ease,
+  transition: transform 0.28s cubic-bezier(0.23, 1, 0.32, 1),
+              box-shadow 0.35s cubic-bezier(0.23, 1, 0.32, 1),
               border-color 0.35s ease;
   will-change: transform;
 }
@@ -491,14 +491,16 @@ html {
   border-radius: inherit;
   pointer-events: none;
   background: radial-gradient(
-    450px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(255, 255, 255, 0.12),
-    rgba(168, 85, 247, 0.08) 35%,
-    transparent 70%
+    500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.18),
+    rgba(34, 211, 238, 0.12) 22%,
+    rgba(236, 72, 153, 0.12) 44%,
+    rgba(168, 85, 247, 0.08) 64%,
+    transparent 80%
   );
   opacity: 0;
-  transition: opacity 0.35s ease;
-  mix-blend-mode: overlay;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  mix-blend-mode: screen;
   z-index: 25;
 }
 
@@ -506,9 +508,9 @@ html {
   opacity: 1;
 }
 
-/* Magnetic Button Smooth Snapping */
+/* Magnetic Button with Ultra-Elastic Spring Physics */
 .magnetic-btn {
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
 }
 
@@ -651,6 +653,26 @@ html {
   animation: sparkParticleFly 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Cursor Micro-Stardust Trail Particle */
+@keyframes cursorSparkleFade {
+  0% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(-12px) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-cursor-sparkle {
+  position: fixed;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 99990;
+  animation: cursorSparkleFade 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Floating Laser Glow Button */
 .neon-glow-btn {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -659,6 +681,49 @@ html {
 .neon-glow-btn:hover {
   box-shadow: 0 0 35px rgba(236, 72, 153, 0.7), 0 0 65px rgba(168, 85, 247, 0.45);
   transform: translateY(-2px) scale(1.02);
+}
+
+/* Chromatic Metallic Rainbow Text Shimmer */
+@keyframes chromaticShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-chromatic-shimmer {
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #e879f9 25%,
+    #38bdf8 50%,
+    #c084fc 75%,
+    #ffffff 100%
+  );
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: chromaticShimmer 6s ease-in-out infinite;
+}
+
+/* Marquee Item Interactive Hover Spring */
+.marquee-item {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              filter 0.35s ease,
+              border-color 0.35s ease,
+              box-shadow 0.35s ease;
+}
+
+.marquee-item:hover {
+  transform: translateY(-4px) scale(1.06);
+  filter: brightness(1.2);
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.4), inset 0 0 15px rgba(236, 72, 153, 0.3);
 }
 
 

@@ -490,12 +490,16 @@ export default function Home() {
       return drawn;
     };
 
-    // Intelligent animation loop with lerp (sleeps when stationary to preserve 100% CPU/GPU)
+    // Intelligent animation loop with adaptive dynamic lerp (Zero latency on fast scroll, buttery deceleration)
     const loop = () => {
       if (prefersReducedMotion) {
         currentFrame = targetFrame;
       } else {
-        currentFrame += (targetFrame - currentFrame) * 0.12;
+        const diff = targetFrame - currentFrame;
+        const speed = Math.abs(diff);
+        // Responsive dynamic lerp: snappier tracking during fast scrolls (0.16), buttery deceleration when settling (0.095)
+        const lerpFactor = speed > 3 ? 0.16 : 0.095;
+        currentFrame += diff * lerpFactor;
       }
       currentFrameRef.current = currentFrame;
 
@@ -803,7 +807,7 @@ export default function Home() {
 
             <h1 
               ref={titleRef}
-              className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-100 via-purple-200 to-indigo-200 drop-shadow-[0_8px_24px_rgba(0,0,0,0.95)] leading-tight transition-all duration-150 ease-out"
+              className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-100 via-purple-200 to-indigo-200 drop-shadow-[0_8px_24px_rgba(0,0,0,0.95)] leading-tight transition-all duration-150 ease-out animate-chromatic-shimmer"
               style={{
                 opacity: 0,
                 transform: 'translateY(35px) scale(0.9)'
@@ -832,7 +836,7 @@ export default function Home() {
                 pointerEvents: 'none'
               }}
             >
-              <a href="#videos" className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:px-9 sm:py-4 font-medium text-sm sm:text-base text-white transition-all duration-300 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 hover:scale-[1.05] shadow-[0_0_25px_rgba(219,39,119,0.7)] hover:shadow-[0_0_40px_rgba(219,39,119,1)] border border-pink-400/50 backdrop-blur-md active:scale-95 mt-3 neon-glow-btn">
+              <a href="#videos" className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:px-9 sm:py-4 font-medium text-sm sm:text-base text-white transition-all duration-300 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 hover:scale-[1.05] shadow-[0_0_25px_rgba(219,39,119,0.7)] hover:shadow-[0_0_40px_rgba(219,39,119,1)] border border-pink-400/50 backdrop-blur-md active:scale-95 mt-3 neon-glow-btn magnetic-btn">
                 <span>Explore Content</span>
                 <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
               </a>
@@ -875,7 +879,7 @@ export default function Home() {
                 <div className="animate-marquee flex items-center">
                   {[...topLogos, ...topLogos, ...topLogos, ...topLogos].map((logo, idx) => (
                     <div key={idx} className="flex items-center shrink-0">
-                      <div className="px-8 sm:px-12 group cursor-pointer flex flex-col justify-center">
+                      <div className="px-8 sm:px-12 py-2 rounded-xl group cursor-pointer flex flex-col justify-center marquee-item">
                         <span className="font-sans font-black tracking-[0.2em] text-sm sm:text-lg text-zinc-100 uppercase group-hover:text-purple-300 transition-colors">
                           {logo.name}
                         </span>
@@ -895,7 +899,7 @@ export default function Home() {
                 <div className="animate-marquee-reverse flex items-center">
                   {[...bottomLogos, ...bottomLogos, ...bottomLogos, ...bottomLogos].map((logo, idx) => (
                     <div key={idx} className="flex items-center shrink-0">
-                      <div className="px-8 sm:px-12 group cursor-pointer flex flex-col justify-center">
+                      <div className="px-8 sm:px-12 py-2 rounded-xl group cursor-pointer flex flex-col justify-center marquee-item">
                         <span className="font-sans font-black tracking-[0.2em] text-sm sm:text-lg text-zinc-100 uppercase group-hover:text-pink-300 transition-colors">
                           {logo.name}
                         </span>
@@ -964,8 +968,10 @@ export default function Home() {
                   <div className="flex items-end gap-1.5 h-8">
                     <div className="w-1.5 bg-pink-400 rounded-full animate-eq-1 shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
                     <div className="w-1.5 bg-purple-400 rounded-full animate-eq-2 shadow-[0_0_8px_rgba(192,132,252,0.8)]" />
-                    <div className="w-1.5 bg-indigo-400 rounded-full animate-eq-3 shadow-[0_0_8px_rgba(129,140,248,0.8)]" />
-                    <div className="w-1.5 bg-pink-500 rounded-full animate-eq-4 shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
+                    <div className="w-1.5 bg-cyan-400 rounded-full animate-eq-3 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                    <div className="w-1.5 bg-indigo-400 rounded-full animate-eq-4 shadow-[0_0_8px_rgba(129,140,248,0.8)]" />
+                    <div className="w-1.5 bg-fuchsia-400 rounded-full animate-eq-2 shadow-[0_0_8px_rgba(232,121,249,0.8)]" />
+                    <div className="w-1.5 bg-pink-500 rounded-full animate-eq-1 shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
                   </div>
                   <span className="text-xs font-mono text-zinc-200 font-semibold">Live Stream Output</span>
                 </div>

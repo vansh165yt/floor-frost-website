@@ -14,12 +14,14 @@ export default function CosmicEffects() {
   const verticalFillRef = useRef<HTMLDivElement>(null);
   const verticalPercentRef = useRef<HTMLSpanElement>(null);
   const waypointRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const mouseCanvasPosRef = useRef({ x: -1000, y: -1000 });
 
-  // 1. Mouse Tracking for Interactive Ambient Spotlight Glow (Idle-Aware, Direct Ref)
+  // 1. Mouse Tracking for Interactive Ambient Spotlight Glow & Dynamic Stardust Trail
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    if (window.matchMedia('(pointer: fine)').matches) {
+    const isPointer = window.matchMedia('(pointer: fine)').matches;
+    if (isPointer) {
       setIsPointerDevice(true);
     }
 
@@ -29,6 +31,10 @@ export default function CosmicEffects() {
     let currentX = -1000;
     let currentY = -1000;
     let isMoving = false;
+
+    let lastSparkleTime = 0;
+    let lastSparkleX = 0;
+    let lastSparkleY = 0;
 
     const animateGlow = () => {
       // Smooth lerp
@@ -56,6 +62,32 @@ export default function CosmicEffects() {
     const handleMouseMove = (e: MouseEvent) => {
       targetX = e.clientX;
       targetY = e.clientY;
+      mouseCanvasPosRef.current = { x: e.clientX, y: e.clientY };
+
+      // Spawn ethereal micro-stardust particles following cursor (Pointer devices only)
+      if (isPointer) {
+        const now = performance.now();
+        const distMoved = Math.hypot(e.clientX - lastSparkleX, e.clientY - lastSparkleY);
+        if (now - lastSparkleTime > 40 && distMoved > 16) {
+          lastSparkleTime = now;
+          lastSparkleX = e.clientX;
+          lastSparkleY = e.clientY;
+
+          const sparkle = document.createElement('div');
+          sparkle.className = 'animate-cursor-sparkle';
+          sparkle.style.left = `${e.clientX}px`;
+          sparkle.style.top = `${e.clientY}px`;
+          const sSize = Math.random() * 2.5 + 2;
+          sparkle.style.width = `${sSize}px`;
+          sparkle.style.height = `${sSize}px`;
+          const sparkColors = ['#f43f5e', '#ec4899', '#c084fc', '#38bdf8', '#ffffff'];
+          const c = sparkColors[Math.floor(Math.random() * sparkColors.length)];
+          sparkle.style.backgroundColor = c;
+          sparkle.style.boxShadow = `0 0 10px ${c}, 0 0 4px #ffffff`;
+          document.body.appendChild(sparkle);
+          setTimeout(() => sparkle.remove(), 650);
+        }
+      }
 
       if (!isMoving) {
         isMoving = true;
@@ -68,6 +100,7 @@ export default function CosmicEffects() {
     const handleMouseLeave = () => {
       targetX = -1000;
       targetY = -1000;
+      mouseCanvasPosRef.current = { x: -1000, y: -1000 };
       if (!isMoving) {
         isMoving = true;
         if (!rafId) {
@@ -407,11 +440,26 @@ export default function CosmicEffects() {
       tick++;
       ctx.clearRect(0, 0, width, height);
 
-      // Render micro-stars
+      const mx = mouseCanvasPosRef.current.x;
+      const my = mouseCanvasPosRef.current.y;
+
+      // Render micro-stars with subtle cursor deflection
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.speedX;
         p.y += p.speedY;
+
+        // Gentle interactive mouse deflection
+        if (mx > 0 && my > 0) {
+          const dx = p.x - mx;
+          const dy = p.y - my;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 110 && dist > 0) {
+            const force = (1 - dist / 110) * 1.6;
+            p.x += (dx / dist) * force;
+            p.y += (dy / dist) * force;
+          }
+        }
 
         if (p.y < -10) p.y = height + 10;
         if (p.x < -10) p.x = width + 10;
@@ -429,11 +477,22 @@ export default function CosmicEffects() {
         ctx.shadowBlur = 0;
       }
 
-      // Render glowing floating frost embers
+      // Render glowing floating frost embers with gentle deflection
       for (let j = 0; j < embers.length; j++) {
         const em = embers[j];
         em.y += em.speedY;
         em.x += Math.sin(tick * em.swaySpeed + j) * em.swayRange;
+
+        if (mx > 0 && my > 0) {
+          const edx = em.x - mx;
+          const edy = em.y - my;
+          const edist = Math.hypot(edx, edy);
+          if (edist < 130 && edist > 0) {
+            const eforce = (1 - edist / 130) * 2.2;
+            em.x += (edx / edist) * eforce;
+            em.y += (edy / edist) * eforce;
+          }
+        }
 
         if (em.y < -20) {
           em.y = height + 20;
@@ -461,7 +520,7 @@ export default function CosmicEffects() {
     };
   }, []);
 
-  // 7. Interactive Cosmic Stardust Click Burst (All Devices)
+  // 7. Interactive Dual-Pulse Cosmic Stardust Click Burst (All Devices)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -471,18 +530,28 @@ export default function CosmicEffects() {
       const x = e.clientX;
       const y = e.clientY;
 
-      // 1. Expanding Shockwave Ring
-      const shockwave = document.createElement('div');
-      shockwave.className = 'animate-click-shockwave';
-      shockwave.style.left = `${x}px`;
-      shockwave.style.top = `${y}px`;
-      shockwave.style.width = '36px';
-      shockwave.style.height = '36px';
-      document.body.appendChild(shockwave);
+      // 1. Dual Expanding Shockwave Rings
+      const shockwave1 = document.createElement('div');
+      shockwave1.className = 'animate-click-shockwave';
+      shockwave1.style.left = `${x}px`;
+      shockwave1.style.top = `${y}px`;
+      shockwave1.style.width = '36px';
+      shockwave1.style.height = '36px';
+      document.body.appendChild(shockwave1);
 
-      // 2. Burst of 6 Diamond Micro-Sparks
-      const sparkCount = 6;
-      const colors = ['#f43f5e', '#ec4899', '#a855f7', '#22d3ee', '#ffffff'];
+      const shockwave2 = document.createElement('div');
+      shockwave2.className = 'animate-click-shockwave';
+      shockwave2.style.left = `${x}px`;
+      shockwave2.style.top = `${y}px`;
+      shockwave2.style.width = '24px';
+      shockwave2.style.height = '24px';
+      shockwave2.style.animationDelay = '80ms';
+      shockwave2.style.borderColor = 'rgba(56, 189, 248, 0.85)';
+      document.body.appendChild(shockwave2);
+
+      // 2. Burst of 8 Diamond Micro-Sparks
+      const sparkCount = 8;
+      const colors = ['#f43f5e', '#ec4899', '#a855f7', '#38bdf8', '#ffffff', '#c084fc'];
       const sparks: HTMLElement[] = [];
 
       for (let i = 0; i < sparkCount; i++) {
@@ -494,9 +563,9 @@ export default function CosmicEffects() {
         spark.style.width = `${size}px`;
         spark.style.height = `${size}px`;
         spark.style.backgroundColor = colors[i % colors.length];
-        spark.style.boxShadow = `0 0 8px ${colors[i % colors.length]}`;
+        spark.style.boxShadow = `0 0 10px ${colors[i % colors.length]}, 0 0 4px #ffffff`;
         const angle = `${(i * 360) / sparkCount + (Math.random() * 20 - 10)}deg`;
-        const dist = `${Math.floor(Math.random() * 22 + 32)}px`;
+        const dist = `${Math.floor(Math.random() * 26 + 34)}px`;
         spark.style.setProperty('--angle', angle);
         spark.style.setProperty('--dist', dist);
         document.body.appendChild(spark);
@@ -504,9 +573,10 @@ export default function CosmicEffects() {
       }
 
       setTimeout(() => {
-        shockwave.remove();
+        shockwave1.remove();
+        shockwave2.remove();
         sparks.forEach((s) => s.remove());
-      }, 650);
+      }, 700);
     };
 
     window.addEventListener('click', handleClick, { passive: true });

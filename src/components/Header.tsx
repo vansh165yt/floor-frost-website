@@ -113,27 +113,27 @@ export default function Header({
         {/* Main Header Navigation Links (Desktop/Tablet Only - Hidden on Mobile) */}
         <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-xs sm:text-sm font-medium text-white/90">
           {activePage !== 'home' && (
-            <Link href="/?scroll=end" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow">
+            <Link href="/?scroll=end" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow magnetic-btn">
               Home
             </Link>
           )}
           {activePage !== 'projects' && (
-            <Link href="/projects" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow">
+            <Link href="/projects" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow magnetic-btn">
               Projects
             </Link>
           )}
           {activePage !== 'community' && (
-            <Link href="/community" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow">
+            <Link href="/community" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow magnetic-btn">
               Social
             </Link>
           )}
           {activePage !== 'announcements' && (
-            <Link href="/announcements" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow">
+            <Link href="/announcements" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow magnetic-btn">
               Announcements
             </Link>
           )}
           {activePage !== 'videos' && (
-            <Link href="/videos" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow">
+            <Link href="/videos" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow magnetic-btn">
               Videos
             </Link>
           )}
@@ -147,7 +147,7 @@ export default function Header({
             href="https://youtube.com/@floorfrost"
             target="_blank"
             rel="noreferrer"
-            className="text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-red-600 hover:bg-red-500 hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] hover:scale-105 active:scale-95 transition-all text-white shadow-md flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+            className="text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-red-600 hover:bg-red-500 hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] hover:scale-105 active:scale-95 transition-all text-white shadow-md flex items-center gap-1.5 shrink-0 whitespace-nowrap magnetic-btn"
           >
             <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white animate-ping" />
             <span>{subStats.subscriberCount} Subs</span>

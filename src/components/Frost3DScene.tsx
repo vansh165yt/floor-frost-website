@@ -1232,9 +1232,9 @@ export default function Frost3DScene() {
       }
       trailAttr.needsUpdate = true;
 
-      // Subtle Camera Parallax
-      camera.position.x = mouseX * 0.35;
-      camera.position.y = -mouseY * 0.35;
+      // Cinematic Camera Parallax with Smooth Damped Inertia
+      camera.position.x += (mouseX * 0.45 - camera.position.x) * 0.055;
+      camera.position.y += (-mouseY * 0.45 - camera.position.y) * 0.055;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
