@@ -531,3 +531,115 @@ html {
   animation: borderBeamMove 4s ease infinite;
 }
 
+/* ============================================================ */
+/* ADVANCED CYBER LASER BORDER BEAM (CONIC GRADIENT SWEEP)     */
+/* ============================================================ */
+
+@property --beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotateBeam {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+.border-beam-card {
+  position: relative;
+}
+
+.border-beam-card::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0%,
+    transparent 68%,
+    rgba(168, 85, 247, 0.7) 80%,
+    rgba(236, 72, 153, 0.95) 90%,
+    rgba(255, 255, 255, 1) 95%,
+    rgba(34, 211, 238, 0.95) 98%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: rotateBeam 4.5s linear infinite;
+  pointer-events: none;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.border-beam-card:hover::after {
+  opacity: 1;
+  animation-duration: 2.5s;
+}
+
+/* ============================================================ */
+/* INTERACTIVE COSMIC CLICK BURST & SPARK RIPPLES               */
+/* ============================================================ */
+
+@keyframes clickShockwave {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 1;
+    border-width: 3px;
+  }
+  60% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.6);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+.animate-click-shockwave {
+  position: fixed;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 99999;
+  border-style: solid;
+  border-color: rgba(236, 72, 153, 0.8);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.8), inset 0 0 15px rgba(34, 211, 238, 0.6);
+  animation: clickShockwave 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes sparkParticleFly {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(var(--dist)) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-spark-particle {
+  position: fixed;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 99999;
+  animation: sparkParticleFly 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Floating Laser Glow Button */
+.neon-glow-btn {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neon-glow-btn:hover {
+  box-shadow: 0 0 35px rgba(236, 72, 153, 0.7), 0 0 65px rgba(168, 85, 247, 0.45);
+  transform: translateY(-2px) scale(1.02);
+}
+
+

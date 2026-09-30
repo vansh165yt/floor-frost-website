@@ -93,7 +93,7 @@ export default function ProjectsPage() {
           href="https://pingu.xo.je"
           target="_blank"
           rel="noreferrer"
-          className="rounded-[2.5rem] bg-gradient-to-b from-[#120b24]/95 to-[#0c0817]/95 border-2 border-purple-500/40 p-8 sm:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 shadow-[0_15px_50px_rgba(168,85,247,0.25)] relative overflow-hidden group hover:border-pink-400 hover:shadow-[0_0_65px_rgba(236,72,153,0.45)] hover-lift shimmer-hover transition-all duration-300 cursor-pointer tilt-card scroll-scale-in"
+          className="rounded-[2.5rem] bg-gradient-to-b from-[#120b24]/95 to-[#0c0817]/95 border-2 border-purple-500/40 p-8 sm:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 shadow-[0_15px_50px_rgba(168,85,247,0.25)] relative overflow-hidden group hover:border-pink-400 hover:shadow-[0_0_65px_rgba(236,72,153,0.45)] hover-lift shimmer-hover transition-all duration-300 cursor-pointer tilt-card scroll-scale-in border-beam-card"
         >
           <div className="tilt-glare" />
           {/* Animated Background Glow */}

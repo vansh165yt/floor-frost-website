@@ -794,7 +794,7 @@ export default function Home() {
                 pointerEvents: btnOpacity > 0.5 ? 'auto' : 'none'
               }}
             >
-              <a href="#videos" className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:px-9 sm:py-4 font-medium text-sm sm:text-base text-white transition-all duration-300 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 hover:scale-[1.05] shadow-[0_0_25px_rgba(219,39,119,0.7)] hover:shadow-[0_0_40px_rgba(219,39,119,1)] border border-pink-400/50 backdrop-blur-md active:scale-95 mt-3">
+              <a href="#videos" className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:px-9 sm:py-4 font-medium text-sm sm:text-base text-white transition-all duration-300 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 hover:scale-[1.05] shadow-[0_0_25px_rgba(219,39,119,0.7)] hover:shadow-[0_0_40px_rgba(219,39,119,1)] border border-pink-400/50 backdrop-blur-md active:scale-95 mt-3 neon-glow-btn">
                 <span>Explore Content</span>
                 <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
               </a>
@@ -898,7 +898,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
             <div 
               data-reveal-delay="100" 
-              className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col justify-between gap-8 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-purple-400/70 hover:shadow-[0_0_55px_rgba(168,85,247,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
+              className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col justify-between gap-8 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-purple-400/70 hover:shadow-[0_0_55px_rgba(168,85,247,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in border-beam-card"
             >
               <div className="tilt-glare" />
               <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/35 transition-all pointer-events-none" />
@@ -1146,7 +1146,7 @@ export default function Home() {
               {/* Ambient Theater Backlight Glow */}
               <div className="absolute -inset-1.5 bg-gradient-to-r from-red-600/30 via-purple-600/30 to-pink-600/30 rounded-[2.5rem] blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none -z-10" />
 
-              <div className="w-full rounded-3xl bg-gradient-to-b from-[#140b24] to-[#0c0817] border-2 border-purple-500/40 overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.25)] flex flex-col lg:flex-row group-hover:border-pink-400/80 transition-all duration-300">
+              <div className="w-full rounded-3xl bg-gradient-to-b from-[#140b24] to-[#0c0817] border-2 border-purple-500/40 overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.25)] flex flex-col lg:flex-row group-hover:border-pink-400/80 transition-all duration-300 border-beam-card">
                 
                 {/* Left Video Player Container */}
                 <div className="lg:w-3/5 relative aspect-video bg-black flex items-center justify-center overflow-hidden">

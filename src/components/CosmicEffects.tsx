@@ -323,12 +323,26 @@ export default function CosmicEffects() {
       };
     });
 
+    // Embers and Micro-Stars
+    const emberCount = 12;
+    const embers = Array.from({ length: emberCount }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: 1.5 + Math.random() * 2,
+      color: Math.random() > 0.5 ? 'rgba(236, 72, 153, ' : 'rgba(168, 85, 247, ',
+      speedY: -0.4 - Math.random() * 0.6,
+      swaySpeed: 0.02 + Math.random() * 0.03,
+      swayRange: 0.8 + Math.random() * 1.5,
+      alpha: 0.3 + Math.random() * 0.5
+    }));
+
     let tick = 0;
     const render = () => {
       if (!isTabVisible) return;
       tick++;
       ctx.clearRect(0, 0, width, height);
 
+      // Render micro-stars
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.speedX;
@@ -350,6 +364,26 @@ export default function CosmicEffects() {
         ctx.shadowBlur = 0;
       }
 
+      // Render glowing floating frost embers
+      for (let j = 0; j < embers.length; j++) {
+        const em = embers[j];
+        em.y += em.speedY;
+        em.x += Math.sin(tick * em.swaySpeed + j) * em.swayRange;
+
+        if (em.y < -20) {
+          em.y = height + 20;
+          em.x = Math.random() * width;
+        }
+
+        ctx.beginPath();
+        ctx.arc(em.x, em.y, em.size, 0, Math.PI * 2);
+        ctx.fillStyle = `${em.color}${em.alpha * (0.8 + Math.sin(tick * 0.05 + j) * 0.2)})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#ec4899';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
       animationFrameId = requestAnimationFrame(render);
     };
 
@@ -360,6 +394,58 @@ export default function CosmicEffects() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
+  }, []);
+
+  // 7. Interactive Cosmic Stardust Click Burst (All Devices)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleClick = (e: MouseEvent) => {
+      if (!e.clientX && !e.clientY) return;
+
+      const x = e.clientX;
+      const y = e.clientY;
+
+      // 1. Expanding Shockwave Ring
+      const shockwave = document.createElement('div');
+      shockwave.className = 'animate-click-shockwave';
+      shockwave.style.left = `${x}px`;
+      shockwave.style.top = `${y}px`;
+      shockwave.style.width = '36px';
+      shockwave.style.height = '36px';
+      document.body.appendChild(shockwave);
+
+      // 2. Burst of 6 Diamond Micro-Sparks
+      const sparkCount = 6;
+      const colors = ['#f43f5e', '#ec4899', '#a855f7', '#22d3ee', '#ffffff'];
+      const sparks: HTMLElement[] = [];
+
+      for (let i = 0; i < sparkCount; i++) {
+        const spark = document.createElement('div');
+        spark.className = 'animate-spark-particle';
+        spark.style.left = `${x}px`;
+        spark.style.top = `${y}px`;
+        const size = Math.random() * 2.5 + 2.5;
+        spark.style.width = `${size}px`;
+        spark.style.height = `${size}px`;
+        spark.style.backgroundColor = colors[i % colors.length];
+        spark.style.boxShadow = `0 0 8px ${colors[i % colors.length]}`;
+        const angle = `${(i * 360) / sparkCount + (Math.random() * 20 - 10)}deg`;
+        const dist = `${Math.floor(Math.random() * 22 + 32)}px`;
+        spark.style.setProperty('--angle', angle);
+        spark.style.setProperty('--dist', dist);
+        document.body.appendChild(spark);
+        sparks.push(spark);
+      }
+
+      setTimeout(() => {
+        shockwave.remove();
+        sparks.forEach((s) => s.remove());
+      }, 650);
+    };
+
+    window.addEventListener('click', handleClick, { passive: true });
+    return () => window.removeEventListener('click', handleClick);
   }, []);
 
   const scrollToTop = () => {
