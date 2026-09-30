@@ -460,23 +460,42 @@ export default function CosmicEffects() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const waypoints = [
+    { id: 'top', label: '01 / WELCOME', targetY: 0 },
+    { id: 'marquee', label: '02 / ECOSYSTEM', targetId: 'marquee' },
+    { id: 'about', label: '03 / CREATOR', targetId: 'about' },
+    { id: 'videos', label: '04 / VIDEOS', targetId: 'videos' },
+    { id: 'community', label: '05 / COMMUNITY', targetId: 'community' }
+  ];
+
+  const scrollToWaypoint = (wp: typeof waypoints[0]) => {
+    if (wp.targetId) {
+      const el = document.getElementById(wp.targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+    window.scrollTo({ top: wp.targetY ?? 0, behavior: 'smooth' });
+  };
+
   return (
     <>
       {/* 1. Ultra-Sleek Top Scroll Progress Bar with Laser Stream & Comet Supernova Head */}
-      <div className="fixed top-0 left-0 right-0 h-[3px] z-[9999] pointer-events-none bg-transparent">
+      <div className="fixed top-0 left-0 right-0 h-[3.5px] z-[9999] pointer-events-none bg-transparent">
         <div
-          className="h-full bg-gradient-to-r from-purple-600 via-pink-500 via-red-500 via-purple-500 to-indigo-500 animate-laser-stream transition-all duration-75 ease-out shadow-[0_0_14px_rgba(236,72,153,0.9),0_0_6px_rgba(168,85,247,0.8)] relative"
+          className="h-full bg-gradient-to-r from-purple-600 via-pink-500 via-red-500 via-purple-500 to-indigo-500 animate-laser-stream transition-all duration-75 ease-out shadow-[0_0_16px_rgba(236,72,153,0.95),0_0_8px_rgba(168,85,247,0.85)] relative"
           style={{ width: `${scrollProgress}%` }}
         >
           {scrollProgress > 0 && (
             <>
               {/* Outer Shockwave Glow Ring */}
-              <div className="absolute right-0 -top-[5px] -bottom-[5px] w-3.5 rounded-full bg-pink-500/50 animate-ping" />
+              <div className="absolute right-0 -top-[5.5px] -bottom-[5.5px] w-4 rounded-full bg-pink-500/50 animate-ping" />
               {/* Core Pulsing Comet Supernova Head */}
-              <div className="absolute right-0 -top-[3.5px] -bottom-[3.5px] w-2.5 rounded-full bg-white animate-comet-head" />
+              <div className="absolute right-0 -top-[4px] -bottom-[4px] w-3 rounded-full bg-white animate-comet-head shadow-[0_0_15px_#fff]" />
               {/* Floating Futuristic HUD Percentage Pill Badge (Visible during active scrolling) */}
               <div
-                className={`absolute right-0 top-3 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-950/90 border border-purple-500/40 backdrop-blur-md text-[10px] font-mono font-bold tracking-wider text-pink-300 shadow-[0_4px_16px_rgba(0,0,0,0.7),0_0_10px_rgba(236,72,153,0.4)] transition-all duration-300 ${
+                className={`absolute right-0 top-3.5 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-950/95 border border-purple-500/40 backdrop-blur-md text-[10px] font-mono font-bold tracking-wider text-pink-300 shadow-[0_4px_16px_rgba(0,0,0,0.8),0_0_12px_rgba(236,72,153,0.5)] transition-all duration-300 ${
                   isScrolling ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
                 }`}
               >
@@ -529,6 +548,62 @@ export default function CosmicEffects() {
           </div>
         </button>
       )}
+
+      {/* 6. Interactive Floating Cyber Vertical Scroll Navigator (Desktop / Tablet) */}
+      <div 
+        aria-label="Page Scroll Navigator"
+        className={`fixed right-3.5 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center gap-2 p-1.5 rounded-full bg-[#0b0517]/80 border border-purple-500/30 backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.8),inset_0_0_15px_rgba(168,85,247,0.15)] transition-all duration-500 ${
+          isScrolling ? 'scale-105 border-pink-500/50 shadow-[0_0_35px_rgba(236,72,153,0.35)]' : 'scale-100 opacity-80 hover:opacity-100'
+        }`}
+      >
+        {/* Glow ambient background aura */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-b from-purple-600/10 via-pink-600/10 to-cyan-500/10 blur-sm pointer-events-none" />
+
+        {/* Rail Vertical Track with Live Fill */}
+        <div className="relative w-1.5 h-32 rounded-full bg-white/10 overflow-hidden my-1">
+          <div 
+            className="w-full bg-gradient-to-b from-pink-500 via-purple-500 to-cyan-400 rounded-full transition-all duration-75 shadow-[0_0_8px_#ec4899]"
+            style={{ height: `${scrollProgress}%` }}
+          />
+        </div>
+
+        {/* Waypoint Diamond Nodes */}
+        <div className="flex flex-col items-center gap-2.5 py-1 relative z-10">
+          {waypoints.map((wp, idx) => {
+            const nodeProgress = (idx / (waypoints.length - 1)) * 100;
+            const isActive = Math.abs(scrollProgress - nodeProgress) < 14;
+            return (
+              <button
+                key={wp.id}
+                onClick={() => scrollToWaypoint(wp)}
+                aria-label={wp.label}
+                title={wp.label}
+                className="group relative flex items-center justify-center p-1 focus:outline-none cursor-pointer"
+              >
+                {/* Node Diamond / Dot */}
+                <div 
+                  className={`transition-all duration-300 rounded-sm ${
+                    isActive 
+                      ? 'w-2.5 h-2.5 bg-gradient-to-tr from-pink-400 to-cyan-300 rotate-45 shadow-[0_0_12px_#ec4899] scale-125' 
+                      : 'w-1.5 h-1.5 bg-white/40 rotate-45 group-hover:bg-purple-300 group-hover:scale-125 group-hover:shadow-[0_0_8px_#a855f7]'
+                  }`} 
+                />
+
+                {/* Cyberpunk Flying Tooltip on Left */}
+                <div className="absolute right-7 px-3 py-1 rounded-lg bg-[#0d071d]/95 border border-purple-500/40 text-[10px] font-mono font-bold tracking-wider text-pink-300 uppercase whitespace-nowrap shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_12px_rgba(168,85,247,0.3)] backdrop-blur-md opacity-0 pointer-events-none group-hover:opacity-100 group-hover:-translate-x-1 transition-all duration-200 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                  <span>{wp.label}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Mini Percentage HUD at Bottom of Rail */}
+        <span className="text-[9px] font-mono font-bold text-zinc-400 tracking-tighter pt-0.5">
+          {Math.round(scrollProgress)}%
+        </span>
+      </div>
     </>
   );
 }
