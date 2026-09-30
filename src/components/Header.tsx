@@ -228,7 +228,10 @@ export default function Header({
               className="p-3.5 sm:p-4 rounded-2xl border border-pink-500/40 bg-pink-950/20 hover:border-pink-400 hover:shadow-[0_0_30px_rgba(236,72,153,0.3)] transition-all flex flex-col gap-1 group cursor-pointer"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm sm:text-base font-bold uppercase text-white group-hover:text-pink-300 group-hover:translate-x-1 transition-all flex items-center gap-1.5">
+                <h3 className="text-sm sm:text-base font-bold uppercase text-white group-hover:text-pink-300 group-hover:translate-x-1 transition-all flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-md overflow-hidden relative border border-white/20 shrink-0 bg-[#a5b4fc]">
+                    <NextImage src="/pingu-logo.png" alt="Pingu AI" fill className="object-cover" />
+                  </div>
                   <span>Pingu AI App</span>
                   <span className="text-xs">↗</span>
                 </h3>

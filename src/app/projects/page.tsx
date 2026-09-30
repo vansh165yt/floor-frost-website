@@ -112,8 +112,13 @@ export default function ProjectsPage() {
             </div>
 
             <div className="flex items-center gap-4 mt-1">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 p-0.5 shadow-xl flex items-center justify-center text-3xl sm:text-4xl group-hover:scale-110 animate-float transition-transform duration-300">
-                🐧
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border-2 border-white/20 shadow-xl relative group-hover:scale-110 animate-float transition-transform duration-300 shrink-0 bg-[#a5b4fc]">
+                <NextImage
+                  src="/pingu-logo.png"
+                  alt="Pingu AI Official Logo"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div>
                 <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-white group-hover:text-pink-300 transition-colors flex items-center gap-3">
