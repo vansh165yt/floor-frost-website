@@ -3,12 +3,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 export default function CosmicEffects() {
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isPointerDevice, setIsPointerDevice] = useState(false);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Dedicated refs for buttery-smooth fluid liquid scrollbar movement
+  const topBarRef = useRef<HTMLDivElement>(null);
+  const percentTextRef = useRef<HTMLSpanElement>(null);
+  const verticalFillRef = useRef<HTMLDivElement>(null);
+  const verticalPercentRef = useRef<HTMLSpanElement>(null);
+  const waypointRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // 1. Mouse Tracking for Interactive Ambient Spotlight Glow (Idle-Aware, Direct Ref)
   useEffect(() => {
@@ -81,10 +87,62 @@ export default function CosmicEffects() {
     };
   }, []);
 
-  // 2. Throttled Scroll Progress & Back to Top Visibility & Active Scrolling Tracker
+  // 2. Buttery-Smooth Fluid Liquid Scrollbar Engine (Physics Lerp with Zero Jitter)
   useEffect(() => {
-    let ticking = false;
+    let targetProgress = 0;
+    let currentProgress = 0;
+    let isLerping = false;
+    let rafId: number | null = null;
     let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    const updateDOM = (p: number) => {
+      const pClamped = Math.min(100, Math.max(0, p));
+      const pStr = `${pClamped.toFixed(2)}%`;
+      const pInt = `${Math.round(pClamped)}%`;
+
+      if (topBarRef.current) {
+        topBarRef.current.style.width = pStr;
+        topBarRef.current.style.opacity = pClamped > 0.1 ? '1' : '0';
+      }
+      if (percentTextRef.current) {
+        percentTextRef.current.textContent = pInt;
+      }
+      if (verticalFillRef.current) {
+        verticalFillRef.current.style.height = pStr;
+      }
+      if (verticalPercentRef.current) {
+        verticalPercentRef.current.textContent = pInt;
+      }
+
+      // Update waypoint diamond indicators
+      const waypointCount = 5;
+      for (let idx = 0; idx < waypointCount; idx++) {
+        const nodeEl = waypointRefs.current[idx];
+        if (!nodeEl) continue;
+        const nodeProgress = (idx / (waypointCount - 1)) * 100;
+        const isActive = Math.abs(pClamped - nodeProgress) < 14;
+        if (isActive) {
+          nodeEl.className = 'transition-all duration-300 rounded-sm w-2.5 h-2.5 bg-gradient-to-tr from-pink-400 to-cyan-300 rotate-45 shadow-[0_0_12px_#ec4899] scale-125';
+        } else {
+          nodeEl.className = 'transition-all duration-300 rounded-sm w-1.5 h-1.5 bg-white/40 rotate-45 group-hover:bg-purple-300 group-hover:scale-125 group-hover:shadow-[0_0_8px_#a855f7]';
+        }
+      }
+    };
+
+    const animate = () => {
+      const diff = targetProgress - currentProgress;
+      if (Math.abs(diff) > 0.03) {
+        // 0.13 fluid inertia damping: natural glide deceleration with 0 latency
+        currentProgress += diff * 0.13;
+        updateDOM(currentProgress);
+        rafId = requestAnimationFrame(animate);
+      } else {
+        currentProgress = targetProgress;
+        updateDOM(currentProgress);
+        isLerping = false;
+        rafId = null;
+      }
+    };
 
     const handleScroll = () => {
       setIsScrolling(true);
@@ -93,25 +151,28 @@ export default function CosmicEffects() {
         setIsScrolling(false);
       }, 750);
 
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-          if (totalScroll > 0) {
-            const currentProgress = (window.scrollY / totalScroll) * 100;
-            setScrollProgress(Math.min(100, Math.max(0, currentProgress)));
-          }
-          setShowBackToTop(window.scrollY > 400);
-          ticking = false;
-        });
-        ticking = true;
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalScroll > 0) {
+        targetProgress = Math.min(100, Math.max(0, (window.scrollY / totalScroll) * 100));
+      } else {
+        targetProgress = 0;
+      }
+
+      setShowBackToTop(window.scrollY > 400);
+
+      if (!isLerping) {
+        isLerping = true;
+        rafId = requestAnimationFrame(animate);
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       if (scrollTimeout) clearTimeout(scrollTimeout);
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -481,29 +542,26 @@ export default function CosmicEffects() {
 
   return (
     <>
-      {/* 1. Ultra-Sleek Top Scroll Progress Bar with Laser Stream & Comet Supernova Head */}
+      {/* 1. Ultra-Sleek Top Scroll Progress Bar with Fluid Lerp Movement & Supernova Comet Head */}
       <div className="fixed top-0 left-0 right-0 h-[3.5px] z-[9999] pointer-events-none bg-transparent">
         <div
-          className="h-full bg-gradient-to-r from-purple-600 via-pink-500 via-red-500 via-purple-500 to-indigo-500 animate-laser-stream transition-all duration-75 ease-out shadow-[0_0_16px_rgba(236,72,153,0.95),0_0_8px_rgba(168,85,247,0.85)] relative"
-          style={{ width: `${scrollProgress}%` }}
+          ref={topBarRef}
+          className="h-full bg-gradient-to-r from-purple-600 via-pink-500 via-red-500 via-purple-500 to-indigo-500 animate-laser-stream shadow-[0_0_16px_rgba(236,72,153,0.95),0_0_8px_rgba(168,85,247,0.85)] relative"
+          style={{ width: '0%', opacity: 0 }}
         >
-          {scrollProgress > 0 && (
-            <>
-              {/* Outer Shockwave Glow Ring */}
-              <div className="absolute right-0 -top-[5.5px] -bottom-[5.5px] w-4 rounded-full bg-pink-500/50 animate-ping" />
-              {/* Core Pulsing Comet Supernova Head */}
-              <div className="absolute right-0 -top-[4px] -bottom-[4px] w-3 rounded-full bg-white animate-comet-head shadow-[0_0_15px_#fff]" />
-              {/* Floating Futuristic HUD Percentage Pill Badge (Visible during active scrolling) */}
-              <div
-                className={`absolute right-0 top-3.5 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-950/95 border border-purple-500/40 backdrop-blur-md text-[10px] font-mono font-bold tracking-wider text-pink-300 shadow-[0_4px_16px_rgba(0,0,0,0.8),0_0_12px_rgba(236,72,153,0.5)] transition-all duration-300 ${
-                  isScrolling ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
-                }`}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse" />
-                <span>{Math.round(scrollProgress)}%</span>
-              </div>
-            </>
-          )}
+          {/* Outer Shockwave Glow Ring */}
+          <div className="absolute right-0 -top-[5.5px] -bottom-[5.5px] w-4 rounded-full bg-pink-500/50 animate-ping pointer-events-none" />
+          {/* Core Pulsing Comet Supernova Head */}
+          <div className="absolute right-0 -top-[4px] -bottom-[4px] w-3 rounded-full bg-white animate-comet-head shadow-[0_0_15px_#fff] pointer-events-none" />
+          {/* Floating Futuristic HUD Percentage Pill Badge (Visible during active scrolling) */}
+          <div
+            className={`absolute right-0 top-3.5 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-950/95 border border-purple-500/40 backdrop-blur-md text-[10px] font-mono font-bold tracking-wider text-pink-300 shadow-[0_4px_16px_rgba(0,0,0,0.8),0_0_12px_rgba(236,72,153,0.5)] transition-all duration-300 ${
+              isScrolling ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse" />
+            <span ref={percentTextRef}>0%</span>
+          </div>
         </div>
       </div>
 
@@ -562,46 +620,40 @@ export default function CosmicEffects() {
         {/* Rail Vertical Track with Live Fill */}
         <div className="relative w-1.5 h-32 rounded-full bg-white/10 overflow-hidden my-1">
           <div 
-            className="w-full bg-gradient-to-b from-pink-500 via-purple-500 to-cyan-400 rounded-full transition-all duration-75 shadow-[0_0_8px_#ec4899]"
-            style={{ height: `${scrollProgress}%` }}
+            ref={verticalFillRef}
+            className="w-full bg-gradient-to-b from-pink-500 via-purple-500 to-cyan-400 rounded-full shadow-[0_0_8px_#ec4899]"
+            style={{ height: '0%' }}
           />
         </div>
 
         {/* Waypoint Diamond Nodes */}
         <div className="flex flex-col items-center gap-2.5 py-1 relative z-10">
-          {waypoints.map((wp, idx) => {
-            const nodeProgress = (idx / (waypoints.length - 1)) * 100;
-            const isActive = Math.abs(scrollProgress - nodeProgress) < 14;
-            return (
-              <button
-                key={wp.id}
-                onClick={() => scrollToWaypoint(wp)}
-                aria-label={wp.label}
-                title={wp.label}
-                className="group relative flex items-center justify-center p-1 focus:outline-none cursor-pointer"
-              >
-                {/* Node Diamond / Dot */}
-                <div 
-                  className={`transition-all duration-300 rounded-sm ${
-                    isActive 
-                      ? 'w-2.5 h-2.5 bg-gradient-to-tr from-pink-400 to-cyan-300 rotate-45 shadow-[0_0_12px_#ec4899] scale-125' 
-                      : 'w-1.5 h-1.5 bg-white/40 rotate-45 group-hover:bg-purple-300 group-hover:scale-125 group-hover:shadow-[0_0_8px_#a855f7]'
-                  }`} 
-                />
+          {waypoints.map((wp, idx) => (
+            <button
+              key={wp.id}
+              onClick={() => scrollToWaypoint(wp)}
+              aria-label={wp.label}
+              title={wp.label}
+              className="group relative flex items-center justify-center p-1 focus:outline-none cursor-pointer"
+            >
+              {/* Node Diamond / Dot */}
+              <div 
+                ref={(el) => { waypointRefs.current[idx] = el; }}
+                className="transition-all duration-300 rounded-sm w-1.5 h-1.5 bg-white/40 rotate-45 group-hover:bg-purple-300 group-hover:scale-125 group-hover:shadow-[0_0_8px_#a855f7]"
+              />
 
-                {/* Cyberpunk Flying Tooltip on Left */}
-                <div className="absolute right-7 px-3 py-1 rounded-lg bg-[#0d071d]/95 border border-purple-500/40 text-[10px] font-mono font-bold tracking-wider text-pink-300 uppercase whitespace-nowrap shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_12px_rgba(168,85,247,0.3)] backdrop-blur-md opacity-0 pointer-events-none group-hover:opacity-100 group-hover:-translate-x-1 transition-all duration-200 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-                  <span>{wp.label}</span>
-                </div>
-              </button>
-            );
-          })}
+              {/* Cyberpunk Flying Tooltip on Left */}
+              <div className="absolute right-7 px-3 py-1 rounded-lg bg-[#0d071d]/95 border border-purple-500/40 text-[10px] font-mono font-bold tracking-wider text-pink-300 uppercase whitespace-nowrap shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_12px_rgba(168,85,247,0.3)] backdrop-blur-md opacity-0 pointer-events-none group-hover:opacity-100 group-hover:-translate-x-1 transition-all duration-200 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                <span>{wp.label}</span>
+              </div>
+            </button>
+          ))}
         </div>
 
         {/* Mini Percentage HUD at Bottom of Rail */}
-        <span className="text-[9px] font-mono font-bold text-zinc-400 tracking-tighter pt-0.5">
-          {Math.round(scrollProgress)}%
+        <span ref={verticalPercentRef} className="text-[9px] font-mono font-bold text-zinc-400 tracking-tighter pt-0.5">
+          0%
         </span>
       </div>
     </>
