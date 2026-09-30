@@ -122,44 +122,69 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Smooth Slow Auto-Scroll to Last Hero Frame when coming back from Social page
+  // Smooth Instant-Response Auto-Scroll to Welcome Text when returning from other pages
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('scroll') === 'end') {
-      const timer = setTimeout(() => {
-        if (containerRef.current) {
-          const targetY = containerRef.current.offsetHeight - window.innerHeight;
-          
-          // Custom Slow Smooth Scroll (2.5 Seconds Cinematic Glide)
-          const startY = window.scrollY || window.pageYOffset;
-          const distance = targetY - startY;
-          const duration = 2500; // 2.5s slow glide
-          let startTime: number | null = null;
+      let animationFrameId: number;
 
-          const easeInOutCubic = (t: number) =>
-            t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const startGlide = () => {
+        if (!containerRef.current) return;
+        const targetY = containerRef.current.offsetHeight - window.innerHeight;
+        const startY = window.scrollY || window.pageYOffset;
+        const distance = targetY - startY;
+        if (Math.abs(distance) <= 10) return;
 
-          const animateScroll = (currentTime: number) => {
-            if (startTime === null) startTime = currentTime;
-            const timeElapsed = currentTime - startTime;
-            const progress = Math.min(timeElapsed / duration, 1);
-            const easeProgress = easeInOutCubic(progress);
+        // Temporarily bypass CSS smooth scroll conflict during programmatic RAF glide
+        const prevScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto';
 
-            window.scrollTo(0, startY + distance * easeProgress);
+        const duration = 2000; // 2.0s responsive cinematic glide
+        let startTime: number | null = null;
 
-            if (timeElapsed < duration) {
-              requestAnimationFrame(animateScroll);
-            } else {
-              // Clean up URL search param after scroll finishes
-              window.history.replaceState({}, document.title, window.location.pathname);
-            }
-          };
+        // Immediate forward glide from frame 1 (Zero initial freeze/lag, smooth natural deceleration)
+        const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
-          requestAnimationFrame(animateScroll);
-        }
-      }, 200);
-      return () => clearTimeout(timer);
+        const stopOnUserAction = () => {
+          cancelAnimationFrame(animationFrameId);
+          document.documentElement.style.scrollBehavior = prevScrollBehavior;
+          window.removeEventListener('wheel', stopOnUserAction);
+          window.removeEventListener('touchmove', stopOnUserAction);
+        };
+
+        window.addEventListener('wheel', stopOnUserAction, { passive: true, once: true });
+        window.addEventListener('touchmove', stopOnUserAction, { passive: true, once: true });
+
+        const animateScroll = (currentTime: number) => {
+          if (startTime === null) startTime = currentTime;
+          const timeElapsed = currentTime - startTime;
+          const progress = Math.min(timeElapsed / duration, 1);
+          const easeProgress = easeOutCubic(progress);
+
+          window.scrollTo(0, startY + distance * easeProgress);
+
+          if (timeElapsed < duration) {
+            animationFrameId = requestAnimationFrame(animateScroll);
+          } else {
+            document.documentElement.style.scrollBehavior = prevScrollBehavior;
+            window.removeEventListener('wheel', stopOnUserAction);
+            window.removeEventListener('touchmove', stopOnUserAction);
+            // Clean up URL search param after scroll finishes
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+        };
+
+        animationFrameId = requestAnimationFrame(animateScroll);
+      };
+
+      // Start on next tick (20ms) as soon as container dimensions are mounted
+      const timer = setTimeout(startGlide, 20);
+
+      return () => {
+        clearTimeout(timer);
+        cancelAnimationFrame(animationFrameId);
+      };
     }
   }, []);
 
