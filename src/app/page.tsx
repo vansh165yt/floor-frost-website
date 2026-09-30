@@ -16,6 +16,9 @@ export default function Home() {
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const loadedImagesRef = useRef<Set<number>>(new Set());
   const loadedCountRef = useRef(0);
+  const renderFrameRef = useRef<((frameIndex?: number) => boolean) | null>(null);
+  const hasDrawnInitialRef = useRef(false);
+  const currentFrameRef = useRef(1);
 
   const [actualLoaded, setActualLoaded] = useState(0);
   const [displayPercent, setDisplayPercent] = useState(0);
@@ -232,12 +235,36 @@ export default function Home() {
     ? videos 
     : videos.filter(v => v.category === activeCategory);
 
-  // 1. Unconditional Immediate Preload of all 150 Frames
+  // 1. Unconditional Immediate Preload of all 150 Frames with Frame 1 Priority
   useEffect(() => {
     const frameCount = 150;
     let count = 0;
 
-    for (let i = 1; i <= frameCount; i++) {
+    // Prioritize frame 1 for instant initial background paint
+    const img1 = new window.Image();
+    img1.src = '/frames/frame_001.webp';
+    img1.onload = () => {
+      loadedImagesRef.current.add(1);
+      count++;
+      loadedCountRef.current = count;
+      setActualLoaded(count);
+      renderFrameRef.current?.(1);
+    };
+    img1.onerror = () => {
+      count++;
+      loadedCountRef.current = count;
+      setActualLoaded(count);
+    };
+    if (img1.complete && img1.naturalWidth > 0) {
+      loadedImagesRef.current.add(1);
+      count++;
+      loadedCountRef.current = count;
+      setActualLoaded(count);
+      renderFrameRef.current?.(1);
+    }
+    imagesRef.current[1] = img1;
+
+    for (let i = 2; i <= frameCount; i++) {
       const paddedIndex = String(i).padStart(3, '0');
       const img = new window.Image();
       img.src = `/frames/frame_${paddedIndex}.webp`;
@@ -247,6 +274,10 @@ export default function Home() {
         count++;
         loadedCountRef.current = count;
         setActualLoaded(count);
+
+        if (!hasDrawnInitialRef.current || Math.round(currentFrameRef.current) === i) {
+          renderFrameRef.current?.();
+        }
       };
 
       img.onerror = () => {
@@ -254,6 +285,12 @@ export default function Home() {
         loadedCountRef.current = count;
         setActualLoaded(count);
       };
+
+      if (img.complete && img.naturalWidth > 0) {
+        loadedImagesRef.current.add(i);
+        count++;
+        loadedCountRef.current = count;
+      }
 
       imagesRef.current[i] = img;
     }
@@ -301,8 +338,12 @@ export default function Home() {
           document.documentElement.style.overflow = '';
           document.body.style.overflow = '';
 
+          // Force instant canvas frame render when loader disappears
+          renderFrameRef.current?.(1);
+
           setTimeout(() => {
             setIsLoaderVisible(false);
+            renderFrameRef.current?.(1);
           }, 700);
         }, 450);
       }
@@ -334,21 +375,23 @@ export default function Home() {
       const dpr = window.devicePixelRatio || 1;
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
+      renderFrame(currentFrame);
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
 
-    const drawImageCover = (img: HTMLImageElement) => {
-      if (!ctx || !canvas) return;
+    const drawImageCover = (img: HTMLImageElement): boolean => {
+      if (!ctx || !canvas) return false;
       const cw = canvas.width;
       const ch = canvas.height;
-
-      ctx.clearRect(0, 0, cw, ch);
+      if (cw === 0 || ch === 0) return false;
 
       const imgWidth = img.naturalWidth;
       const imgHeight = img.naturalHeight;
-      if (!imgWidth || !imgHeight) return;
+      if (!imgWidth || !imgHeight) return false;
+
+      ctx.clearRect(0, 0, cw, ch);
 
       const imgRatio = imgWidth / imgHeight;
       const canvasRatio = cw / ch;
@@ -374,32 +417,46 @@ export default function Home() {
       offsetY = (ch - drawHeight) / 2;
 
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+      hasDrawnInitialRef.current = true;
+      return true;
     };
 
-    const renderFrame = (frameIndex: number) => {
+    const renderFrame = (frameIndex: number): boolean => {
       const imgIndex = Math.min(frameCount, Math.max(1, Math.round(frameIndex)));
       const img = imagesRef.current[imgIndex];
 
       if (img && img.complete && img.naturalWidth > 0) {
-        drawImageCover(img);
-      } else {
-        let nearest = -1;
-        let minDiff = Infinity;
-        loadedImagesRef.current.forEach((idx) => {
-          const diff = Math.abs(idx - imgIndex);
-          if (diff < minDiff) {
-            minDiff = diff;
-            nearest = idx;
-          }
-        });
-        if (nearest !== -1 && imagesRef.current[nearest]) {
-          drawImageCover(imagesRef.current[nearest]);
-        }
+        return drawImageCover(img);
       }
+
+      let nearest = -1;
+      let minDiff = Infinity;
+      loadedImagesRef.current.forEach((idx) => {
+        const diff = Math.abs(idx - imgIndex);
+        if (diff < minDiff) {
+          minDiff = diff;
+          nearest = idx;
+        }
+      });
+
+      if (nearest !== -1 && imagesRef.current[nearest]) {
+        return drawImageCover(imagesRef.current[nearest]);
+      }
+
+      return false;
     };
 
     let lastRenderedFrameIndex = -1;
     let isLoopRunning = false;
+
+    renderFrameRef.current = (frameIndex?: number) => {
+      const f = frameIndex ?? currentFrame;
+      const drawn = renderFrame(f);
+      if (drawn) {
+        lastRenderedFrameIndex = Math.round(f);
+      }
+      return drawn;
+    };
 
     // Intelligent animation loop with lerp (sleeps when stationary to preserve 100% CPU/GPU)
     const loop = () => {
@@ -408,14 +465,17 @@ export default function Home() {
       } else {
         currentFrame += (targetFrame - currentFrame) * 0.12;
       }
+      currentFrameRef.current = currentFrame;
 
       const roundedFrame = Math.round(currentFrame);
-      if (roundedFrame !== lastRenderedFrameIndex) {
-        renderFrame(currentFrame);
-        lastRenderedFrameIndex = roundedFrame;
+      if (roundedFrame !== lastRenderedFrameIndex || !hasDrawnInitialRef.current) {
+        const drawn = renderFrame(currentFrame);
+        if (drawn) {
+          lastRenderedFrameIndex = roundedFrame;
+        }
       }
 
-      if (Math.abs(targetFrame - currentFrame) > 0.01) {
+      if (Math.abs(targetFrame - currentFrame) > 0.01 || !hasDrawnInitialRef.current) {
         animationFrameId = requestAnimationFrame(loop);
       } else {
         isLoopRunning = false;
@@ -450,6 +510,7 @@ export default function Home() {
     const handleVisibility = () => {
       if (!document.hidden) {
         lastRenderedFrameIndex = -1;
+        renderFrame(currentFrame);
         startLoop();
       } else {
         cancelAnimationFrame(animationFrameId);
@@ -467,6 +528,7 @@ export default function Home() {
       window.removeEventListener('scroll', updateScroll);
       document.removeEventListener('visibilitychange', handleVisibility);
       cancelAnimationFrame(animationFrameId);
+      renderFrameRef.current = null;
     };
   }, []);
 
@@ -637,14 +699,24 @@ export default function Home() {
       {/* 1. HERO SECTION WITH CANVAS SCROLL SEQUENCE */}
       <div ref={containerRef} className="relative h-[400vh]">
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center items-center">
+          {/* Instant First Frame Fallback (Zero delay while canvas initializes) */}
+          <NextImage
+            src="/frames/frame_001.webp"
+            alt="Floor Frost Hero Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover scale-[1.04] pointer-events-none select-none z-0"
+          />
+
           {/* Canvas for Scroll-linked Image Sequence */}
           <canvas
             ref={canvasRef}
-            className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-100 object-cover"
+            className="absolute inset-0 w-full h-full pointer-events-none z-[1] opacity-100 object-cover"
           />
 
           {/* Minimal dark gradient overlays */}
-          <div className="absolute inset-0 bg-black/15 pointer-events-none z-0" />
+          <div className="absolute inset-0 bg-black/15 pointer-events-none z-[2]" />
           <div className="absolute bottom-0 left-0 w-full h-28 bg-gradient-to-t from-[#07040d] via-[#07040d]/60 to-transparent pointer-events-none z-10" />
 
           {/* Glass Header with 3 Parallel Lines Hamburger Menu */}
