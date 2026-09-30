@@ -102,6 +102,9 @@ body {
   display: flex;
   width: max-content;
   animation: marquee 35s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .animate-marquee:hover {
@@ -112,6 +115,9 @@ body {
   display: flex;
   width: max-content;
   animation: marqueeReverse 35s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .animate-marquee-reverse:hover {

@@ -18,6 +18,17 @@ export default function CosmicEffects() {
   const verticalPercentRef = useRef<HTMLSpanElement>(null);
   const waypointRefs = useRef<(HTMLDivElement | null)[]>([]);
   const mouseCanvasPosRef = useRef({ x: -1000, y: -1000 });
+  const cursorSparklesRef = useRef<Array<{
+    x: number;
+    y: number;
+    size: number;
+    color: string;
+    alpha: number;
+    life: number;
+    maxLife: number;
+    vx: number;
+    vy: number;
+  }>>([]);
 
   // 1. Mouse Tracking for Interactive Ambient Spotlight Glow, Stardust Trail & Morphing Cursor
   useEffect(() => {
@@ -83,27 +94,30 @@ export default function CosmicEffects() {
           setCursorMode('default');
         }
 
-        // Spawn ethereal micro-stardust particles following cursor
+        // Spawn ethereal micro-stardust particles into zero-garbage canvas particle buffer
         const now = performance.now();
         const distMoved = Math.hypot(e.clientX - lastSparkleX, e.clientY - lastSparkleY);
-        if (now - lastSparkleTime > 40 && distMoved > 16) {
+        if (now - lastSparkleTime > 32 && distMoved > 12) {
           lastSparkleTime = now;
           lastSparkleX = e.clientX;
           lastSparkleY = e.clientY;
 
-          const sparkle = document.createElement('div');
-          sparkle.className = 'animate-cursor-sparkle';
-          sparkle.style.left = `${e.clientX}px`;
-          sparkle.style.top = `${e.clientY}px`;
-          const sSize = Math.random() * 2.5 + 2;
-          sparkle.style.width = `${sSize}px`;
-          sparkle.style.height = `${sSize}px`;
-          const sparkColors = ['#f43f5e', '#ec4899', '#c084fc', '#38bdf8', '#ffffff'];
+          const sparkColors = ['rgba(244, 63, 94, ', 'rgba(236, 72, 153, ', 'rgba(192, 132, 252, ', 'rgba(56, 189, 248, ', 'rgba(255, 255, 255, '];
           const c = sparkColors[Math.floor(Math.random() * sparkColors.length)];
-          sparkle.style.backgroundColor = c;
-          sparkle.style.boxShadow = `0 0 10px ${c}, 0 0 4px #ffffff`;
-          document.body.appendChild(sparkle);
-          setTimeout(() => sparkle.remove(), 650);
+
+          if (cursorSparklesRef.current.length < 35) {
+            cursorSparklesRef.current.push({
+              x: e.clientX,
+              y: e.clientY,
+              size: Math.random() * 2.0 + 1.4,
+              color: c,
+              alpha: 1.0,
+              life: 0,
+              maxLife: Math.floor(Math.random() * 16 + 20),
+              vx: (Math.random() - 0.5) * 0.7,
+              vy: (Math.random() - 0.5) * 0.7 - 0.3
+            });
+          }
         }
       }
 
@@ -462,7 +476,7 @@ export default function CosmicEffects() {
       const mx = mouseCanvasPosRef.current.x;
       const my = mouseCanvasPosRef.current.y;
 
-      // Render micro-stars with subtle cursor deflection
+      // 1. Render micro-stars with hardware-native dual-concentric glow (Zero blur pass overhead)
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.speedX;
@@ -487,16 +501,20 @@ export default function CosmicEffects() {
         p.alpha = p.baseAlpha + Math.sin(tick * p.twinkleSpeed + i) * 0.2;
         p.alpha = Math.max(0.05, Math.min(0.8, p.alpha));
 
+        // Soft outer blooming aura
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = `${p.color}${p.alpha * 0.28})`;
+        ctx.fill();
+
+        // Intense crystalline core
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = `${p.color}${p.alpha})`;
-        ctx.shadowBlur = p.size * 3;
-        ctx.shadowColor = `${p.color}0.6)`;
         ctx.fill();
-        ctx.shadowBlur = 0;
       }
 
-      // Render glowing floating frost embers with gentle deflection
+      // 2. Render glowing floating frost embers with gentle deflection
       for (let j = 0; j < embers.length; j++) {
         const em = embers[j];
         em.y += em.speedY;
@@ -518,13 +536,46 @@ export default function CosmicEffects() {
           em.x = Math.random() * width;
         }
 
+        const emberAlpha = em.alpha * (0.8 + Math.sin(tick * 0.05 + j) * 0.2);
+
+        // Soft outer blooming halo
+        ctx.beginPath();
+        ctx.arc(em.x, em.y, em.size * 2.6, 0, Math.PI * 2);
+        ctx.fillStyle = `${em.color}${emberAlpha * 0.25})`;
+        ctx.fill();
+
+        // Glowing core
         ctx.beginPath();
         ctx.arc(em.x, em.y, em.size, 0, Math.PI * 2);
-        ctx.fillStyle = `${em.color}${em.alpha * (0.8 + Math.sin(tick * 0.05 + j) * 0.2)})`;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#ec4899';
+        ctx.fillStyle = `${em.color}${emberAlpha})`;
         ctx.fill();
-        ctx.shadowBlur = 0;
+      }
+
+      // 3. Render Cursor Stardust & Click Sparks directly on Canvas (Zero DOM Nodes, 120 FPS)
+      const sparkles = cursorSparklesRef.current;
+      for (let s = sparkles.length - 1; s >= 0; s--) {
+        const sp = sparkles[s];
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.life++;
+        sp.alpha = Math.max(0, 1 - sp.life / sp.maxLife);
+
+        if (sp.life >= sp.maxLife) {
+          sparkles.splice(s, 1);
+          continue;
+        }
+
+        // Soft outer stardust aura
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, sp.size * 2.4, 0, Math.PI * 2);
+        ctx.fillStyle = `${sp.color}${sp.alpha * 0.35})`;
+        ctx.fill();
+
+        // Brilliant Diamond core
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+        ctx.fillStyle = `${sp.color}${sp.alpha})`;
+        ctx.fill();
       }
 
       animationFrameId = requestAnimationFrame(render);
@@ -549,7 +600,7 @@ export default function CosmicEffects() {
       const x = e.clientX;
       const y = e.clientY;
 
-      // 1. Dual Expanding Shockwave Rings
+      // 1. Dual Expanding Shockwave Rings (CSS GPU Accelerated)
       const shockwave1 = document.createElement('div');
       shockwave1.className = 'animate-click-shockwave';
       shockwave1.style.left = `${x}px`;
@@ -568,33 +619,28 @@ export default function CosmicEffects() {
       shockwave2.style.borderColor = 'rgba(56, 189, 248, 0.85)';
       document.body.appendChild(shockwave2);
 
-      // 2. Burst of 8 Diamond Micro-Sparks
-      const sparkCount = 8;
-      const colors = ['#f43f5e', '#ec4899', '#a855f7', '#38bdf8', '#ffffff', '#c084fc'];
-      const sparks: HTMLElement[] = [];
-
-      for (let i = 0; i < sparkCount; i++) {
-        const spark = document.createElement('div');
-        spark.className = 'animate-spark-particle';
-        spark.style.left = `${x}px`;
-        spark.style.top = `${y}px`;
-        const size = Math.random() * 2.5 + 2.5;
-        spark.style.width = `${size}px`;
-        spark.style.height = `${size}px`;
-        spark.style.backgroundColor = colors[i % colors.length];
-        spark.style.boxShadow = `0 0 10px ${colors[i % colors.length]}, 0 0 4px #ffffff`;
-        const angle = `${(i * 360) / sparkCount + (Math.random() * 20 - 10)}deg`;
-        const dist = `${Math.floor(Math.random() * 26 + 34)}px`;
-        spark.style.setProperty('--angle', angle);
-        spark.style.setProperty('--dist', dist);
-        document.body.appendChild(spark);
-        sparks.push(spark);
+      // 2. High-Performance Canvas Radial Spark Burst (Zero DOM Pollution)
+      const burstCount = 10;
+      const burstColors = ['rgba(244, 63, 94, ', 'rgba(236, 72, 153, ', 'rgba(168, 85, 247, ', 'rgba(56, 189, 248, ', 'rgba(255, 255, 255, '];
+      for (let i = 0; i < burstCount; i++) {
+        const angle = (i * Math.PI * 2) / burstCount + (Math.random() * 0.4 - 0.2);
+        const speed = Math.random() * 2.5 + 2.0;
+        cursorSparklesRef.current.push({
+          x,
+          y,
+          size: Math.random() * 2.2 + 2.0,
+          color: burstColors[i % burstColors.length],
+          alpha: 1.0,
+          life: 0,
+          maxLife: Math.floor(Math.random() * 12 + 18),
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed
+        });
       }
 
       setTimeout(() => {
         shockwave1.remove();
         shockwave2.remove();
-        sparks.forEach((s) => s.remove());
       }, 700);
     };
 
