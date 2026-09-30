@@ -251,7 +251,7 @@ export default function VideosPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 relative z-10 flex flex-col gap-12">
 
         {/* Hero Section Banner */}
-        <div className="relative rounded-[2.5rem] bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-12 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] flex flex-col items-start gap-5 overflow-hidden group">
+        <div className="relative rounded-2xl sm:rounded-[2.5rem] bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] flex flex-col items-start gap-5 overflow-hidden group">
           <div className="absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br from-red-600/30 via-pink-600/20 to-purple-500/25 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
 
           {/* Badges Bar */}

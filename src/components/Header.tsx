@@ -90,7 +90,7 @@ export default function Header({
 
   return (
     <div
-      className="sticky top-6 z-50 w-[92%] sm:w-full max-w-5xl mx-auto my-4 transition-all duration-150 ease-out relative"
+      className="sticky top-2 sm:top-6 z-50 w-[95%] sm:w-[92%] md:w-full max-w-5xl mx-auto my-2 sm:my-4 transition-all duration-150 ease-out relative"
       style={{
         opacity,
         transform: `translateY(${translateY}px)`,
@@ -98,20 +98,20 @@ export default function Header({
       }}
     >
       {/* Main Glass Navigation Bar */}
-      <header className="w-full px-5 sm:px-7 py-2.5 flex items-center justify-between gap-4 rounded-full bg-black/50 border border-white/20 backdrop-blur-xl shadow-2xl text-white relative z-20">
+      <header className="w-full px-3.5 sm:px-7 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4 rounded-full bg-black/60 border border-white/20 backdrop-blur-xl shadow-2xl text-white relative z-20">
         
         {/* Brand Logo & Title */}
-        <Link href="/?scroll=end" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-purple-400 shadow-md relative">
+        <Link href="/?scroll=end" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border border-purple-400 shadow-md relative shrink-0">
             <NextImage src="/logo.png" alt="Floor Frost Logo" fill className="object-cover" />
           </div>
-          <span className="font-black tracking-wider text-xs sm:text-sm uppercase text-white group-hover:text-purple-300 transition-colors">
+          <span className="font-black tracking-wider text-xs sm:text-sm uppercase text-white group-hover:text-purple-300 transition-colors whitespace-nowrap">
             FLOOR FROST
           </span>
         </Link>
 
-        {/* Main Header Navigation Links (Home, Projects, Social, Announcements) */}
-        <nav className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-white/90">
+        {/* Main Header Navigation Links (Desktop/Tablet Only - Hidden on Mobile) */}
+        <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-xs sm:text-sm font-medium text-white/90">
           {activePage !== 'home' && (
             <Link href="/?scroll=end" className="px-3 py-1.5 rounded-full hover:bg-white/10 hover:text-purple-300 transition-all duration-200 drop-shadow">
               Home
@@ -140,16 +140,16 @@ export default function Header({
         </nav>
 
         {/* Right Section: Subs Badge + 3 Parallel Lines Hamburger Toggle */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           
-          {/* Live Subscriber Badge */}
+          {/* Live Subscriber Badge - Compact on Mobile */}
           <a
             href="https://youtube.com/@floorfrost"
             target="_blank"
             rel="noreferrer"
-            className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-red-600 hover:bg-red-500 hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] hover:scale-105 active:scale-95 transition-all text-white shadow-md flex items-center gap-1.5 shrink-0"
+            className="text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-red-600 hover:bg-red-500 hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] hover:scale-105 active:scale-95 transition-all text-white shadow-md flex items-center gap-1.5 shrink-0 whitespace-nowrap"
           >
-            <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white animate-ping" />
             <span>{subStats.subscriberCount} Subs</span>
           </a>
 
@@ -158,7 +158,7 @@ export default function Header({
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle Navigation Menu"
             title="Navigation Menu"
-            className={`p-2 rounded-full transition-all duration-300 border backdrop-blur-md flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 ${
+            className={`p-1.5 sm:p-2 rounded-full transition-all duration-300 border backdrop-blur-md flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 ${
               menuOpen
                 ? 'bg-purple-600 text-white border-pink-400 shadow-[0_0_20px_rgba(236,72,153,0.7)] rotate-90'
                 : 'bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]'
@@ -166,12 +166,12 @@ export default function Header({
           >
             {menuOpen ? (
               // Close Icon (X)
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
               </svg>
             ) : (
               // 3 Parallel Lines Icon (Hamburger)
-              <svg className="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" strokeWidth="2.5">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 stroke-current" fill="none" viewBox="0 0 24 24" strokeWidth="2.5">
                 <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round" />
                 <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
                 <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round" />
@@ -184,7 +184,7 @@ export default function Header({
 
       {/* DROPDOWN MENU BOX SLIDING DOWN VISIBLY FROM MAIN HEADER */}
       {menuOpen && (
-        <div className="absolute top-full left-0 right-0 mt-3 p-5 sm:p-6 rounded-3xl bg-[#0c0719]/95 border-2 border-purple-500/40 backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.95),0_0_35px_rgba(168,85,247,0.25)] flex flex-col gap-4 text-white z-10 animate-slide-down">
+        <div className="absolute top-full left-0 right-0 mt-2 sm:mt-3 p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-[#0c0719]/98 border-2 border-purple-500/40 backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.95),0_0_35px_rgba(168,85,247,0.25)] flex flex-col gap-3 sm:gap-4 text-white z-50 animate-slide-down max-h-[80vh] overflow-y-auto">
           
           <div className="flex items-center justify-between pb-3 border-b border-white/10 px-1">
             <span className="text-xs font-mono font-bold uppercase tracking-widest text-purple-300 flex items-center gap-2">
