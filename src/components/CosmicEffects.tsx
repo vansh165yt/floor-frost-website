@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 
 export default function CosmicEffects() {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
   const [isPointerDevice, setIsPointerDevice] = useState(false);
@@ -72,11 +73,18 @@ export default function CosmicEffects() {
     };
   }, []);
 
-  // 2. Throttled Scroll Progress & Back to Top Visibility
+  // 2. Throttled Scroll Progress & Back to Top Visibility & Active Scrolling Tracker
   useEffect(() => {
     let ticking = false;
+    let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const handleScroll = () => {
+      setIsScrolling(true);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 750);
+
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -93,7 +101,10 @@ export default function CosmicEffects() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
   }, []);
 
   // 3. Automated IntersectionObserver Scroll Reveal Engine (Debounced)
@@ -357,14 +368,28 @@ export default function CosmicEffects() {
 
   return (
     <>
-      {/* 1. Ultra-Sleek Top Scroll Progress Bar with Laser Glare Tip */}
-      <div className="fixed top-0 left-0 right-0 h-[2.5px] z-[9999] pointer-events-none bg-transparent">
+      {/* 1. Ultra-Sleek Top Scroll Progress Bar with Laser Stream & Comet Supernova Head */}
+      <div className="fixed top-0 left-0 right-0 h-[3px] z-[9999] pointer-events-none bg-transparent">
         <div
-          className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 transition-all duration-75 ease-out shadow-[0_0_12px_rgba(236,72,153,0.9),0_0_4px_rgba(168,85,247,0.7)] relative"
+          className="h-full bg-gradient-to-r from-purple-600 via-pink-500 via-red-500 via-purple-500 to-indigo-500 animate-laser-stream transition-all duration-75 ease-out shadow-[0_0_14px_rgba(236,72,153,0.9),0_0_6px_rgba(168,85,247,0.8)] relative"
           style={{ width: `${scrollProgress}%` }}
         >
           {scrollProgress > 0 && (
-            <div className="absolute right-0 -top-[3px] bottom-[-3px] w-2.5 rounded-full bg-white shadow-[0_0_10px_#ffffff,0_0_20px_#ec4899]" />
+            <>
+              {/* Outer Shockwave Glow Ring */}
+              <div className="absolute right-0 -top-[5px] -bottom-[5px] w-3.5 rounded-full bg-pink-500/50 animate-ping" />
+              {/* Core Pulsing Comet Supernova Head */}
+              <div className="absolute right-0 -top-[3.5px] -bottom-[3.5px] w-2.5 rounded-full bg-white animate-comet-head" />
+              {/* Floating Futuristic HUD Percentage Pill Badge (Visible during active scrolling) */}
+              <div
+                className={`absolute right-0 top-3 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-950/90 border border-purple-500/40 backdrop-blur-md text-[10px] font-mono font-bold tracking-wider text-pink-300 shadow-[0_4px_16px_rgba(0,0,0,0.7),0_0_10px_rgba(236,72,153,0.4)] transition-all duration-300 ${
+                  isScrolling ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
+                }`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse" />
+                <span>{Math.round(scrollProgress)}%</span>
+              </div>
+            </>
           )}
         </div>
       </div>

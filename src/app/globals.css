@@ -12,10 +12,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Custom Sleek Dark Gaming Scrollbar */
+/* Custom Sleek Dark Gaming Scrollbar with Ambient Glow */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
 }
 
 ::-webkit-scrollbar-track {
@@ -23,13 +23,48 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #7e22ce, #db2777);
+  background: linear-gradient(180deg, #7e22ce, #db2777, #9333ea);
+  background-size: 100% 200%;
   border-radius: 9999px;
   border: 2px solid #07040d;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+  transition: all 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #a855f7, #ec4899);
+  background: linear-gradient(180deg, #a855f7, #ec4899, #f43f5e);
+  box-shadow: 0 0 18px rgba(236, 72, 153, 0.8), 0 0 10px rgba(168, 85, 247, 0.9);
+}
+
+/* Animated Flowing Laser Stream for Scroll Progress Bar */
+@keyframes laserStream {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 250% 50%;
+  }
+}
+
+.animate-laser-stream {
+  background-size: 250% 100%;
+  animation: laserStream 2.8s linear infinite;
+}
+
+/* Pulsing Cosmic Comet Head Glow */
+@keyframes cometPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px #ffffff, 0 0 18px #ec4899, 0 0 28px #a855f7;
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 14px #ffffff, 0 0 26px #ec4899, 0 0 42px #f43f5e;
+    transform: scale(1.22);
+  }
+}
+
+.animate-comet-head {
+  animation: cometPulse 1.6s ease-in-out infinite;
 }
 
 body {
