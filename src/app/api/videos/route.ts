@@ -133,7 +133,7 @@ const FALLBACK_PLAYLISTS = [
   }
 ];
 
-// Pure YouTube Community Posts ONLY (No Discord)
+// Pure YouTube Community Posts ONLY (Exact real channel posts, max 5)
 const FALLBACK_YOUTUBE_POSTS = [
   {
     id: 'UgkxRPQlM736iJJSwhVuc6qXTkGyyo5twn5P',
@@ -156,39 +156,6 @@ const FALLBACK_YOUTUBE_POSTS = [
     likes: '2 Likes',
     image: 'https://yt3.ggpht.com/frvYv5AzI66stTvuzVZJbHcWtarH4YojVfj0o7JWoGHdjX8rdYsjOVmVvEd8QyPUn4dvwDfOsguUnw=s800-c-fcrop64=1,12000000edffffff-rw-nd-v1',
     url: 'https://www.youtube.com/post/Ugkxkd7WvgLgaBvnyzgDdPjzH5xx1iomoIHv'
-  },
-  {
-    id: 'yt-post-3',
-    source: 'youtube' as const,
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: `🎮 NEW VIDEO IS LIVE ON YOUTUBE!\n\n"I Tested 50+ Minecraft Shaders — These Are INSANE ✨" is officially out! Shaders ko benchmark kiya hai RTX settings par. Video dekho aur batao kaun sa shader tumhara favourite hai! 🌟`,
-    publishedAt: 'Recent',
-    likes: 'Official',
-    image: null,
-    url: 'https://www.youtube.com/@floorfrost/posts'
-  },
-  {
-    id: 'yt-post-4',
-    source: 'youtube' as const,
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: `⚡ Forza Horizon 5 Hindi Racing Series ka next part jald hi aane wala hai! Ek aisi car aur track choose kiya hai jisme race pure edge-of-seat excitement degi. Stay tuned Floor Frost channel par! 🏎️💨`,
-    publishedAt: 'Recent',
-    likes: 'Series Update',
-    image: null,
-    url: 'https://www.youtube.com/@floorfrost/posts'
-  },
-  {
-    id: 'yt-post-5',
-    source: 'youtube' as const,
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: `❤️ Dil se shukriya har subscriber aur supporter ka! Hum lagatar daily fresh gameplay aur Minecraft realistic shader guides upload kar rahe hain. Har video ko pura dekhne aur support karne ke liye thank you! 🚀🎮`,
-    publishedAt: 'Recent',
-    likes: 'Community',
-    image: null,
-    url: 'https://www.youtube.com/@floorfrost/posts'
   }
 ];
 
@@ -293,7 +260,7 @@ export async function GET(request: NextRequest) {
       playlists = FALLBACK_PLAYLISTS;
     }
 
-    // 3. Fetch YouTube Community Posts ONLY (No Discord updates)
+    // 3. Fetch YouTube Community Posts ONLY (Max 5, or whatever is available)
     const fetchedPosts: any[] = [];
 
     try {
@@ -341,16 +308,8 @@ export async function GET(request: NextRequest) {
       console.error("YT Community posts fetch error:", e);
     }
 
-    // Fill up to 5 posts with YouTube fallback posts
-    let finalPosts = [...fetchedPosts];
-    if (finalPosts.length < 5) {
-      for (const fb of FALLBACK_YOUTUBE_POSTS) {
-        if (!finalPosts.some(p => p.id === fb.id) && finalPosts.length < 5) {
-          finalPosts.push(fb);
-        }
-      }
-    }
-    finalPosts = finalPosts.slice(0, 5);
+    // Only return available real posts, capped at max 5 (no padding with dummy posts)
+    const finalPosts = (fetchedPosts.length > 0 ? fetchedPosts : FALLBACK_YOUTUBE_POSTS).slice(0, 5);
 
     return NextResponse.json({
       latestVideo: last10DaysVideos[0] || allVideos[0] || null,
@@ -368,7 +327,7 @@ export async function GET(request: NextRequest) {
       videos: FALLBACK_10_DAYS_VIDEOS,
       last10DaysVideos: FALLBACK_10_DAYS_VIDEOS,
       playlists: FALLBACK_PLAYLISTS,
-      posts: FALLBACK_YOUTUBE_POSTS,
+      posts: FALLBACK_YOUTUBE_POSTS.slice(0, 5),
       error: error.message || "Using fallback videos data"
     }, {
       status: 200,

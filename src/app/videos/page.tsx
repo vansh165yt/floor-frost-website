@@ -149,7 +149,7 @@ const INITIAL_PLAYLISTS: Playlist[] = [
   }
 ];
 
-// Initial 5 Pure YouTube Community Posts
+// Initial Pure YouTube Community Posts (Actual available channel posts)
 const INITIAL_YOUTUBE_POSTS: Post[] = [
   {
     id: 'UgkxRPQlM736iJJSwhVuc6qXTkGyyo5twn5P',
@@ -172,39 +172,6 @@ const INITIAL_YOUTUBE_POSTS: Post[] = [
     likes: '2 Likes',
     image: 'https://yt3.ggpht.com/frvYv5AzI66stTvuzVZJbHcWtarH4YojVfj0o7JWoGHdjX8rdYsjOVmVvEd8QyPUn4dvwDfOsguUnw=s800-c-fcrop64=1,12000000edffffff-rw-nd-v1',
     url: 'https://www.youtube.com/post/Ugkxkd7WvgLgaBvnyzgDdPjzH5xx1iomoIHv'
-  },
-  {
-    id: 'yt-post-3',
-    source: 'youtube',
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: `🎮 NEW VIDEO IS LIVE ON YOUTUBE!\n\n"I Tested 50+ Minecraft Shaders — These Are INSANE ✨" is officially out! Shaders ko benchmark kiya hai RTX settings par. Video dekho aur batao kaun sa shader tumhara favourite hai! 🌟`,
-    publishedAt: 'Recent',
-    likes: 'Official Post',
-    image: null,
-    url: 'https://www.youtube.com/@floorfrost/posts'
-  },
-  {
-    id: 'yt-post-4',
-    source: 'youtube',
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: `⚡ Forza Horizon 5 Hindi Racing Series ka next part jald hi aane wala hai! Ek aisi car aur track choose kiya hai jisme race pure edge-of-seat excitement degi. Stay tuned Floor Frost channel par! 🏎️💨`,
-    publishedAt: 'Recent',
-    likes: 'Series Update',
-    image: null,
-    url: 'https://www.youtube.com/@floorfrost/posts'
-  },
-  {
-    id: 'yt-post-5',
-    source: 'youtube',
-    author: 'Floor Frost',
-    avatar: '/logo.png',
-    content: `❤️ Dil se shukriya har subscriber aur supporter ka! Hum lagatar daily fresh gameplay aur Minecraft realistic shader guides upload kar rahe hain. Har video ko pura dekhne aur support karne ke liye thank you! 🚀🎮`,
-    publishedAt: 'Recent',
-    likes: 'Community',
-    image: null,
-    url: 'https://www.youtube.com/@floorfrost/posts'
   }
 ];
 
@@ -334,7 +301,7 @@ export default function VideosPage() {
               onClick={() => scrollToArea('posts-area')}
               className="px-4 py-2.5 rounded-xl bg-pink-600/20 border border-pink-400/40 hover:border-pink-400 text-pink-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(236,72,153,0.2)] flex items-center gap-2 cursor-pointer"
             >
-              <span>💬 Posts Area (Last 5)</span>
+              <span>💬 Community Posts</span>
               <span className="px-1.5 py-0.5 rounded bg-pink-500/40 text-[10px] text-white">{posts.length}</span>
             </button>
 
@@ -631,13 +598,13 @@ export default function VideosPage() {
               <span className="text-2xl p-2.5 rounded-2xl bg-pink-500/20 border border-pink-500/40 shadow-inner text-pink-300">💬</span>
               <div>
                 <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wider text-pink-200 font-sans flex items-center gap-2.5">
-                  <span>POSTS AREA</span>
+                  <span>COMMUNITY POSTS AREA</span>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-pink-500/30 border border-pink-400/50 text-pink-200 font-mono font-bold">
-                    LAST 5 POSTS
+                    {posts.length} {posts.length === 1 ? 'POST' : 'POSTS'}
                   </span>
                 </h2>
                 <p className="text-xs text-pink-200/80 font-light mt-0.5">
-                  Floor Frost official YouTube community tab posts and milestone announcements
+                  Floor Frost channel par available latest YouTube community posts (maximum 5)
                 </p>
               </div>
             </div>
