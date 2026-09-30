@@ -6,6 +6,62 @@ import Header from '@/components/Header';
 import DiscordAnnouncements from '@/components/DiscordAnnouncements';
 import Frost3DScene from '@/components/Frost3DScene';
 
+// High-Tech Slot/Roll-up Number Counter with Finish Flash
+function AnimatedCounter({ value, duration = 1600, suffix = "" }: { value: string | number; duration?: number; suffix?: string }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+  const elementRef = useRef<HTMLSpanElement>(null);
+
+  const numericTarget = typeof value === 'number' 
+    ? value 
+    : parseInt(String(value).replace(/[^0-9]/g, '')) || 0;
+
+  useEffect(() => {
+    const el = elementRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !hasAnimated) {
+        setHasAnimated(true);
+        const startTime = performance.now();
+
+        const update = (now: number) => {
+          const elapsed = now - startTime;
+          const progress = Math.min(1, elapsed / duration);
+          // Ease out exponential for high-tech snappy deceleration
+          const easeOut = 1 - Math.pow(2, -10 * progress);
+          const current = Math.floor(easeOut * numericTarget);
+          setDisplayValue(current);
+
+          if (progress < 1) {
+            requestAnimationFrame(update);
+          } else {
+            setDisplayValue(numericTarget);
+            setIsFinished(true);
+          }
+        };
+
+        requestAnimationFrame(update);
+      }
+    }, { threshold: 0.15 });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [numericTarget, duration, hasAnimated]);
+
+  return (
+    <span 
+      ref={elementRef} 
+      className={`inline-block font-mono tracking-tight transition-transform duration-300 ${
+        isFinished ? 'animate-counter-finish' : ''
+      }`}
+    >
+      {hasAnimated ? displayValue.toLocaleString() : "0"}{suffix}
+    </span>
+  );
+}
+
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1002,7 +1058,7 @@ export default function Home() {
 
               <div className="flex flex-col gap-2 my-auto z-10">
                 <span className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-pink-200 to-purple-300 tracking-tight font-mono drop-shadow-[0_0_20px_rgba(236,72,153,0.4)]">
-                  {subStats.subscriberCount}
+                  <AnimatedCounter value={subStats.subscriberCount} />
                 </span>
                 <h4 className="text-lg font-bold text-white uppercase tracking-wider">COMMUNITY LEGION</h4>
                 <p className="text-xs text-zinc-300/90 leading-relaxed font-light">
@@ -1140,15 +1196,21 @@ export default function Home() {
 
             <div className="grid grid-cols-3 gap-6 w-full max-w-lg mt-2 pt-6 border-t border-purple-900/40">
               <div>
-                <p className="text-3xl font-black text-white">{subStats.subscriberCount}</p>
+                <p className="text-3xl font-black text-white">
+                  <AnimatedCounter value={subStats.subscriberCount} />
+                </p>
                 <p className="text-xs text-zinc-400 font-mono uppercase mt-1">Live Subscribers</p>
               </div>
               <div>
-                <p className="text-3xl font-black text-pink-400">100%</p>
+                <p className="text-3xl font-black text-pink-400">
+                  <AnimatedCounter value={100} suffix="%" />
+                </p>
                 <p className="text-xs text-zinc-400 font-mono uppercase mt-1">Pure Gameplay</p>
               </div>
               <div>
-                <p className="text-3xl font-black text-purple-400">4K</p>
+                <p className="text-3xl font-black text-purple-400">
+                  <AnimatedCounter value={4} suffix="K" />
+                </p>
                 <p className="text-xs text-zinc-400 font-mono uppercase mt-1">Ultra Quality</p>
               </div>
             </div>
@@ -1191,7 +1253,7 @@ export default function Home() {
               {/* Ambient Theater Backlight Glow */}
               <div className="absolute -inset-1.5 bg-gradient-to-r from-red-600/30 via-purple-600/30 to-pink-600/30 rounded-[2.5rem] blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none -z-10" />
 
-              <div className="w-full rounded-3xl bg-gradient-to-b from-[#140b24] to-[#0c0817] border-2 border-purple-500/40 overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.25)] flex flex-col lg:flex-row group-hover:border-pink-400/80 transition-all duration-300 border-beam-card">
+              <div className="w-full rounded-3xl bg-gradient-to-b from-[#140b24] to-[#0c0817] border-2 border-purple-500/40 overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.25)] flex flex-col lg:flex-row group-hover:border-pink-400/80 transition-all duration-300 border-beam-card fluid-energy-border">
                 
                 {/* Left Video Player Container */}
                 <div className="lg:w-3/5 relative aspect-video bg-black flex items-center justify-center overflow-hidden">
@@ -1206,6 +1268,7 @@ export default function Home() {
                   ) : (
                     <div 
                       onClick={() => setIsPlayingFeatured(true)}
+                      data-cursor="play"
                       className="relative w-full h-full cursor-pointer group/thumb flex items-center justify-center"
                     >
                       {/* Thumbnail */}
@@ -1295,6 +1358,7 @@ export default function Home() {
                 <div
                   key={video.id}
                   data-reveal-delay={String(Math.min(500, (idx + 1) * 75))}
+                  data-cursor="play"
                   onClick={() => {
                     setFeaturedVideo(video);
                     setIsPlayingFeatured(true);

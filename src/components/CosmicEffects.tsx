@@ -6,6 +6,9 @@ export default function CosmicEffects() {
   const [isScrolling, setIsScrolling] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isPointerDevice, setIsPointerDevice] = useState(false);
+  const [cursorMode, setCursorMode] = useState<'default' | 'hover' | 'play'>('default');
+  const [isCursorVisible, setIsCursorVisible] = useState(false);
+  const customCursorRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -16,7 +19,7 @@ export default function CosmicEffects() {
   const waypointRefs = useRef<(HTMLDivElement | null)[]>([]);
   const mouseCanvasPosRef = useRef({ x: -1000, y: -1000 });
 
-  // 1. Mouse Tracking for Interactive Ambient Spotlight Glow & Dynamic Stardust Trail
+  // 1. Mouse Tracking for Interactive Ambient Spotlight Glow, Stardust Trail & Morphing Cursor
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -37,9 +40,13 @@ export default function CosmicEffects() {
     let lastSparkleY = 0;
 
     const animateGlow = () => {
-      // Smooth lerp
-      currentX += (targetX - currentX) * 0.12;
-      currentY += (targetY - currentY) * 0.12;
+      // Smooth responsive lerp for cursor follower
+      currentX += (targetX - currentX) * 0.18;
+      currentY += (targetY - currentY) * 0.18;
+
+      if (customCursorRef.current) {
+        customCursorRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+      }
 
       if (spotlightRef.current) {
         if (currentX < 0) {
@@ -51,7 +58,7 @@ export default function CosmicEffects() {
       }
 
       // If close enough to target, idle RAF to conserve 100% CPU when mouse is stationary
-      if (Math.abs(targetX - currentX) > 0.2 || Math.abs(targetY - currentY) > 0.2) {
+      if (Math.abs(targetX - currentX) > 0.15 || Math.abs(targetY - currentY) > 0.15) {
         rafId = requestAnimationFrame(animateGlow);
       } else {
         isMoving = false;
@@ -63,9 +70,20 @@ export default function CosmicEffects() {
       targetX = e.clientX;
       targetY = e.clientY;
       mouseCanvasPosRef.current = { x: e.clientX, y: e.clientY };
+      setIsCursorVisible(true);
 
-      // Spawn ethereal micro-stardust particles following cursor (Pointer devices only)
+      // Detect hover target for morphing cursor
       if (isPointer) {
+        const targetEl = e.target as HTMLElement | null;
+        if (targetEl?.closest('[data-cursor="play"], .video-card-thumb, .featured-player, .cursor-play')) {
+          setCursorMode('play');
+        } else if (targetEl?.closest('button, a, [role="button"], .magnetic-btn, .cursor-pointer, input, select, [data-cursor="hover"]')) {
+          setCursorMode('hover');
+        } else {
+          setCursorMode('default');
+        }
+
+        // Spawn ethereal micro-stardust particles following cursor
         const now = performance.now();
         const distMoved = Math.hypot(e.clientX - lastSparkleX, e.clientY - lastSparkleY);
         if (now - lastSparkleTime > 40 && distMoved > 16) {
@@ -101,6 +119,7 @@ export default function CosmicEffects() {
       targetX = -1000;
       targetY = -1000;
       mouseCanvasPosRef.current = { x: -1000, y: -1000 };
+      setIsCursorVisible(false);
       if (!isMoving) {
         isMoving = true;
         if (!rafId) {
@@ -622,12 +641,43 @@ export default function CosmicEffects() {
         </div>
       </div>
 
-      {/* 2. Interactive Ambient Cursor Spotlight (Desktop only) */}
+      {/* 2. Interactive Ambient Cursor Spotlight & Morphing Pill Cursor (Desktop only) */}
       {isPointerDevice && (
-        <div
-          ref={spotlightRef}
-          className="fixed inset-0 pointer-events-none z-10 transition-opacity duration-300 ease-out opacity-0"
-        />
+        <>
+          <div
+            ref={spotlightRef}
+            className="fixed inset-0 pointer-events-none z-10 transition-opacity duration-300 ease-out opacity-0"
+          />
+
+          {/* Morphing Dynamic Custom Cursor Follower */}
+          <div
+            ref={customCursorRef}
+            className={`fixed pointer-events-none z-[999999] select-none flex items-center justify-center transition-[width,height,background-color,border-color,box-shadow,opacity] duration-200 ease-out ${
+              !isCursorVisible ? 'opacity-0 scale-50' : 'opacity-100 scale-100'
+            } ${
+              cursorMode === 'play'
+                ? 'w-24 h-9 rounded-full bg-red-600/90 border border-white/90 shadow-[0_0_30px_rgba(239,68,68,0.95)] backdrop-blur-md'
+                : cursorMode === 'hover'
+                ? 'w-12 h-12 rounded-full border-2 border-cyan-400 bg-cyan-400/15 shadow-[0_0_20px_rgba(34,211,238,0.65)] backdrop-blur-xs'
+                : 'w-7 h-7 rounded-full border border-purple-400/50 bg-purple-500/10 shadow-[0_0_12px_rgba(168,85,247,0.35)]'
+            }`}
+            style={{
+              left: 0,
+              top: 0,
+              transform: 'translate3d(-1000px, -1000px, 0) translate(-50%, -50%)',
+              willChange: 'transform'
+            }}
+          >
+            {cursorMode === 'play' ? (
+              <span className="text-[11px] font-mono font-black text-white tracking-widest flex items-center gap-1.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span>PLAY</span>
+                <span className="text-xs">▶</span>
+              </span>
+            ) : cursorMode === 'default' ? (
+              <div className="w-1.5 h-1.5 rounded-full bg-pink-400 shadow-[0_0_8px_#ec4899]" />
+            ) : null}
+          </div>
+        </>
       )}
 
       {/* 3. Cosmic Aurora Ambient Glow Drift in Background */}
