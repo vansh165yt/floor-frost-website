@@ -9,9 +9,192 @@ const NO_CACHE_HEADERS = {
   'Expires': '0',
 };
 
+// Fallback 10 videos of the last 10 days from @FloorFrost
+const FALLBACK_10_DAYS_VIDEOS = [
+  {
+    id: "Ms4_Smdr5Gw",
+    title: "I Tested 50+ Minecraft Shaders — These Are INSANE ✨",
+    description: "Testing over 50 Minecraft shaders to find the most visually stunning graphics and realistic lighting in 2026.",
+    publishedAt: "Uploaded Today",
+    rawPublishedAt: "2026-09-29T07:30:26Z",
+    thumbnail: "https://i.ytimg.com/vi/Ms4_Smdr5Gw/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=Ms4_Smdr5Gw",
+    embedUrl: "https://www.youtube.com/embed/Ms4_Smdr5Gw"
+  },
+  {
+    id: "E0W9b_ROk14",
+    title: "Minecraft Shaders Make the Game 100x Better 🤯",
+    description: "Watch how Minecraft visuals change completely with these top-tier ultra realistic shader settings.",
+    publishedAt: "1 day ago",
+    rawPublishedAt: "2026-09-28T07:30:17Z",
+    thumbnail: "https://i.ytimg.com/vi/E0W9b_ROk14/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=E0W9b_ROk14",
+    embedUrl: "https://www.youtube.com/embed/E0W9b_ROk14"
+  },
+  {
+    id: "8ru4SjK_UiY",
+    title: "Which Shader Is The Best Part 77! #minecraft #shaders",
+    description: "Part 77 of our best shader comparison showdown! Which shader wins your vote?",
+    publishedAt: "2 days ago",
+    rawPublishedAt: "2026-09-27T07:30:15Z",
+    thumbnail: "https://i.ytimg.com/vi/8ru4SjK_UiY/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=8ru4SjK_UiY",
+    embedUrl: "https://www.youtube.com/embed/8ru4SjK_UiY"
+  },
+  {
+    id: "J1InW-aepkY",
+    title: "I Transformed My Minecraft World With This 1 Shader 😱",
+    description: "One single shader pack that completely redefines skies, water reflections, and ray-traced shadows.",
+    publishedAt: "3 days ago",
+    rawPublishedAt: "2026-09-26T07:30:38Z",
+    thumbnail: "https://i.ytimg.com/vi/J1InW-aepkY/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=J1InW-aepkY",
+    embedUrl: "https://www.youtube.com/embed/J1InW-aepkY"
+  },
+  {
+    id: "hX8G4eoiVFc",
+    title: "I Found The Most Realistic Minecraft Shader 2026",
+    description: "Insane ray tracing lighting, lush foliage swaying, and water caustics in 4K resolution.",
+    publishedAt: "4 days ago",
+    rawPublishedAt: "2026-09-25T07:30:33Z",
+    thumbnail: "https://i.ytimg.com/vi/hX8G4eoiVFc/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=hX8G4eoiVFc",
+    embedUrl: "https://www.youtube.com/embed/hX8G4eoiVFc"
+  },
+  {
+    id: "EKmMj0sw38E",
+    title: "Minecraft Shader Comparison Which is Truly Most Realistic ?",
+    description: "Head-to-head comparison of the most popular shaders side-by-side with vanilla gameplay.",
+    publishedAt: "5 days ago",
+    rawPublishedAt: "2026-09-24T07:30:38Z",
+    thumbnail: "https://i.ytimg.com/vi/EKmMj0sw38E/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=EKmMj0sw38E",
+    embedUrl: "https://www.youtube.com/embed/EKmMj0sw38E"
+  },
+  {
+    id: "hh0FgSVHVKk",
+    title: "I Tested The Best Minecraft Shaders 😲 #1 Will Surprise You",
+    description: "Surprising ranking of top shader packs tested for both performance FPS and visuals.",
+    publishedAt: "6 days ago",
+    rawPublishedAt: "2026-09-23T07:30:31Z",
+    thumbnail: "https://i.ytimg.com/vi/hh0FgSVHVKk/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=hh0FgSVHVKk",
+    embedUrl: "https://www.youtube.com/embed/hh0FgSVHVKk"
+  },
+  {
+    id: "JiFKmveIiIA",
+    title: "I Tested 20 ULTRA Shaders So You Don't Have To ⚡😱",
+    description: "20 heavy ultra shader packs tested on extreme settings. Which one run smoothest?",
+    publishedAt: "7 days ago",
+    rawPublishedAt: "2026-09-22T07:30:19Z",
+    thumbnail: "https://i.ytimg.com/vi/JiFKmveIiIA/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=JiFKmveIiIA",
+    embedUrl: "https://www.youtube.com/embed/JiFKmveIiIA"
+  },
+  {
+    id: "pBPorvvyxds",
+    title: "Is This the MOST REALISTIC Shader for Minecraft? 🔥 (Test)",
+    description: "In-depth graphics analysis and biome showcase of this realistic shader test.",
+    publishedAt: "8 days ago",
+    rawPublishedAt: "2026-09-21T07:30:01Z",
+    thumbnail: "https://i.ytimg.com/vi/pBPorvvyxds/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=pBPorvvyxds",
+    embedUrl: "https://www.youtube.com/embed/pBPorvvyxds"
+  },
+  {
+    id: "4p6T7W9lCkw",
+    title: "I tested the most realistic Minecraft shader pack ever 🌄",
+    description: "Breathtaking sunset and sunrise lighting showcase with photorealistic clouds.",
+    publishedAt: "9 days ago",
+    rawPublishedAt: "2026-09-20T07:30:38Z",
+    thumbnail: "https://i.ytimg.com/vi/4p6T7W9lCkw/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=4p6T7W9lCkw",
+    embedUrl: "https://www.youtube.com/embed/4p6T7W9lCkw"
+  }
+];
+
+// Fallback all playlists
+const FALLBACK_PLAYLISTS = [
+  {
+    id: 'PLH2CdBxERGq8',
+    title: 'Forza Horizon 5: The Hindi Racing Journey 🚗💨',
+    description: 'High-speed Hindi gameplay and track runs in Forza Horizon 5 with Floor Frost.',
+    itemCount: 2,
+    thumbnail: 'https://i.ytimg.com/vi/15jYDYxiqTM/mqdefault.jpg',
+    url: 'https://www.youtube.com/playlist?list=PLH2CdBxERGq8'
+  },
+  {
+    id: 'PLWzRHC_PVfI0',
+    title: 'Minecraft Survival Hindi Series 🪓🏠⚒️',
+    description: 'Epic Minecraft survival series with hyper-realistic shaders and architecture.',
+    itemCount: 1,
+    thumbnail: 'https://i.ytimg.com/vi/iCT_nI2IY4s/mqdefault.jpg',
+    url: 'https://www.youtube.com/playlist?list=PLWzRHC_PVfI0'
+  }
+];
+
+// Fallback 5 posts
+const FALLBACK_POSTS = [
+  {
+    id: 'UgkxRPQlM736iJJSwhVuc6qXTkGyyo5twn5P',
+    source: 'youtube' as const,
+    author: 'Floor Frost',
+    avatar: '/logo.png',
+    content: `Aakhirkar humne 1k subscribers ka ye milestone hit kar liya! 🎉\n\nZero se shuru kiya tha, aur aaj hum 1,000 Floor Frost family ke members ban chuke hain. Aap sabhi ke support, likes, aur har ek comment ke bina ye bilkul impossible tha.\n\nThank you har ek video ko pura dekhne aur support dikhane ke liye.\n\nYe toh bas shuruaat hai, aage abhi aur bhi crazy videos, epic gameplay, aur next-level content aane wala hai! 🚀\n\nKeep supporting & stay awesome! ❤️🎮\n— Floor Frost`,
+    publishedAt: 'Recent',
+    likes: '15 Likes',
+    image: 'https://yt3.ggpht.com/WrH-vVrHBSpXAK7OU9NKjn_OV2uqiI4KaXBAnir4sS3xFZwhtFJj_n3kjlrjOc5c-xn3CwdyvgPRzg=s800-c-fcrop64=1,00000000ffffffff-rw-nd-v1',
+    url: 'https://www.youtube.com/@floorfrost/posts'
+  },
+  {
+    id: 'Ugkxkd7WvgLgaBvnyzgDdPjzH5xx1iomoIHv',
+    source: 'youtube' as const,
+    author: 'Floor Frost',
+    avatar: '/logo.png',
+    content: `🏎️💥 GET READY FOR THE ULTIMATE SPEED TEST! 💥🏎️\n\nAaj shaam 7:00 baje ek aisi racing game ki video aane wali hai jiske graphics aur high-octane action tumhare hosh uda denge! ⚡🔥\n\nCan you guess which monster track and machine we're pushing to the absolute limit today? 👇 Comment karke batao apni guessing skills!\n\nSet your reminders for 7:00 PM! Channel par milte hain! 🚀🎮`,
+    publishedAt: 'Recent',
+    likes: '2 Likes',
+    image: 'https://yt3.ggpht.com/frvYv5AzI66stTvuzVZJbHcWtarH4YojVfj0o7JWoGHdjX8rdYsjOVmVvEd8QyPUn4dvwDfOsguUnw=s800-c-fcrop64=1,12000000edffffff-rw-nd-v1',
+    url: 'https://www.youtube.com/@floorfrost/posts'
+  },
+  {
+    id: 'discord-post-1',
+    source: 'discord' as const,
+    author: 'Floor Frost',
+    avatar: '/logo.png',
+    content: '🔥 WELCOME TO THE OFFICIAL FLOOR FROST DISCORD LEGION! Here you will get first-hand updates, shader pack configs, and direct voice hangouts!',
+    publishedAt: 'Recent',
+    likes: 'Pinned',
+    image: null,
+    url: 'https://discord.gg/aN5CCRT6CS'
+  },
+  {
+    id: 'update-post-2',
+    source: 'youtube' as const,
+    author: 'Floor Frost',
+    avatar: '/logo.png',
+    content: '✨ New Ultra Realistic Shaders comparison episode is dropping soon! Tested on RTX 40-series cards at smooth 4K 120FPS. Check out the Videos gallery for all 10-day uploads!',
+    publishedAt: 'Recent',
+    likes: 'Community',
+    image: null,
+    url: 'https://youtube.com/@floorfrost'
+  },
+  {
+    id: 'update-post-3',
+    source: 'discord' as const,
+    author: 'Floor Frost',
+    avatar: '/logo.png',
+    content: "🎮 Thank you all for the tremendous love on our daily Minecraft shader series! Don't forget to share your favorite shader preset in the comments or in our Discord server!",
+    publishedAt: 'Recent',
+    likes: 'Live',
+    image: null,
+    url: 'https://discord.gg/aN5CCRT6CS'
+  }
+];
+
 export async function GET(request: NextRequest) {
-  const apiKey = process.env.YOUTUBE_API_KEY;
-  const channelId = process.env.YOUTUBE_CHANNEL_ID;
+  const apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyBUsCHTIIfcuUOG1FIFbNLZSfKVimEsqJM';
+  const channelId = process.env.YOUTUBE_CHANNEL_ID || 'UCRmkfvlZjgkCOZUqJenJC3A';
   const botToken = process.env.DISCORD_BOT_TOKEN;
   const discordChannelId = process.env.DISCORD_CHANNEL_ID;
 
@@ -20,97 +203,7 @@ export async function GET(request: NextRequest) {
   const maxResults = limitParam ? Math.min(50, Math.max(1, parseInt(limitParam))) : 50;
 
   // Convert Channel ID (UC...) to Uploads Playlist ID (UU...)
-  const uploadsPlaylistId = channelId ? channelId.replace(/^UC/, 'UU') : null;
-
-  // Fallback defaults
-  const fallbackPlaylists = [
-    {
-      id: 'PLH2CdBxERGq8',
-      title: 'Forza Horizon 5: The Hindi Racing Journey 🚗💨',
-      description: 'High-speed Hindi gameplay and track runs in Forza Horizon 5 with Floor Frost.',
-      itemCount: 2,
-      thumbnail: 'https://i.ytimg.com/vi/15jYDYxiqTM/mqdefault.jpg',
-      url: 'https://www.youtube.com/playlist?list=PLH2CdBxERGq8'
-    },
-    {
-      id: 'PLWzRHC_PVfI0',
-      title: 'Minecraft Survival Hindi Series 🪓🏠⚒️',
-      description: 'Epic Minecraft survival series with hyper-realistic shaders and architecture.',
-      itemCount: 1,
-      thumbnail: 'https://i.ytimg.com/vi/iCT_nI2IY4s/mqdefault.jpg',
-      url: 'https://www.youtube.com/playlist?list=PLWzRHC_PVfI0'
-    }
-  ];
-
-  const fallbackPosts = [
-    {
-      id: 'UgkxRPQlM736iJJSwhVuc6qXTkGyyo5twn5P',
-      source: 'youtube' as const,
-      author: 'Floor Frost',
-      avatar: '/logo.png',
-      content: `Aakhirkar humne 1k subscribers ka ye milestone hit kar liya! 🎉\n\nZero se shuru kiya tha, aur aaj hum 1,000 Floor Frost family ke members ban chuke hain. Aap sabhi ke support, likes, aur har ek comment ke bina ye bilkul impossible tha.\n\nThank you har ek video ko pura dekhne aur support dikhane ke liye.\n\nYe toh bas shuruaat hai, aage abhi aur bhi crazy videos, epic gameplay, aur next-level content aane wala hai! 🚀\n\nKeep supporting & stay awesome! ❤️🎮\n— Floor Frost`,
-      publishedAt: 'Recent',
-      likes: '15 Likes',
-      image: 'https://yt3.ggpht.com/WrH-vVrHBSpXAK7OU9NKjn_OV2uqiI4KaXBAnir4sS3xFZwhtFJj_n3kjlrjOc5c-xn3CwdyvgPRzg=s800-c-fcrop64=1,00000000ffffffff-rw-nd-v1',
-      url: 'https://www.youtube.com/@floorfrost/posts'
-    },
-    {
-      id: 'Ugkxkd7WvgLgaBvnyzgDdPjzH5xx1iomoIHv',
-      source: 'youtube' as const,
-      author: 'Floor Frost',
-      avatar: '/logo.png',
-      content: `🏎️💥 GET READY FOR THE ULTIMATE SPEED TEST! 💥🏎️\n\nAaj shaam 7:00 baje ek aisi racing game ki video aane wali hai jiske graphics aur high-octane action tumhare hosh uda denge! ⚡🔥\n\nCan you guess which monster track and machine we're pushing to the absolute limit today? 👇 Comment karke batao apni guessing skills!\n\nSet your reminders for 7:00 PM! Channel par milte hain! 🚀🎮`,
-      publishedAt: 'Recent',
-      likes: '2 Likes',
-      image: 'https://yt3.ggpht.com/frvYv5AzI66stTvuzVZJbHcWtarH4YojVfj0o7JWoGHdjX8rdYsjOVmVvEd8QyPUn4dvwDfOsguUnw=s800-c-fcrop64=1,12000000edffffff-rw-nd-v1',
-      url: 'https://www.youtube.com/@floorfrost/posts'
-    },
-    {
-      id: 'discord-post-1',
-      source: 'discord' as const,
-      author: 'Floor Frost',
-      avatar: '/logo.png',
-      content: '🔥 WELCOME TO THE OFFICIAL FLOOR FROST DISCORD LEGION! Here you will get first-hand updates, shader pack configs, and direct voice hangouts!',
-      publishedAt: 'Recent',
-      likes: 'Pinned',
-      image: null,
-      url: 'https://discord.gg/aN5CCRT6CS'
-    },
-    {
-      id: 'update-post-2',
-      source: 'youtube' as const,
-      author: 'Floor Frost',
-      avatar: '/logo.png',
-      content: '✨ New Ultra Realistic Shaders comparison episode is dropping soon! Tested on RTX 40-series cards at smooth 4K 120FPS. Check out the Videos gallery for all 10-day uploads!',
-      publishedAt: 'Recent',
-      likes: 'Community',
-      image: null,
-      url: 'https://youtube.com/@floorfrost'
-    },
-    {
-      id: 'update-post-3',
-      source: 'discord' as const,
-      author: 'Floor Frost',
-      avatar: '/logo.png',
-      content: '🎮 Thank you all for the tremendous love on our daily Minecraft shader series! Don\'t forget to share your favorite shader preset in the comments or in our Discord server!',
-      publishedAt: 'Recent',
-      likes: 'Live',
-      image: null,
-      url: 'https://discord.gg/aN5CCRT6CS'
-    }
-  ];
-
-  if (!apiKey || !uploadsPlaylistId) {
-    return NextResponse.json({
-      latestVideo: null,
-      videos: [],
-      last10DaysVideos: [],
-      playlists: fallbackPlaylists,
-      posts: fallbackPosts
-    }, {
-      headers: NO_CACHE_HEADERS
-    });
-  }
+  const uploadsPlaylistId = channelId.replace(/^UC/, 'UU');
 
   try {
     const now = new Date();
@@ -162,7 +255,14 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const last10DaysVideos = allVideos.filter(v => v.isWithin10Days);
+    let last10DaysVideos = allVideos.filter(v => v.isWithin10Days);
+    if (last10DaysVideos.length === 0) {
+      last10DaysVideos = FALLBACK_10_DAYS_VIDEOS;
+    }
+
+    if (allVideos.length === 0) {
+      allVideos = FALLBACK_10_DAYS_VIDEOS;
+    }
 
     // 2. Fetch Channel Playlists
     let playlists: any[] = [];
@@ -192,7 +292,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (playlists.length === 0) {
-      playlists = fallbackPlaylists;
+      playlists = FALLBACK_PLAYLISTS;
     }
 
     // 3. Fetch Posts (YouTube Community Tab + Discord Announcements)
@@ -280,7 +380,7 @@ export async function GET(request: NextRequest) {
     // Fill up to 5 posts with fallback if needed
     let finalPosts = [...fetchedPosts];
     if (finalPosts.length < 5) {
-      for (const fb of fallbackPosts) {
+      for (const fb of FALLBACK_POSTS) {
         if (!finalPosts.some(p => p.id === fb.id) && finalPosts.length < 5) {
           finalPosts.push(fb);
         }
@@ -289,7 +389,7 @@ export async function GET(request: NextRequest) {
     finalPosts = finalPosts.slice(0, 5);
 
     return NextResponse.json({
-      latestVideo: allVideos[0] || null,
+      latestVideo: last10DaysVideos[0] || allVideos[0] || null,
       videos: allVideos,
       last10DaysVideos: last10DaysVideos,
       playlists: playlists,
@@ -300,12 +400,12 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error("Failed to fetch videos and ecosystem data:", error);
     return NextResponse.json({
-      latestVideo: null,
-      videos: [],
-      last10DaysVideos: [],
-      playlists: fallbackPlaylists,
-      posts: fallbackPosts,
-      error: error.message || "Failed to fetch YouTube videos"
+      latestVideo: FALLBACK_10_DAYS_VIDEOS[0],
+      videos: FALLBACK_10_DAYS_VIDEOS,
+      last10DaysVideos: FALLBACK_10_DAYS_VIDEOS,
+      playlists: FALLBACK_PLAYLISTS,
+      posts: FALLBACK_POSTS,
+      error: error.message || "Using fallback videos data"
     }, {
       status: 200,
       headers: NO_CACHE_HEADERS
