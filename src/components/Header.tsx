@@ -42,7 +42,7 @@ export default function Header({
     };
 
     fetchSubscribers();
-    const interval = setInterval(fetchSubscribers, 15000);
+    const interval = setInterval(fetchSubscribers, 30000);
     return () => clearInterval(interval);
   }, []);
 

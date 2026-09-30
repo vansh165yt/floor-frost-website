@@ -42,7 +42,7 @@ export default function Frost3DScene() {
       powerPreference: 'high-performance'
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.35;
 
@@ -969,6 +969,16 @@ export default function Frost3DScene() {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('resize', onResize);
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        clock.start();
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
     onScroll();
 
     // 8. BIOMECHANICAL FLIGHT SIMULATION LOOP
@@ -1238,6 +1248,7 @@ export default function Frost3DScene() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       cancelAnimationFrame(animationFrameId);
 
       // Dispose geometries, textures & materials

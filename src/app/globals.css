@@ -444,6 +444,13 @@ html {
   opacity: 1 !important;
   transform: translate(0, 0) scale(1) !important;
   filter: blur(0px) !important;
+  will-change: auto !important;
+}
+
+/* Off-screen Render Optimizer */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 800px;
 }
 
 /* Stagger Delays for Grid Elements */

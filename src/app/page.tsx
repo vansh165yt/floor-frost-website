@@ -9,7 +9,12 @@ import Frost3DScene from '@/components/Frost3DScene';
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const headerWrapperRef = useRef<HTMLDivElement>(null);
+  const subheadRef = useRef<HTMLHeadingElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const btnContainerRef = useRef<HTMLDivElement>(null);
+  const scrollHintRef = useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState('All');
 
   // Dedicated Preloader and Image References
@@ -92,7 +97,7 @@ export default function Home() {
     };
 
     fetchSubscribers();
-    const interval = setInterval(fetchSubscribers, 15000);
+    const interval = setInterval(fetchSubscribers, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -268,6 +273,7 @@ export default function Home() {
     // Prioritize frame 1 for instant initial background paint
     const img1 = new window.Image();
     img1.src = '/frames/frame_001.webp';
+    img1.decode?.().catch(() => {});
     img1.onload = () => {
       loadedImagesRef.current.add(1);
       count++;
@@ -293,6 +299,7 @@ export default function Home() {
       const paddedIndex = String(i).padStart(3, '0');
       const img = new window.Image();
       img.src = `/frames/frame_${paddedIndex}.webp`;
+      img.decode?.().catch(() => {});
 
       img.onload = () => {
         loadedImagesRef.current.add(i);
@@ -514,6 +521,55 @@ export default function Home() {
       }
     };
 
+    const clamp = (val: number, min: number, max: number) => Math.min(max, Math.max(min, val));
+
+    const updateHeroDOM = (progress: number) => {
+      const headerOpacity = clamp((progress - 0.65) / 0.25, 0, 1);
+      const headerTranslateY = -(1 - headerOpacity) * 30;
+
+      const subheadOpacity = clamp((progress - 0.55) / 0.25, 0, 1);
+      const subheadScale = 0.85 + subheadOpacity * 0.15;
+      const subheadTranslateY = (1 - subheadOpacity) * 20;
+
+      const titleOpacity = clamp((progress - 0.65) / 0.25, 0, 1);
+      const titleScale = 0.9 + titleOpacity * 0.1;
+      const titleTranslateY = (1 - titleOpacity) * 35;
+
+      const descOpacity = clamp((progress - 0.75) / 0.20, 0, 1);
+      const descTranslateY = (1 - descOpacity) * 20;
+
+      const btnOpacity = clamp((progress - 0.82) / 0.18, 0, 1);
+      const btnScale = 0.85 + btnOpacity * 0.15;
+
+      const scrollHintOpacity = clamp((0.15 - progress) / 0.15, 0, 1);
+
+      if (headerWrapperRef.current) {
+        headerWrapperRef.current.style.opacity = `${headerOpacity}`;
+        headerWrapperRef.current.style.transform = `translateY(${headerTranslateY}px)`;
+        headerWrapperRef.current.style.pointerEvents = headerOpacity > 0.5 ? 'auto' : 'none';
+      }
+      if (subheadRef.current) {
+        subheadRef.current.style.opacity = `${subheadOpacity}`;
+        subheadRef.current.style.transform = `translateY(${subheadTranslateY}px) scale(${subheadScale})`;
+      }
+      if (titleRef.current) {
+        titleRef.current.style.opacity = `${titleOpacity}`;
+        titleRef.current.style.transform = `translateY(${titleTranslateY}px) scale(${titleScale})`;
+      }
+      if (descRef.current) {
+        descRef.current.style.opacity = `${descOpacity}`;
+        descRef.current.style.transform = `translateY(${descTranslateY}px)`;
+      }
+      if (btnContainerRef.current) {
+        btnContainerRef.current.style.opacity = `${btnOpacity}`;
+        btnContainerRef.current.style.transform = `scale(${btnScale})`;
+        btnContainerRef.current.style.pointerEvents = btnOpacity > 0.5 ? 'auto' : 'none';
+      }
+      if (scrollHintRef.current) {
+        scrollHintRef.current.style.opacity = `${scrollHintOpacity}`;
+      }
+    };
+
     const updateScroll = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
@@ -528,7 +584,7 @@ export default function Home() {
       const progress = Math.min(1, Math.max(0, currentScroll / totalScrollable));
 
       targetFrame = 1 + progress * (frameCount - 1);
-      setScrollProgress(progress);
+      updateHeroDOM(progress);
       startLoop();
     };
 
@@ -546,6 +602,7 @@ export default function Home() {
     window.addEventListener('scroll', updateScroll, { passive: true });
     document.addEventListener('visibilitychange', handleVisibility);
     updateScroll();
+    updateHeroDOM(0);
     startLoop();
 
     return () => {
@@ -567,28 +624,6 @@ export default function Home() {
   } else if (displayPercent > 10) {
     loadingStatus = 'STREAMING HIGH-RES ASSET BUFFER...';
   }
-
-  const clamp = (val: number, min: number, max: number) => Math.min(max, Math.max(min, val));
-
-  // Dynamic staggered animation progress synchronized directly with background frames
-  const headerOpacity = clamp((scrollProgress - 0.65) / 0.25, 0, 1);
-  const headerTranslateY = - (1 - headerOpacity) * 30;
-
-  const subheadOpacity = clamp((scrollProgress - 0.55) / 0.25, 0, 1);
-  const subheadScale = 0.85 + subheadOpacity * 0.15;
-  const subheadTranslateY = (1 - subheadOpacity) * 20;
-
-  const titleOpacity = clamp((scrollProgress - 0.65) / 0.25, 0, 1);
-  const titleScale = 0.9 + titleOpacity * 0.1;
-  const titleTranslateY = (1 - titleOpacity) * 35;
-
-  const descOpacity = clamp((scrollProgress - 0.75) / 0.20, 0, 1);
-  const descTranslateY = (1 - descOpacity) * 20;
-
-  const btnOpacity = clamp((scrollProgress - 0.82) / 0.18, 0, 1);
-  const btnScale = 0.85 + btnOpacity * 0.15;
-
-  const scrollHintOpacity = clamp((0.15 - scrollProgress) / 0.15, 0, 1);
 
   return (
     <div className="bg-[#07040d] text-white selection:bg-purple-500/30 font-sans min-h-screen relative">
@@ -745,53 +780,56 @@ export default function Home() {
           <div className="absolute bottom-0 left-0 w-full h-28 bg-gradient-to-t from-[#07040d] via-[#07040d]/60 to-transparent pointer-events-none z-10" />
 
           {/* Glass Header with 3 Parallel Lines Hamburger Menu */}
-          <div className="absolute top-0 left-0 right-0 z-50">
-            <Header 
-              opacity={headerOpacity} 
-              translateY={headerTranslateY} 
-              pointerEvents={headerOpacity > 0.5 ? 'auto' : 'none'} 
-              activePage="home" 
-            />
+          <div 
+            ref={headerWrapperRef}
+            className="absolute top-0 left-0 right-0 z-50 transition-all duration-150 ease-out"
+            style={{ opacity: 0, transform: 'translateY(-30px)', pointerEvents: 'none' }}
+          >
+            <Header activePage="home" />
           </div>
 
           {/* Hero Content */}
           <main className="relative z-30 w-full max-w-4xl mx-auto px-6 text-center flex flex-col items-center justify-center gap-4 sm:gap-6 mt-6">
             <h3 
+              ref={subheadRef}
               className="text-xl sm:text-2xl md:text-3xl font-bold tracking-[0.25em] text-white/95 uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] transition-all duration-150 ease-out"
               style={{
-                opacity: subheadOpacity,
-                transform: `translateY(${subheadTranslateY}px) scale(${subheadScale})`
+                opacity: 0,
+                transform: 'translateY(20px) scale(0.85)'
               }}
             >
               WELCOME TO THE
             </h3>
 
             <h1 
+              ref={titleRef}
               className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-100 via-purple-200 to-indigo-200 drop-shadow-[0_8px_24px_rgba(0,0,0,0.95)] leading-tight transition-all duration-150 ease-out"
               style={{
-                opacity: titleOpacity,
-                transform: `translateY(${titleTranslateY}px) scale(${titleScale})`
+                opacity: 0,
+                transform: 'translateY(35px) scale(0.9)'
               }}
             >
               WORLD OF GAMES
             </h1>
 
             <p 
+              ref={descRef}
               className="max-w-xl text-xs sm:text-sm md:text-base text-white/90 font-normal leading-relaxed drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] mt-1 transition-all duration-150 ease-out"
               style={{
-                opacity: descOpacity,
-                transform: `translateY(${descTranslateY}px)`
+                opacity: 0,
+                transform: 'translateY(20px)'
               }}
             >
               High-skill gameplay, epic walkthroughs, secret strategies, and funny gaming moments with Floor Frost.
             </p>
 
             <div
+              ref={btnContainerRef}
               className="transition-all duration-150 ease-out"
               style={{
-                opacity: btnOpacity,
-                transform: `scale(${btnScale})`,
-                pointerEvents: btnOpacity > 0.5 ? 'auto' : 'none'
+                opacity: 0,
+                transform: 'scale(0.85)',
+                pointerEvents: 'none'
               }}
             >
               <a href="#videos" className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:px-9 sm:py-4 font-medium text-sm sm:text-base text-white transition-all duration-300 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 hover:scale-[1.05] shadow-[0_0_25px_rgba(219,39,119,0.7)] hover:shadow-[0_0_40px_rgba(219,39,119,1)] border border-pink-400/50 backdrop-blur-md active:scale-95 mt-3 neon-glow-btn">
@@ -804,8 +842,9 @@ export default function Home() {
 
           {/* Scroll Down Indicator */}
           <div 
+            ref={scrollHintRef}
             className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none transition-opacity duration-300"
-            style={{ opacity: scrollHintOpacity }}
+            style={{ opacity: 1 }}
           >
             <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase text-pink-200/90 animate-pulse drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               Scroll Down
@@ -878,7 +917,7 @@ export default function Home() {
       </section>
 
       {/* 3. BENTO GRID SECTION WITH ENHANCED FROSTED GLASSMORPHISM */}
-      <section className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20">
+      <section className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20 content-auto">
         <div className="absolute top-1/4 right-1/4 w-[30rem] h-[30rem] bg-purple-600/20 rounded-full blur-[180px] pointer-events-none" />
         <div className="absolute bottom-1/4 left-1/4 w-[30rem] h-[30rem] bg-pink-600/20 rounded-full blur-[180px] pointer-events-none" />
 
@@ -1038,7 +1077,7 @@ export default function Home() {
       </section>
 
       {/* 4. ABOUT CREATOR SECTION WITH REAL CHANNEL BIO & DISCORD */}
-      <section id="about" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20">
+      <section id="about" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20 content-auto">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-30">
           
           <div className="relative flex justify-center items-center scroll-slide-left">
@@ -1113,7 +1152,7 @@ export default function Home() {
       </section>
 
       {/* 5. FEATURED LATEST YOUTUBE VIDEOS & SPOTLIGHT PLAYER */}
-      <section id="videos" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#07040d] overflow-hidden border-t border-purple-900/20">
+      <section id="videos" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#07040d] overflow-hidden border-t border-purple-900/20 content-auto">
         <div className="max-w-7xl mx-auto flex flex-col items-start gap-10 relative z-30">
           
           <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-6 scroll-fade-up">
@@ -1301,7 +1340,7 @@ export default function Home() {
       <DiscordAnnouncements />
 
       {/* 6. COMMUNITY & DISCORD BANNER WITH REAL LINKS */}
-      <section id="community" className="relative py-24 px-6 sm:px-12 lg:px-20 bg-[#06030a] border-t border-purple-900/20">
+      <section id="community" className="relative py-24 px-6 sm:px-12 lg:px-20 bg-[#06030a] border-t border-purple-900/20 content-auto">
         <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-10 sm:p-16 relative overflow-hidden flex flex-col items-center text-center gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)] relative z-30 tilt-card scroll-scale-in">
           <div className="tilt-glare" />
           <div className="absolute w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />

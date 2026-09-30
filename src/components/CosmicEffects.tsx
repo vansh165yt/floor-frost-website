@@ -6,11 +6,11 @@ export default function CosmicEffects() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
   const [isPointerDevice, setIsPointerDevice] = useState(false);
+  const spotlightRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // 1. Mouse Tracking for Interactive Ambient Spotlight Glow (Idle-Aware)
+  // 1. Mouse Tracking for Interactive Ambient Spotlight Glow (Idle-Aware, Direct Ref)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -29,7 +29,15 @@ export default function CosmicEffects() {
       // Smooth lerp
       currentX += (targetX - currentX) * 0.12;
       currentY += (targetY - currentY) * 0.12;
-      setMousePos({ x: Math.round(currentX), y: Math.round(currentY) });
+
+      if (spotlightRef.current) {
+        if (currentX < 0) {
+          spotlightRef.current.style.opacity = '0';
+        } else {
+          spotlightRef.current.style.opacity = '1';
+          spotlightRef.current.style.background = `radial-gradient(550px circle at ${Math.round(currentX)}px ${Math.round(currentY)}px, rgba(168, 85, 247, 0.08), rgba(236, 72, 153, 0.03) 40%, transparent 80%)`;
+        }
+      }
 
       // If close enough to target, idle RAF to conserve 100% CPU when mouse is stationary
       if (Math.abs(targetX - currentX) > 0.2 || Math.abs(targetY - currentY) > 0.2) {
@@ -481,12 +489,10 @@ export default function CosmicEffects() {
       </div>
 
       {/* 2. Interactive Ambient Cursor Spotlight (Desktop only) */}
-      {isPointerDevice && mousePos.x >= 0 && (
+      {isPointerDevice && (
         <div
-          className="fixed inset-0 pointer-events-none z-10 transition-opacity duration-500 ease-out"
-          style={{
-            background: `radial-gradient(550px circle at ${mousePos.x}px ${mousePos.y}px, rgba(168, 85, 247, 0.08), rgba(236, 72, 153, 0.03) 40%, transparent 80%)`,
-          }}
+          ref={spotlightRef}
+          className="fixed inset-0 pointer-events-none z-10 transition-opacity duration-300 ease-out opacity-0"
         />
       )}
 
