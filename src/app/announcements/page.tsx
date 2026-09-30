@@ -68,7 +68,7 @@ export default function AnnouncementsPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 relative z-10 flex flex-col gap-10">
 
         {/* Hero Section Banner */}
-        <div className="relative rounded-2xl sm:rounded-[2.5rem] bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] flex flex-col items-start gap-4 overflow-hidden group">
+        <div className="relative rounded-2xl sm:rounded-[2.5rem] bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] flex flex-col items-start gap-4 overflow-hidden group scroll-fade-up">
           <div className="absolute -top-24 -right-24 w-72 h-72 bg-gradient-to-br from-indigo-600/30 to-purple-500/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
 
           <div className="flex flex-wrap items-center gap-3">
@@ -94,7 +94,7 @@ export default function AnnouncementsPage() {
               href="https://discord.gg/aN5CCRT6CS"
               target="_blank"
               rel="noreferrer"
-              className="px-6 py-3 rounded-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_25px_rgba(88,101,242,0.5)]"
+              className="px-6 py-3 rounded-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_25px_rgba(88,101,242,0.5)] magnetic-btn"
             >
               <span>Join Official Discord Server</span>
               <span>↗</span>
@@ -104,7 +104,7 @@ export default function AnnouncementsPage() {
 
         {/* ALL DISCORD ANNOUNCEMENTS FEED LIST */}
         <div className="flex flex-col gap-6 w-full">
-          <div className="flex items-center justify-between px-2">
+          <div className="flex items-center justify-between px-2 scroll-fade-up">
             <h2 className="text-xl font-bold uppercase tracking-wider text-zinc-300 font-mono flex items-center gap-2">
               <span>ALL DISCORD ANNOUNCEMENTS</span>
               {isLive && (
@@ -124,11 +124,13 @@ export default function AnnouncementsPage() {
             </div>
           ) : announcements.length > 0 ? (
             <div className="flex flex-col gap-6 w-full">
-              {announcements.map((item) => (
+              {announcements.map((item, idx) => (
                 <div
                   key={item.id}
-                  className="group rounded-3xl bg-gradient-to-b from-[#0f0b1f]/95 to-[#080512]/95 border-2 border-indigo-500/30 p-8 flex flex-col gap-6 shadow-[0_10px_35px_rgba(88,101,242,0.15)] hover:border-[#5865f2] hover:shadow-[0_0_55px_rgba(88,101,242,0.4)] hover-lift transition-all duration-300 relative overflow-hidden"
+                  data-reveal-delay={String(Math.min(400, (idx + 1) * 100))}
+                  className="group rounded-3xl bg-gradient-to-b from-[#0f0b1f]/95 to-[#080512]/95 border-2 border-indigo-500/30 p-8 flex flex-col gap-6 shadow-[0_10px_35px_rgba(88,101,242,0.15)] hover:border-[#5865f2] hover:shadow-[0_0_55px_rgba(88,101,242,0.4)] hover-lift shimmer-glass-card tilt-card scroll-fade-up transition-all duration-300 relative overflow-hidden"
                 >
+                  <div className="tilt-glare" />
                   <div className="absolute top-0 right-0 w-64 h-64 bg-[#5865f2]/10 rounded-full blur-3xl pointer-events-none group-hover:bg-[#5865f2]/20 transition-colors" />
 
                   {/* Author Header Info */}

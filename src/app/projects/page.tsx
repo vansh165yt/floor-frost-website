@@ -66,7 +66,7 @@ export default function ProjectsPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 relative z-10 flex flex-col gap-10">
 
         {/* Hero Section Banner */}
-        <div className="relative rounded-2xl sm:rounded-[2.5rem] bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] flex flex-col items-start gap-4 overflow-hidden group">
+        <div className="relative rounded-2xl sm:rounded-[2.5rem] bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] flex flex-col items-start gap-4 overflow-hidden group scroll-fade-up">
           <div className="absolute -top-24 -right-24 w-72 h-72 bg-gradient-to-br from-purple-600/30 to-pink-500/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
 
           <div className="flex flex-wrap items-center gap-3">
@@ -93,8 +93,9 @@ export default function ProjectsPage() {
           href="https://pingu.xo.je"
           target="_blank"
           rel="noreferrer"
-          className="rounded-[2.5rem] bg-gradient-to-b from-[#120b24]/95 to-[#0c0817]/95 border-2 border-purple-500/40 p-8 sm:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 shadow-[0_15px_50px_rgba(168,85,247,0.25)] relative overflow-hidden group hover:border-pink-400 hover:shadow-[0_0_65px_rgba(236,72,153,0.45)] hover-lift shimmer-hover transition-all duration-300 cursor-pointer"
+          className="rounded-[2.5rem] bg-gradient-to-b from-[#120b24]/95 to-[#0c0817]/95 border-2 border-purple-500/40 p-8 sm:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 shadow-[0_15px_50px_rgba(168,85,247,0.25)] relative overflow-hidden group hover:border-pink-400 hover:shadow-[0_0_65px_rgba(236,72,153,0.45)] hover-lift shimmer-hover transition-all duration-300 cursor-pointer tilt-card scroll-scale-in"
         >
+          <div className="tilt-glare" />
           {/* Animated Background Glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-600/20 via-pink-600/15 to-transparent rounded-full blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-500" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
@@ -142,7 +143,7 @@ export default function ProjectsPage() {
           </div>
 
           <div className="z-10 w-full md:w-auto shrink-0">
-            <div className="px-8 py-4 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 group-hover:from-pink-500 group-hover:to-purple-500 text-sm font-bold uppercase tracking-wider text-white shadow-[0_0_35px_rgba(219,39,119,0.6)] group-hover:scale-105 active:scale-95 transition-all duration-300 text-center border border-pink-400/50 flex items-center justify-center gap-2.5">
+            <div className="px-8 py-4 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 group-hover:from-pink-500 group-hover:to-purple-500 text-sm font-bold uppercase tracking-wider text-white shadow-[0_0_35px_rgba(219,39,119,0.6)] group-hover:scale-105 active:scale-95 transition-all duration-300 text-center border border-pink-400/50 flex items-center justify-center gap-2.5 magnetic-btn">
               <span>Launch pingu.xo.je</span>
               <span>🚀</span>
             </div>
@@ -150,7 +151,8 @@ export default function ProjectsPage() {
         </a>
 
         {/* BEAUTIFUL "MORE PROJECTS COMING SOON" SECTION */}
-        <div className="relative rounded-[2.5rem] bg-gradient-to-b from-white/[0.04] to-white/[0.01] border-2 border-dashed border-purple-500/30 p-8 sm:p-12 shadow-2xl flex flex-col items-center text-center gap-6 overflow-hidden backdrop-blur-xl group hover:border-purple-400/60 transition-all duration-500">
+        <div className="relative rounded-[2.5rem] bg-gradient-to-b from-white/[0.04] to-white/[0.01] border-2 border-dashed border-purple-500/30 p-8 sm:p-12 shadow-2xl flex flex-col items-center text-center gap-6 overflow-hidden backdrop-blur-xl group hover:border-purple-400/60 transition-all duration-500 tilt-card scroll-fade-up">
+          <div className="tilt-glare" />
           
           {/* Ambient Glow & Radial Pulse */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none group-hover:bg-pink-600/15 transition-all duration-700" />

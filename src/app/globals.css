@@ -335,7 +335,7 @@ body {
   animation: haloPulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Subtle Floating Breathing Ambient Glow */
+/* Smooth Slow Floating Breathing Ambient Glow */
 @keyframes ambientBreathe {
   0%, 100% {
     transform: scale(1) translate(0, 0);
@@ -349,5 +349,150 @@ body {
 
 .animate-ambient-breathe {
   animation: ambientBreathe 9s ease-in-out infinite;
+}
+
+/* ============================================================ */
+/* ULTRA-PREMIUM SCROLL REVEAL & 3D TILT ANIMATION SUITE        */
+/* ============================================================ */
+
+/* Smooth Native Scroll Behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scroll Reveal: Fade Up Entrance */
+.scroll-fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(6px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+/* Scroll Reveal: Scale In Entrance */
+.scroll-scale-in {
+  opacity: 0;
+  transform: scale(0.92) translateY(24px);
+  filter: blur(8px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+/* Scroll Reveal: Slide Left Entrance */
+.scroll-slide-left {
+  opacity: 0;
+  transform: translateX(-35px);
+  filter: blur(6px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+/* Scroll Reveal: Slide Right Entrance */
+.scroll-slide-right {
+  opacity: 0;
+  transform: translateX(35px);
+  filter: blur(6px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+/* Revealed State Triggered dynamically on Scroll */
+.is-revealed {
+  opacity: 1 !important;
+  transform: translate(0, 0) scale(1) !important;
+  filter: blur(0px) !important;
+}
+
+/* Stagger Delays for Grid Elements */
+[data-reveal-delay="50"]  { transition-delay: 50ms; }
+[data-reveal-delay="100"] { transition-delay: 100ms; }
+[data-reveal-delay="150"] { transition-delay: 150ms; }
+[data-reveal-delay="200"] { transition-delay: 200ms; }
+[data-reveal-delay="250"] { transition-delay: 250ms; }
+[data-reveal-delay="300"] { transition-delay: 300ms; }
+[data-reveal-delay="350"] { transition-delay: 350ms; }
+[data-reveal-delay="400"] { transition-delay: 400ms; }
+[data-reveal-delay="500"] { transition-delay: 500ms; }
+
+/* 3D Perspective Tilt Card with Specular Glare */
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s ease,
+              border-color 0.35s ease;
+  will-change: transform;
+}
+
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    450px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.12),
+    rgba(168, 85, 247, 0.08) 35%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  mix-blend-mode: overlay;
+  z-index: 25;
+}
+
+.tilt-card:hover .tilt-glare {
+  opacity: 1;
+}
+
+/* Magnetic Button Smooth Snapping */
+.magnetic-btn {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+/* Cosmic Aurora Drift Background */
+@keyframes auroraDrift {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.22;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.15);
+    opacity: 0.38;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 0.22;
+  }
+}
+
+.animate-aurora-drift {
+  animation: auroraDrift 30s ease-in-out infinite;
+}
+
+/* Subtle Shimmer Border Beam */
+@keyframes borderBeamMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-border-beam {
+  background-size: 200% 200%;
+  animation: borderBeamMove 4s ease infinite;
 }
 

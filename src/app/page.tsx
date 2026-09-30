@@ -686,7 +686,7 @@ export default function Home() {
       </div>
 
       {/* 2. INFINITE LOGO CAROUSEL WITH FULL-WIDTH PERSPECTIVE RIBBON & VERTICAL DIVIDERS */}
-      <section id="marquee" className="relative py-20 bg-[#050308] overflow-hidden border-t border-purple-900/30">
+      <section id="marquee" className="relative py-20 bg-[#050308] overflow-hidden border-t border-purple-900/30 scroll-fade-up">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-96 bg-purple-900/10 rounded-full blur-[180px] pointer-events-none" />
 
         {/* Edge Fade Gradients */}
@@ -751,7 +751,7 @@ export default function Home() {
         <div className="absolute bottom-1/4 left-1/4 w-[30rem] h-[30rem] bg-pink-600/20 rounded-full blur-[180px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto flex flex-col gap-12 relative z-30">
-          <div className="flex flex-col items-start gap-3">
+          <div className="flex flex-col items-start gap-3 scroll-fade-up">
             <span className="text-pink-400 font-mono text-xs uppercase tracking-[0.25em] font-bold">
               Ecosystem & Metrics ~
             </span>
@@ -764,7 +764,11 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-            <div className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col justify-between gap-8 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-purple-400/70 hover:shadow-[0_0_55px_rgba(168,85,247,0.35)] hover-lift shimmer-hover transition-all duration-300">
+            <div 
+              data-reveal-delay="100" 
+              className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col justify-between gap-8 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-purple-400/70 hover:shadow-[0_0_55px_rgba(168,85,247,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
+            >
+              <div className="tilt-glare" />
               <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/35 transition-all pointer-events-none" />
               
               <div className="flex justify-between items-start z-10">
@@ -802,7 +806,11 @@ export default function Home() {
             </div>
 
             {/* Bento Card 2: Live Subscriber Count */}
-            <div className="rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300">
+            <div 
+              data-reveal-delay="200"
+              className="rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
+            >
+              <div className="tilt-glare" />
               <div className="absolute -top-10 -left-10 w-44 h-44 bg-pink-500/15 rounded-full blur-2xl group-hover:bg-pink-500/30 transition-all pointer-events-none" />
 
               <div className="flex justify-between items-start z-10">
@@ -836,7 +844,11 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-indigo-400/70 hover:shadow-[0_0_55px_rgba(129,140,248,0.35)] hover-lift shimmer-hover transition-all duration-300">
+            <div 
+              data-reveal-delay="300"
+              className="rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-indigo-400/70 hover:shadow-[0_0_55px_rgba(129,140,248,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
+            >
+              <div className="tilt-glare" />
               <div className="flex justify-between items-start z-10">
                 <span className="px-3.5 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 font-mono text-xs font-bold uppercase tracking-wider backdrop-blur-md">
                   03 / ECOSYSTEM
@@ -863,7 +875,11 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300">
+            <div 
+              data-reveal-delay="400"
+              className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
+            >
+              <div className="tilt-glare" />
               <div className="flex flex-col gap-3 max-w-lg z-10">
                 <span className="px-3.5 py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 font-mono text-xs font-bold uppercase tracking-wider self-start backdrop-blur-md">
                   04 / VISION
@@ -880,7 +896,7 @@ export default function Home() {
                 href="https://discord.gg/aN5CCRT6CS" 
                 target="_blank"
                 rel="noreferrer"
-                className="px-8 py-4 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 font-bold text-xs sm:text-sm text-white shadow-[0_0_30px_rgba(219,39,119,0.5)] hover:scale-105 active:scale-95 transition-all shrink-0 border border-pink-400/40 z-10"
+                className="px-8 py-4 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 font-bold text-xs sm:text-sm text-white shadow-[0_0_30px_rgba(219,39,119,0.5)] hover:scale-105 active:scale-95 transition-all shrink-0 border border-pink-400/40 z-10 magnetic-btn"
               >
                 Join The Legion →
               </a>
@@ -893,10 +909,11 @@ export default function Home() {
       <section id="about" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-30">
           
-          <div className="relative flex justify-center items-center">
+          <div className="relative flex justify-center items-center scroll-slide-left">
             <div className="absolute w-80 h-80 bg-purple-600/30 rounded-full blur-3xl animate-pulse" />
             
-            <div className="relative z-10 w-80 sm:w-96 rounded-3xl overflow-hidden border-2 border-purple-500/50 shadow-[0_0_50px_rgba(168,85,247,0.4)] bg-gradient-to-b from-purple-950 to-zinc-950 p-4">
+            <div className="relative z-10 w-80 sm:w-96 rounded-3xl overflow-hidden border-2 border-purple-500/50 shadow-[0_0_50px_rgba(168,85,247,0.4)] bg-gradient-to-b from-purple-950 to-zinc-950 p-4 tilt-card">
+              <div className="tilt-glare" />
               <div className="relative w-full aspect-square rounded-2xl overflow-hidden border border-purple-400/30">
                 <NextImage 
                   src="/logo.png" 
@@ -933,7 +950,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex flex-col items-start gap-6">
+          <div className="flex flex-col items-start gap-6 scroll-slide-right">
             <span className="text-purple-400 font-mono text-sm tracking-wider uppercase font-bold">
               Meet The Creator ~
             </span>
@@ -967,7 +984,7 @@ export default function Home() {
       <section id="videos" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#07040d] overflow-hidden border-t border-purple-900/20">
         <div className="max-w-7xl mx-auto flex flex-col items-start gap-10 relative z-30">
           
-          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-6 scroll-fade-up">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
@@ -984,7 +1001,7 @@ export default function Home() {
               href="https://youtube.com/@floorfrost"
               target="_blank"
               rel="noreferrer"
-              className="px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+              className="px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.4)] magnetic-btn"
             >
               <span>Visit @FloorFrost YouTube</span>
               <span>↗</span>
@@ -993,7 +1010,7 @@ export default function Home() {
 
           {/* Featured Spotlight Video Card (Latest Uploaded Video) */}
           {featuredVideo && (
-            <div className="relative w-full group">
+            <div className="relative w-full group scroll-scale-in">
               {/* Ambient Theater Backlight Glow */}
               <div className="absolute -inset-1.5 bg-gradient-to-r from-red-600/30 via-purple-600/30 to-pink-600/30 rounded-[2.5rem] blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none -z-10" />
 
@@ -1063,7 +1080,7 @@ export default function Home() {
                       href={featuredVideo.url || `https://www.youtube.com/watch?v=${featuredVideo.id}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider text-center transition-all shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider text-center transition-all shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 magnetic-btn"
                     >
                       <span>Watch on YouTube</span>
                       <span>↗</span>
@@ -1076,7 +1093,7 @@ export default function Home() {
 
           {/* Grid of 7 Recent YouTube Uploads (Excludes the #1 Latest Video) */}
           <div className="w-full flex flex-col gap-4 mt-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between scroll-fade-up">
               <h3 className="text-xl font-bold uppercase text-zinc-300 font-mono tracking-wider flex items-center gap-2">
                 <span>RECENT UPLOADS</span>
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-900/60 border border-purple-500/30 text-purple-300 font-mono">
@@ -1097,16 +1114,18 @@ export default function Home() {
                   { id: '8ru4SjK_UiY_7', title: 'Which Shader Is The Best Part 76! #minecraft', publishedAt: '6 days ago', thumbnail: 'https://img.youtube.com/vi/8ru4SjK_UiY/hqdefault.jpg' },
                   { id: 'J1InW-aepkY_8', title: 'ULTRA Realistic Minecraft Gameplay & Shaders Guide', publishedAt: '7 days ago', thumbnail: 'https://img.youtube.com/vi/J1InW-aepkY/hqdefault.jpg' }
                 ]
-              ).map((video: any) => (
+              ).map((video: any, idx: number) => (
                 <div
                   key={video.id}
+                  data-reveal-delay={String(Math.min(500, (idx + 1) * 75))}
                   onClick={() => {
                     setFeaturedVideo(video);
                     setIsPlayingFeatured(true);
                     window.scrollTo({ top: (document.getElementById('videos')?.offsetTop || 0) + 100, behavior: 'smooth' });
                   }}
-                  className="group relative rounded-2xl overflow-hidden bg-zinc-950 border border-purple-900/40 hover:border-purple-400/80 hover:shadow-[0_0_35px_rgba(168,85,247,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer"
+                  className="group relative rounded-2xl overflow-hidden bg-zinc-950 border border-purple-900/40 hover:border-purple-400/80 hover:shadow-[0_0_35px_rgba(168,85,247,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer tilt-card scroll-fade-up shimmer-glass-card"
                 >
+                  <div className="tilt-glare" />
                   <div className="h-44 w-full relative overflow-hidden bg-black">
                     <img
                       src={video.thumbnail}
@@ -1149,8 +1168,8 @@ export default function Home() {
 
       {/* 6. COMMUNITY & DISCORD BANNER WITH REAL LINKS */}
       <section id="community" className="relative py-24 px-6 sm:px-12 lg:px-20 bg-[#06030a] border-t border-purple-900/20">
-        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-10 sm:p-16 relative overflow-hidden flex flex-col items-center text-center gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)] relative z-30">
-          
+        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-10 sm:p-16 relative overflow-hidden flex flex-col items-center text-center gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)] relative z-30 tilt-card scroll-scale-in">
+          <div className="tilt-glare" />
           <div className="absolute w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col items-center gap-4 max-w-2xl">
@@ -1173,7 +1192,7 @@ export default function Home() {
               href="https://youtube.com/@floorfrost" 
               target="_blank" 
               rel="noreferrer"
-              className="px-8 py-4 rounded-full bg-red-600 hover:bg-red-500 font-bold text-sm text-white shadow-[0_0_25px_rgba(220,38,38,0.6)] hover:scale-105 transition-all flex items-center gap-2"
+              className="px-8 py-4 rounded-full bg-red-600 hover:bg-red-500 font-bold text-sm text-white shadow-[0_0_25px_rgba(220,38,38,0.6)] hover:scale-105 transition-all flex items-center gap-2 magnetic-btn"
             >
               <span>▶</span> Subscribe ({subStats.subscriberCount})
             </a>
@@ -1181,7 +1200,7 @@ export default function Home() {
               href="https://discord.gg/aN5CCRT6CS" 
               target="_blank" 
               rel="noreferrer"
-              className="px-8 py-4 rounded-full bg-indigo-600 hover:bg-indigo-500 font-bold text-sm text-white shadow-[0_0_25px_rgba(79,70,229,0.6)] hover:scale-105 transition-all flex items-center gap-2"
+              className="px-8 py-4 rounded-full bg-indigo-600 hover:bg-indigo-500 font-bold text-sm text-white shadow-[0_0_25px_rgba(79,70,229,0.6)] hover:scale-105 transition-all flex items-center gap-2 magnetic-btn"
             >
               <span>💬</span> Join Official Discord
             </a>
@@ -1191,7 +1210,7 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-12 border-t border-purple-950 bg-[#040207] text-center text-xs text-zinc-500 font-mono flex flex-col items-center gap-2">
+      <footer className="py-12 border-t border-purple-950 bg-[#040207] text-center text-xs text-zinc-500 font-mono flex flex-col items-center gap-2 scroll-fade-up">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-6 h-6 rounded-full overflow-hidden relative">
             <NextImage src="/logo.png" alt="Floor Frost" fill className="object-cover" />

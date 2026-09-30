@@ -11,8 +11,9 @@ export default function CosmicEffects() {
 
   // 1. Mouse Tracking for Interactive Ambient Spotlight Glow
   useEffect(() => {
-    // Only enable on desktop pointer devices
-    if (typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches) {
+    if (typeof window === 'undefined') return;
+
+    if (window.matchMedia('(pointer: fine)').matches) {
       setIsPointerDevice(true);
     }
 
@@ -33,7 +34,6 @@ export default function CosmicEffects() {
     };
 
     const animateGlow = () => {
-      // Smooth lerp interpolation for silky cursor glide
       currentX += (targetX - currentX) * 0.12;
       currentY += (targetY - currentY) * 0.12;
       setMousePos({ x: Math.round(currentX), y: Math.round(currentY) });
@@ -59,7 +59,7 @@ export default function CosmicEffects() {
         const currentProgress = (window.scrollY / totalScroll) * 100;
         setScrollProgress(Math.min(100, Math.max(0, currentProgress)));
       }
-      setShowBackToTop(window.scrollY > 450);
+      setShowBackToTop(window.scrollY > 400);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -67,7 +67,133 @@ export default function CosmicEffects() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 3. Subtle Twinkling Cosmic Micro-Stars Particles Canvas
+  // 3. Automated IntersectionObserver Scroll Reveal Engine
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const revealSelectors = '.scroll-fade-up, .scroll-scale-in, .scroll-slide-left, .scroll-slide-right, .scroll-reveal';
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -30px 0px'
+      }
+    );
+
+    const observeElements = () => {
+      const elements = document.querySelectorAll(revealSelectors);
+      elements.forEach((el) => {
+        // If element is already revealed, skip
+        if (!el.classList.contains('is-revealed')) {
+          observer.observe(el);
+        }
+      });
+    };
+
+    observeElements();
+
+    // Watch for dynamically rendered DOM nodes (e.g. YouTube API data)
+    const mutationObserver = new MutationObserver(() => {
+      observeElements();
+    });
+
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+    };
+  }, []);
+
+  // 4. Interactive 3D Perspective Tilt & Specular Glare (Pointer Devices Only)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const target = (e.target as HTMLElement)?.closest('.tilt-card, [data-tilt]') as HTMLElement | null;
+      if (!target) return;
+
+      const rect = target.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      // Max tilt angle 6 degrees for subtle high-end feel
+      const maxTilt = 6;
+      const rotateX = -((y - centerY) / centerY) * maxTilt;
+      const rotateY = ((x - centerX) / centerX) * maxTilt;
+
+      target.style.setProperty('--mouse-x', `${x}px`);
+      target.style.setProperty('--mouse-y', `${y}px`);
+      target.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
+    };
+
+    const handlePointerLeave = (e: PointerEvent) => {
+      const target = (e.target as HTMLElement)?.closest('.tilt-card, [data-tilt]') as HTMLElement | null;
+      if (!target) return;
+
+      target.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    };
+
+    document.addEventListener('pointermove', handlePointerMove, { passive: true });
+    document.addEventListener('pointerout', handlePointerLeave, { passive: true });
+
+    return () => {
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerout', handlePointerLeave);
+    };
+  }, []);
+
+  // 5. Interactive Magnetic Buttons Effect (Pointer Devices Only)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
+    const handleMagneticMove = (e: MouseEvent) => {
+      const btn = (e.target as HTMLElement)?.closest('.magnetic-btn, [data-magnetic]') as HTMLElement | null;
+      if (!btn) return;
+
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - (rect.left + rect.width / 2);
+      const y = e.clientY - (rect.top + rect.height / 2);
+
+      // Magnetic pull factor (max 6px offset)
+      const pullX = Math.max(-6, Math.min(6, x * 0.22));
+      const pullY = Math.max(-6, Math.min(6, y * 0.22));
+
+      btn.style.transform = `translate(${pullX}px, ${pullY}px) scale(1.03)`;
+    };
+
+    const handleMagneticLeave = (e: MouseEvent) => {
+      const btn = (e.target as HTMLElement)?.closest('.magnetic-btn, [data-magnetic]') as HTMLElement | null;
+      if (!btn) return;
+
+      btn.style.transform = 'translate(0px, 0px) scale(1)';
+    };
+
+    document.addEventListener('mousemove', handleMagneticMove, { passive: true });
+    document.addEventListener('mouseout', handleMagneticLeave, { passive: true });
+
+    return () => {
+      document.removeEventListener('mousemove', handleMagneticMove);
+      document.removeEventListener('mouseout', handleMagneticLeave);
+    };
+  }, []);
+
+  // 6. Subtle Twinkling Cosmic Micro-Stars Particles Canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -86,13 +212,12 @@ export default function CosmicEffects() {
 
     window.addEventListener('resize', handleResize);
 
-    // Particle pool
-    const particleCount = Math.min(45, Math.floor(window.innerWidth / 30));
+    const particleCount = Math.min(50, Math.floor(window.innerWidth / 28));
     const colors = [
       'rgba(168, 85, 247, ',  // Purple
       'rgba(236, 72, 153, ',  // Pink
       'rgba(192, 132, 252, ', // Lavender
-      'rgba(255, 255, 255, '  // Ice white
+      'rgba(255, 255, 255, '  // Diamond white
     ];
 
     interface Particle {
@@ -132,12 +257,10 @@ export default function CosmicEffects() {
         p.x += p.speedX;
         p.y += p.speedY;
 
-        // Wrap around boundaries
         if (p.y < -10) p.y = height + 10;
         if (p.x < -10) p.x = width + 10;
         if (p.x > width + 10) p.x = -10;
 
-        // Soft twinkle sinusoidal wave
         p.alpha = p.baseAlpha + Math.sin(tick * p.twinkleSpeed + i) * 0.2;
         p.alpha = Math.max(0.05, Math.min(0.8, p.alpha));
 
@@ -167,15 +290,19 @@ export default function CosmicEffects() {
 
   return (
     <>
-      {/* 1. Ultra-Sleek Top Scroll Progress Neon Bar */}
+      {/* 1. Ultra-Sleek Top Scroll Progress Bar with Laser Glare Tip */}
       <div className="fixed top-0 left-0 right-0 h-[2.5px] z-[9999] pointer-events-none bg-transparent">
         <div
-          className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 transition-all duration-75 ease-out shadow-[0_0_12px_rgba(236,72,153,0.9),0_0_4px_rgba(168,85,247,0.7)]"
+          className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 transition-all duration-75 ease-out shadow-[0_0_12px_rgba(236,72,153,0.9),0_0_4px_rgba(168,85,247,0.7)] relative"
           style={{ width: `${scrollProgress}%` }}
-        />
+        >
+          {scrollProgress > 0 && (
+            <div className="absolute right-0 -top-[3px] bottom-[-3px] w-2.5 rounded-full bg-white shadow-[0_0_10px_#ffffff,0_0_20px_#ec4899]" />
+          )}
+        </div>
       </div>
 
-      {/* 2. Interactive Ambient Cursor Spotlight (Desktop only, pointer-events-none) */}
+      {/* 2. Interactive Ambient Cursor Spotlight (Desktop only) */}
       {isPointerDevice && mousePos.x >= 0 && (
         <div
           className="fixed inset-0 pointer-events-none z-10 transition-opacity duration-500 ease-out"
@@ -185,20 +312,26 @@ export default function CosmicEffects() {
         />
       )}
 
-      {/* 3. Subtle Twinkling Cosmic Micro-Stars Canvas */}
+      {/* 3. Cosmic Aurora Ambient Glow Drift in Background */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30">
+        <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-br from-purple-900/30 via-pink-900/20 to-transparent blur-[140px] animate-aurora-drift" />
+        <div className="absolute top-[40%] -right-[15%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-bl from-indigo-900/25 via-purple-900/20 to-transparent blur-[160px] animate-aurora-drift" style={{ animationDirection: 'reverse', animationDuration: '38s' }} />
+      </div>
+
+      {/* 4. Subtle Twinkling Cosmic Micro-Stars Canvas */}
       <canvas
         ref={canvasRef}
         className="fixed inset-0 pointer-events-none z-0 opacity-75"
         style={{ mixBlendMode: 'screen' }}
       />
 
-      {/* 4. Floating Back to Top Glass Orb Button */}
+      {/* 5. Floating Back to Top Glass Orb Button */}
       {showBackToTop && (
         <button
           onClick={scrollToTop}
           aria-label="Back to Top"
           title="Back to Top"
-          className="fixed bottom-6 right-6 z-50 p-3 sm:p-3.5 rounded-full bg-[#120a24]/85 border-2 border-purple-500/50 hover:border-pink-400 text-white shadow-[0_0_30px_rgba(168,85,247,0.4),0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-xl hover:scale-110 active:scale-95 transition-all duration-300 group cursor-pointer animate-portal-fade flex items-center justify-center"
+          className="fixed bottom-6 right-6 z-50 p-3 sm:p-3.5 rounded-full bg-[#120a24]/85 border-2 border-purple-500/50 hover:border-pink-400 text-white shadow-[0_0_30px_rgba(168,85,247,0.4),0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-xl hover:scale-110 active:scale-95 transition-all duration-300 group cursor-pointer animate-portal-fade flex items-center justify-center magnetic-btn"
         >
           <div className="relative flex items-center justify-center">
             {/* Ambient Aura Ring */}

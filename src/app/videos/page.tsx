@@ -251,7 +251,7 @@ export default function VideosPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 relative z-10 flex flex-col gap-12">
 
         {/* Hero Section Banner */}
-        <div className="relative rounded-2xl sm:rounded-[2.5rem] bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] flex flex-col items-start gap-5 overflow-hidden group">
+        <div className="relative rounded-2xl sm:rounded-[2.5rem] bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] flex flex-col items-start gap-5 overflow-hidden group scroll-fade-up">
           <div className="absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br from-red-600/30 via-pink-600/20 to-purple-500/25 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
 
           {/* Badges Bar */}
@@ -283,7 +283,7 @@ export default function VideosPage() {
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
               onClick={() => scrollToArea('videos-area')}
-              className="px-4 py-2.5 rounded-xl bg-purple-600/20 border border-purple-400/40 hover:border-purple-400 text-purple-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-purple-600/20 border border-purple-400/40 hover:border-purple-400 text-purple-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center gap-2 cursor-pointer magnetic-btn"
             >
               <span>⚡ Videos (Last 10 Days)</span>
               <span className="px-1.5 py-0.5 rounded bg-purple-500/40 text-[10px] text-white">{last10DaysVideos.length}</span>
@@ -291,7 +291,7 @@ export default function VideosPage() {
 
             <button
               onClick={() => scrollToArea('playlists-area')}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600/20 border border-indigo-400/40 hover:border-indigo-400 text-indigo-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(99,102,241,0.2)] flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-indigo-600/20 border border-indigo-400/40 hover:border-indigo-400 text-indigo-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(99,102,241,0.2)] flex items-center gap-2 cursor-pointer magnetic-btn"
             >
               <span>📁 All Playlists</span>
               <span className="px-1.5 py-0.5 rounded bg-indigo-500/40 text-[10px] text-white">{playlists.length}</span>
@@ -299,7 +299,7 @@ export default function VideosPage() {
 
             <button
               onClick={() => scrollToArea('posts-area')}
-              className="px-4 py-2.5 rounded-xl bg-pink-600/20 border border-pink-400/40 hover:border-pink-400 text-pink-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(236,72,153,0.2)] flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-pink-600/20 border border-pink-400/40 hover:border-pink-400 text-pink-200 hover:text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(236,72,153,0.2)] flex items-center gap-2 cursor-pointer magnetic-btn"
             >
               <span>💬 Community Posts</span>
               <span className="px-1.5 py-0.5 rounded bg-pink-500/40 text-[10px] text-white">{posts.length}</span>
@@ -309,7 +309,7 @@ export default function VideosPage() {
               href="https://youtube.com/@floorfrost"
               target="_blank"
               rel="noreferrer"
-              className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_25px_rgba(239,68,68,0.5)] flex items-center gap-1.5"
+              className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-[0_0_25px_rgba(239,68,68,0.5)] flex items-center gap-1.5 magnetic-btn"
             >
               <span>YouTube Channel ↗</span>
             </a>
@@ -317,7 +317,7 @@ export default function VideosPage() {
         </div>
 
         {/* 🎬 SPOTLIGHT CINEMATIC VIDEO PLAYER */}
-        <div id="main-video-player" className="relative w-full group scroll-mt-28">
+        <div id="main-video-player" className="relative w-full group scroll-mt-28 scroll-scale-in">
           <div className="absolute -inset-1.5 bg-gradient-to-r from-red-600/30 via-purple-600/30 to-pink-600/30 rounded-[2.5rem] blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none -z-10" />
 
           <div className="w-full rounded-3xl bg-gradient-to-b from-[#140b24] to-[#0c0817] border-2 border-purple-500/40 overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.25)] flex flex-col lg:flex-row group-hover:border-pink-400/80 transition-all duration-300">
@@ -412,7 +412,7 @@ export default function VideosPage() {
         {/* 1. VIDEOS AREA (LAST 10 DAYS VIDEOS) - SIGNATURE COSMIC PALETTE */}
         {/* ============================================================ */}
         <section id="videos-area" className="flex flex-col gap-6 w-full scroll-mt-24">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-red-950/20 via-purple-950/25 to-[#120a24] border-2 border-purple-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(168,85,247,0.18)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-red-950/20 via-purple-950/25 to-[#120a24] border-2 border-purple-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(168,85,247,0.18)] scroll-fade-up">
             <div className="flex items-center gap-3">
               <span className="text-2xl p-2.5 rounded-2xl bg-purple-600/20 border border-purple-500/40 shadow-inner text-purple-300">⚡</span>
               <div>
@@ -438,14 +438,15 @@ export default function VideosPage() {
             {last10DaysVideos.map((video, idx) => (
               <div
                 key={video.id}
+                data-reveal-delay={String(Math.min(500, (idx % 3 + 1) * 100))}
                 onClick={() => handlePlayVideo(video)}
-                style={{ animationDelay: `${idx * 70}ms` }}
-                className={`group relative rounded-2xl overflow-hidden bg-zinc-950 border transition-all duration-300 shadow-xl flex flex-col cursor-pointer hover-lift shimmer-glass-card animate-fade-up ${
+                className={`group relative rounded-2xl overflow-hidden bg-zinc-950 border transition-all duration-300 shadow-xl flex flex-col cursor-pointer hover-lift shimmer-glass-card tilt-card scroll-fade-up ${
                   activeVideo.id === video.id
                     ? 'border-purple-400 shadow-[0_0_35px_rgba(168,85,247,0.5)] ring-2 ring-purple-400/50'
                     : 'border-purple-900/40 hover:border-pink-500/80 hover:shadow-[0_0_30px_rgba(236,72,153,0.35)]'
                 }`}
               >
+                <div className="tilt-glare" />
                 <div className="h-48 w-full relative overflow-hidden bg-black">
                   <img
                     src={video.thumbnail}
@@ -502,7 +503,7 @@ export default function VideosPage() {
         {/* 2. PLAYLISTS AREA (ALL PLAYLISTS) */}
         {/* ============================================================ */}
         <section id="playlists-area" className="flex flex-col gap-6 w-full scroll-mt-24">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-purple-900/15 border-2 border-purple-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(168,85,247,0.15)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-purple-900/15 border-2 border-purple-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(168,85,247,0.15)] scroll-fade-up">
             <div className="flex items-center gap-3">
               <span className="text-2xl p-2.5 rounded-2xl bg-purple-500/20 border border-purple-500/40 shadow-inner text-purple-300">📁</span>
               <div>
@@ -522,7 +523,7 @@ export default function VideosPage() {
               href="https://www.youtube.com/@floorfrost/playlists"
               target="_blank"
               rel="noreferrer"
-              className="text-xs font-mono text-purple-300 hover:text-white px-3.5 py-1.5 rounded-xl bg-purple-500/20 border border-purple-400/30 hover:bg-purple-500/30 transition-all flex items-center gap-1 shrink-0 w-fit"
+              className="text-xs font-mono text-purple-300 hover:text-white px-3.5 py-1.5 rounded-xl bg-purple-500/20 border border-purple-400/30 hover:bg-purple-500/30 transition-all flex items-center gap-1 shrink-0 w-fit magnetic-btn"
             >
               <span>View On YouTube</span>
               <span>↗</span>
@@ -534,12 +535,13 @@ export default function VideosPage() {
             {playlists.map((playlist, idx) => (
               <a
                 key={playlist.id}
+                data-reveal-delay={String(Math.min(400, (idx + 1) * 120))}
                 href={playlist.url}
                 target="_blank"
                 rel="noreferrer"
-                style={{ animationDelay: `${idx * 120}ms` }}
-                className="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#120a24] to-[#080512] border-2 border-purple-500/30 hover:border-purple-400 p-6 flex flex-col sm:flex-row gap-5 shadow-[0_10px_35px_rgba(168,85,247,0.15)] hover:shadow-[0_0_45px_rgba(168,85,247,0.4)] transition-all duration-300 hover-lift shimmer-glass-card animate-fade-up"
+                className="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#120a24] to-[#080512] border-2 border-purple-500/30 hover:border-purple-400 p-6 flex flex-col sm:flex-row gap-5 shadow-[0_10px_35px_rgba(168,85,247,0.15)] hover:shadow-[0_0_45px_rgba(168,85,247,0.4)] transition-all duration-300 hover-lift shimmer-glass-card tilt-card scroll-fade-up"
               >
+                <div className="tilt-glare" />
                 {/* Playlist Thumbnail with Overlay */}
                 <div className="sm:w-44 h-36 sm:h-auto rounded-2xl overflow-hidden relative bg-black shrink-0 border border-purple-500/30 group-hover:border-purple-400/70 transition-colors">
                   <img
@@ -595,7 +597,7 @@ export default function VideosPage() {
         {/* 3. POSTS AREA (LAST 5 YOUTUBE COMMUNITY POSTS ONLY) */}
         {/* ============================================================ */}
         <section id="posts-area" className="flex flex-col gap-6 w-full scroll-mt-24">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-pink-950/20 border-2 border-pink-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(236,72,153,0.15)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-3xl bg-pink-950/20 border-2 border-pink-500/40 backdrop-blur-md shadow-[0_0_35px_rgba(236,72,153,0.15)] scroll-fade-up">
             <div className="flex items-center gap-3">
               <span className="text-2xl p-2.5 rounded-2xl bg-pink-500/20 border border-pink-500/40 shadow-inner text-pink-300">💬</span>
               <div>
@@ -616,7 +618,7 @@ export default function VideosPage() {
                 href="https://www.youtube.com/@floorfrost/posts"
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs font-mono text-pink-300 hover:text-white px-3.5 py-1.5 rounded-xl bg-pink-500/20 border border-pink-400/30 hover:bg-pink-500/30 transition-all flex items-center gap-1.5 shrink-0"
+                className="text-xs font-mono text-pink-300 hover:text-white px-3.5 py-1.5 rounded-xl bg-pink-500/20 border border-pink-400/30 hover:bg-pink-500/30 transition-all flex items-center gap-1.5 shrink-0 magnetic-btn"
               >
                 <span>YouTube Community Tab ↗</span>
               </a>
@@ -628,9 +630,10 @@ export default function VideosPage() {
             {posts.map((post, idx) => (
               <div
                 key={post.id || idx}
-                style={{ animationDelay: `${idx * 140}ms` }}
-                className="group rounded-3xl bg-gradient-to-b from-[#130b24]/95 to-[#090614]/95 border-2 border-pink-500/30 p-6 sm:p-8 flex flex-col gap-5 shadow-[0_10px_35px_rgba(236,72,153,0.15)] hover:border-pink-400 hover:shadow-[0_0_50px_rgba(236,72,153,0.35)] transition-all duration-300 hover-lift shimmer-glass-card animate-fade-up relative overflow-hidden"
+                data-reveal-delay={String(Math.min(400, (idx + 1) * 100))}
+                className="group rounded-3xl bg-gradient-to-b from-[#130b24]/95 to-[#090614]/95 border-2 border-pink-500/30 p-6 sm:p-8 flex flex-col gap-5 shadow-[0_10px_35px_rgba(236,72,153,0.15)] hover:border-pink-400 hover:shadow-[0_0_50px_rgba(236,72,153,0.35)] transition-all duration-300 hover-lift shimmer-glass-card tilt-card scroll-fade-up relative overflow-hidden"
               >
+                <div className="tilt-glare" />
                 <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-pink-600/10 to-purple-600/10 rounded-full blur-3xl pointer-events-none group-hover:from-pink-600/20 transition-all" />
 
                 {/* Post Author Header */}
