@@ -11,7 +11,6 @@ export default function CosmicEffects() {
 
   // Dedicated refs for buttery-smooth fluid liquid scrollbar movement
   const topBarRef = useRef<HTMLDivElement>(null);
-  const percentTextRef = useRef<HTMLSpanElement>(null);
   const verticalFillRef = useRef<HTMLDivElement>(null);
   const verticalPercentRef = useRef<HTMLSpanElement>(null);
   const waypointRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -103,9 +102,6 @@ export default function CosmicEffects() {
       if (topBarRef.current) {
         topBarRef.current.style.width = pStr;
         topBarRef.current.style.opacity = pClamped > 0.1 ? '1' : '0';
-      }
-      if (percentTextRef.current) {
-        percentTextRef.current.textContent = pInt;
       }
       if (verticalFillRef.current) {
         verticalFillRef.current.style.height = pStr;
@@ -553,15 +549,6 @@ export default function CosmicEffects() {
           <div className="absolute right-0 -top-[5.5px] -bottom-[5.5px] w-4 rounded-full bg-pink-500/50 animate-ping pointer-events-none" />
           {/* Core Pulsing Comet Supernova Head */}
           <div className="absolute right-0 -top-[4px] -bottom-[4px] w-3 rounded-full bg-white animate-comet-head shadow-[0_0_15px_#fff] pointer-events-none" />
-          {/* Floating Futuristic HUD Percentage Pill Badge (Visible during active scrolling) */}
-          <div
-            className={`absolute right-0 top-3.5 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-950/95 border border-purple-500/40 backdrop-blur-md text-[10px] font-mono font-bold tracking-wider text-pink-300 shadow-[0_4px_16px_rgba(0,0,0,0.8),0_0_12px_rgba(236,72,153,0.5)] transition-all duration-300 ${
-              isScrolling ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
-            }`}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse" />
-            <span ref={percentTextRef}>0%</span>
-          </div>
         </div>
       </div>
 
