@@ -7,48 +7,82 @@ import DiscordAnnouncements from '@/components/DiscordAnnouncements';
 import Frost3DScene from '@/components/Frost3DScene';
 
 // High-Tech Slot/Roll-up Number Counter with Finish Flash
-function AnimatedCounter({ value, duration = 1600, suffix = "" }: { value: string | number; duration?: number; suffix?: string }) {
-  const [displayValue, setDisplayValue] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
-  const elementRef = useRef<HTMLSpanElement>(null);
-
+function AnimatedCounter({ 
+  value, 
+  duration = 1400, 
+  suffix = "" 
+}: { 
+  value: string | number; 
+  duration?: number; 
+  suffix?: string;
+}) {
   const numericTarget = typeof value === 'number' 
     ? value 
     : parseInt(String(value).replace(/[^0-9]/g, '')) || 0;
+
+  const [displayValue, setDisplayValue] = useState(numericTarget);
+  const [isFinished, setIsFinished] = useState(false);
+  const elementRef = useRef<HTMLSpanElement>(null);
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
     const el = elementRef.current;
     if (!el) return;
 
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !hasAnimated) {
-        setHasAnimated(true);
-        const startTime = performance.now();
-
-        const update = (now: number) => {
-          const elapsed = now - startTime;
-          const progress = Math.min(1, elapsed / duration);
-          // Ease out exponential for high-tech snappy deceleration
-          const easeOut = 1 - Math.pow(2, -10 * progress);
-          const current = Math.floor(easeOut * numericTarget);
-          setDisplayValue(current);
-
-          if (progress < 1) {
-            requestAnimationFrame(update);
-          } else {
-            setDisplayValue(numericTarget);
-            setIsFinished(true);
-          }
-        };
-
-        requestAnimationFrame(update);
+    const startRoll = () => {
+      if (hasStartedRef.current) {
+        setDisplayValue(numericTarget);
+        return;
       }
-    }, { threshold: 0.15 });
+      hasStartedRef.current = true;
+      const startTime = performance.now();
 
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [numericTarget, duration, hasAnimated]);
+      const update = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const easeOut = 1 - Math.pow(2, -10 * progress);
+        const current = Math.floor(easeOut * numericTarget);
+        setDisplayValue(current);
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          setDisplayValue(numericTarget);
+          setIsFinished(true);
+        }
+      };
+
+      setDisplayValue(0);
+      requestAnimationFrame(update);
+    };
+
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0]?.isIntersecting) {
+          startRoll();
+          observer.disconnect();
+        }
+      }, { threshold: 0.05 });
+
+      observer.observe(el);
+      const fallbackTimer = setTimeout(() => {
+        if (!hasStartedRef.current) startRoll();
+      }, 250);
+
+      return () => {
+        observer.disconnect();
+        clearTimeout(fallbackTimer);
+      };
+    } else {
+      startRoll();
+    }
+  }, [numericTarget, duration]);
+
+  useEffect(() => {
+    if (hasStartedRef.current) {
+      setDisplayValue(numericTarget);
+    }
+  }, [numericTarget]);
 
   return (
     <span 
@@ -57,7 +91,7 @@ function AnimatedCounter({ value, duration = 1600, suffix = "" }: { value: strin
         isFinished ? 'animate-counter-finish' : ''
       }`}
     >
-      {hasAnimated ? displayValue.toLocaleString() : "0"}{suffix}
+      {(displayValue || numericTarget).toLocaleString()}{suffix}
     </span>
   );
 }
@@ -1057,7 +1091,7 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col gap-2 my-auto z-10">
-                <span className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-pink-200 to-purple-300 tracking-tight font-mono drop-shadow-[0_0_20px_rgba(236,72,153,0.4)]">
+                <span className="text-4xl sm:text-5xl font-black text-white tracking-tight font-mono drop-shadow-[0_0_20px_rgba(236,72,153,0.6)]">
                   <AnimatedCounter value={subStats.subscriberCount} />
                 </span>
                 <h4 className="text-lg font-bold text-white uppercase tracking-wider">COMMUNITY LEGION</h4>

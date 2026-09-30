@@ -6,47 +6,82 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 
 // High-Tech Slot/Roll-up Number Counter with Finish Flash
-function AnimatedCounter({ value, duration = 1600, suffix = "" }: { value: string | number; duration?: number; suffix?: string }) {
-  const [displayValue, setDisplayValue] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
-  const elementRef = useRef<HTMLSpanElement>(null);
-
+function AnimatedCounter({ 
+  value, 
+  duration = 1400, 
+  suffix = "" 
+}: { 
+  value: string | number; 
+  duration?: number; 
+  suffix?: string;
+}) {
   const numericTarget = typeof value === 'number' 
     ? value 
     : parseInt(String(value).replace(/[^0-9]/g, '')) || 0;
+
+  const [displayValue, setDisplayValue] = useState(numericTarget);
+  const [isFinished, setIsFinished] = useState(false);
+  const elementRef = useRef<HTMLSpanElement>(null);
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
     const el = elementRef.current;
     if (!el) return;
 
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !hasAnimated) {
-        setHasAnimated(true);
-        const startTime = performance.now();
-
-        const update = (now: number) => {
-          const elapsed = now - startTime;
-          const progress = Math.min(1, elapsed / duration);
-          const easeOut = 1 - Math.pow(2, -10 * progress);
-          const current = Math.floor(easeOut * numericTarget);
-          setDisplayValue(current);
-
-          if (progress < 1) {
-            requestAnimationFrame(update);
-          } else {
-            setDisplayValue(numericTarget);
-            setIsFinished(true);
-          }
-        };
-
-        requestAnimationFrame(update);
+    const startRoll = () => {
+      if (hasStartedRef.current) {
+        setDisplayValue(numericTarget);
+        return;
       }
-    }, { threshold: 0.15 });
+      hasStartedRef.current = true;
+      const startTime = performance.now();
 
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [numericTarget, duration, hasAnimated]);
+      const update = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const easeOut = 1 - Math.pow(2, -10 * progress);
+        const current = Math.floor(easeOut * numericTarget);
+        setDisplayValue(current);
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          setDisplayValue(numericTarget);
+          setIsFinished(true);
+        }
+      };
+
+      setDisplayValue(0);
+      requestAnimationFrame(update);
+    };
+
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0]?.isIntersecting) {
+          startRoll();
+          observer.disconnect();
+        }
+      }, { threshold: 0.05 });
+
+      observer.observe(el);
+      const fallbackTimer = setTimeout(() => {
+        if (!hasStartedRef.current) startRoll();
+      }, 250);
+
+      return () => {
+        observer.disconnect();
+        clearTimeout(fallbackTimer);
+      };
+    } else {
+      startRoll();
+    }
+  }, [numericTarget, duration]);
+
+  useEffect(() => {
+    if (hasStartedRef.current) {
+      setDisplayValue(numericTarget);
+    }
+  }, [numericTarget]);
 
   return (
     <span 
@@ -55,7 +90,7 @@ function AnimatedCounter({ value, duration = 1600, suffix = "" }: { value: strin
         isFinished ? 'animate-counter-finish' : ''
       }`}
     >
-      {hasAnimated ? displayValue.toLocaleString() : "0"}{suffix}
+      {(displayValue || numericTarget).toLocaleString()}{suffix}
     </span>
   );
 }
@@ -164,27 +199,27 @@ export default function CommunityPage() {
           </div>
 
           {/* 4 Statistics Grid with Roll-Up Counter Animation */}
-          <div className="grid grid-cols-4 gap-2 sm:gap-4 w-full py-5 border-y border-white/10 my-1 bg-white/[0.02] rounded-2xl">
+          <div className="grid grid-cols-4 gap-2 sm:gap-3 w-full py-5 border-y border-white/10 my-1 bg-white/[0.03] rounded-2xl backdrop-blur-md">
             <div className="flex flex-col items-center">
-              <span className="text-lg sm:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-pink-200 to-purple-300 font-mono">
+              <span className="text-lg sm:text-xl font-black text-white font-mono drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
                 <AnimatedCounter value={subStats.subscriberCount} />
               </span>
               <span className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">Subscribers</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-lg sm:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-cyan-300 font-mono">
+              <span className="text-lg sm:text-xl font-black text-pink-300 font-mono drop-shadow-[0_0_12px_rgba(244,114,182,0.4)]">
                 <AnimatedCounter value={subStats.viewCount} suffix={subStats.viewCount.includes('M') ? 'M' : 'K'} />
               </span>
               <span className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">Total Views</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-lg sm:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-purple-300 font-mono">
+              <span className="text-lg sm:text-xl font-black text-cyan-300 font-mono drop-shadow-[0_0_12px_rgba(34,211,238,0.4)]">
                 <AnimatedCounter value={subStats.videoCount} />
               </span>
               <span className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">Videos</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-lg sm:text-xl font-black text-lime-400 font-mono">
+              <span className="text-lg sm:text-xl font-black text-lime-400 font-mono drop-shadow-[0_0_12px_rgba(163,230,53,0.4)]">
                 <AnimatedCounter value={100} suffix="%" />
               </span>
               <span className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">Gaming</span>
