@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import NextImage from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
 
-// High-Tech Slot/Roll-up Number Counter with Finish Flash
+// High-Tech Slot/Roll-up Number Counter with Finish Flash & Live Update Support
 function AnimatedCounter({ 
   value, 
   duration = 1400, 
@@ -15,122 +15,228 @@ function AnimatedCounter({
   duration?: number; 
   suffix?: string;
 }) {
-  const numericTarget = typeof value === 'number' 
-    ? value 
-    : parseInt(String(value).replace(/[^0-9]/g, '')) || 0;
+  const parseTarget = (val: string | number): number => {
+    if (typeof val === 'number') return val;
+    const cleaned = String(val).replace(/,/g, '').replace(/[^\d.]/g, '');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+  };
 
-  const [displayValue, setDisplayValue] = useState(numericTarget);
+  const numericTarget = parseTarget(value);
+  const [displayValue, setDisplayValue] = useState<number>(numericTarget);
   const [isFinished, setIsFinished] = useState(false);
+  const [hasUpdated, setHasUpdated] = useState(false);
+
   const elementRef = useRef<HTMLSpanElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const currentValRef = useRef<number>(numericTarget);
   const hasStartedRef = useRef(false);
+  const prevTargetRef = useRef<number>(numericTarget);
+
+  currentValRef.current = displayValue;
 
   useEffect(() => {
     const el = elementRef.current;
     if (!el) return;
 
-    const startRoll = () => {
-      if (hasStartedRef.current) {
-        setDisplayValue(numericTarget);
+    const animateTo = (from: number, to: number, animDuration: number, isSubsequent = false) => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+
+      if (from === to) {
+        setDisplayValue(to);
+        setIsFinished(true);
         return;
       }
-      hasStartedRef.current = true;
-      const startTime = performance.now();
 
-      const update = (now: number) => {
+      const startTime = performance.now();
+      const diff = to - from;
+
+      const step = (now: number) => {
         const elapsed = now - startTime;
-        const progress = Math.min(1, elapsed / duration);
+        const progress = Math.min(1, elapsed / animDuration);
         const easeOut = 1 - Math.pow(2, -10 * progress);
-        const current = Math.floor(easeOut * numericTarget);
-        setDisplayValue(current);
+        const nextVal = from + diff * easeOut;
+
+        setDisplayValue(nextVal);
 
         if (progress < 1) {
-          requestAnimationFrame(update);
+          rafRef.current = requestAnimationFrame(step);
         } else {
-          setDisplayValue(numericTarget);
+          setDisplayValue(to);
           setIsFinished(true);
+          rafRef.current = null;
+          if (isSubsequent) {
+            setHasUpdated(true);
+            setTimeout(() => setHasUpdated(false), 2000);
+          }
         }
       };
 
-      setDisplayValue(0);
-      requestAnimationFrame(update);
+      rafRef.current = requestAnimationFrame(step);
     };
 
-    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        if (entries[0]?.isIntersecting) {
-          startRoll();
-          observer.disconnect();
-        }
-      }, { threshold: 0.05 });
-
-      observer.observe(el);
-      const fallbackTimer = setTimeout(() => {
-        if (!hasStartedRef.current) startRoll();
-      }, 250);
-
-      return () => {
-        observer.disconnect();
-        clearTimeout(fallbackTimer);
+    if (!hasStartedRef.current) {
+      const triggerStart = () => {
+        if (hasStartedRef.current) return;
+        hasStartedRef.current = true;
+        setDisplayValue(0);
+        animateTo(0, numericTarget, duration, false);
       };
+
+      if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          if (entries[0]?.isIntersecting) {
+            triggerStart();
+            observer.disconnect();
+          }
+        }, { threshold: 0.05 });
+
+        observer.observe(el);
+        const timer = setTimeout(triggerStart, 250);
+
+        return () => {
+          observer.disconnect();
+          clearTimeout(timer);
+          if (rafRef.current !== null) {
+            cancelAnimationFrame(rafRef.current);
+          }
+        };
+      } else {
+        triggerStart();
+        return () => {
+          if (rafRef.current !== null) {
+            cancelAnimationFrame(rafRef.current);
+          }
+        };
+      }
     } else {
-      startRoll();
+      if (prevTargetRef.current !== numericTarget) {
+        prevTargetRef.current = numericTarget;
+        animateTo(currentValRef.current, numericTarget, 800, true);
+      }
+      return () => {
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+        }
+      };
     }
   }, [numericTarget, duration]);
 
-  useEffect(() => {
-    if (hasStartedRef.current) {
-      setDisplayValue(numericTarget);
-    }
-  }, [numericTarget]);
+  const formattedDisplay = numericTarget % 1 !== 0
+    ? displayValue.toFixed(1)
+    : Math.round(displayValue).toLocaleString();
 
   return (
     <span 
       ref={elementRef} 
-      className={`inline-block font-mono tracking-tight transition-transform duration-300 ${
+      className={`inline-block font-mono tracking-tight transition-all duration-300 ${
         isFinished ? 'animate-counter-finish' : ''
-      }`}
+      } ${hasUpdated ? 'text-lime-300 scale-110 drop-shadow-[0_0_15px_rgba(163,230,53,0.8)]' : ''}`}
     >
-      {(displayValue || numericTarget).toLocaleString()}{suffix}
+      {formattedDisplay}{suffix}
     </span>
   );
 }
 
-export default function CommunityPage() {
-  // Live YouTube Subscribers State
-  const [subStats, setSubStats] = useState({
-    subscriberCount: "1,520",
-    viewCount: "534K",
-    videoCount: "95"
-  });
+interface LatestVideo {
+  id: string;
+  title: string;
+  publishedAt: string;
+  thumbnail: string;
+  url: string;
+}
 
-  // Fetch Live Subscribers every 15s
-  useEffect(() => {
-    const fetchSubscribers = async () => {
-      try {
-        const res = await fetch(`/api/subscribers?t=${Date.now()}`, { cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.subscriberCount) {
-            const count = Number(data.subscriberCount);
-            const views = Number(data.viewCount);
-            setSubStats({
-              subscriberCount: count.toLocaleString(),
-              viewCount: views >= 1000000 
-                ? (views / 1000000).toFixed(1) + "M" 
-                : (views / 1000).toFixed(0) + "K",
-              videoCount: data.videoCount
-            });
-          }
+export default function CommunityPage() {
+  // Live YouTube Subscribers State - seeded with verified channel numbers
+  const [subStats, setSubStats] = useState({
+    subscriberCount: "1,530",
+    viewCount: "538K",
+    videoCount: "96"
+  });
+  const [latestVideo, setLatestVideo] = useState<LatestVideo | null>({
+    id: "Ms4_Smdr5Gw",
+    title: "I Tested 50+ Minecraft Shaders — These Are INSANE ✨",
+    publishedAt: "Uploaded Recently",
+    thumbnail: "https://i.ytimg.com/vi/Ms4_Smdr5Gw/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=Ms4_Smdr5Gw"
+  });
+  const [isLive, setIsLive] = useState(true);
+  const [lastSync, setLastSync] = useState<string>("");
+
+  const fetchLiveStats = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/subscribers?t=${Date.now()}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.subscriberCount) {
+          const count = Number(data.subscriberCount);
+          const views = Number(data.viewCount);
+          setSubStats({
+            subscriberCount: count.toLocaleString(),
+            viewCount: views >= 1000000 
+              ? (views / 1000000).toFixed(1) + "M" 
+              : (views / 1000).toFixed(0) + "K",
+            videoCount: String(data.videoCount || "96")
+          });
+          setIsLive(true);
+          setLastSync(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
         }
-      } catch (e) {
-        console.error("Subscribers fetch error:", e);
+      }
+    } catch (e) {
+      console.error("Subscribers fetch error:", e);
+    }
+  }, []);
+
+  const fetchLatestVideo = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/videos?limit=1&t=${Date.now()}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        const video = data.latestVideo || data.last10DaysVideos?.[0] || data.videos?.[0];
+        if (video) {
+          setLatestVideo({
+            id: video.id,
+            title: video.title,
+            publishedAt: video.publishedAt,
+            thumbnail: video.thumbnail,
+            url: video.url
+          });
+        }
+      }
+    } catch (e) {
+      console.error("Latest video fetch error:", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLiveStats();
+    fetchLatestVideo();
+
+    // Regular interval every 15s for live subscriber/view updates
+    const interval = setInterval(() => {
+      fetchLiveStats();
+    }, 15000);
+
+    // Refresh when user returns to window / tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchLiveStats();
+        fetchLatestVideo();
       }
     };
 
-    fetchSubscribers();
-    const interval = setInterval(fetchSubscribers, 15000);
-    return () => clearInterval(interval);
-  }, []);
+    window.addEventListener('focus', fetchLiveStats);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', fetchLiveStats);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [fetchLiveStats, fetchLatestVideo]);
 
   return (
     <div className="min-h-screen bg-[#07040d] text-white font-sans selection:bg-purple-500/30 relative overflow-hidden flex flex-col justify-between items-center animate-portal-fade">
@@ -147,7 +253,7 @@ export default function CommunityPage() {
       <main className="grow max-w-lg mx-auto px-4 sm:px-6 pt-16 pb-12 w-full flex flex-col items-center justify-center relative z-10">
         
         {/* Obsidian Glass Card with Laser Border Beam */}
-        <div className="relative w-full rounded-[2rem] bg-white/[0.04] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.8),0_0_40px_rgba(168,85,247,0.15)] flex flex-col items-center text-center gap-6 mt-12 tilt-card scroll-scale-in border-beam-card">
+        <div className="relative w-full rounded-[2rem] bg-white/[0.04] border border-white/20 backdrop-blur-2xl p-7 sm:p-9 shadow-[0_25px_70px_rgba(0,0,0,0.8),0_0_40px_rgba(168,85,247,0.15)] flex flex-col items-center text-center gap-5 mt-12 tilt-card scroll-scale-in border-beam-card">
           <div className="tilt-glare" />
           
           {/* Top Circular Protruding Avatar with Concentric Cyber Rings */}
@@ -227,7 +333,7 @@ export default function CommunityPage() {
           </div>
 
           {/* High-Energy YouTube & Discord Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full pt-1">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full pt-1">
             
             {/* 1. YouTube Official Button */}
             <a
@@ -267,6 +373,67 @@ export default function CommunityPage() {
               </div>
             </a>
 
+          </div>
+
+          {/* Dynamic Live Latest YouTube Upload Card */}
+          {latestVideo && (
+            <div className="w-full pt-1">
+              <a
+                href={latestVideo.url}
+                target="_blank"
+                rel="noreferrer"
+                title={`Watch latest video: ${latestVideo.title}`}
+                className="w-full p-3 sm:p-3.5 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-red-500/60 shadow-lg hover:shadow-[0_0_25px_rgba(239,68,68,0.25)] transition-all duration-300 flex items-center gap-3 text-left group cursor-pointer tilt-card"
+              >
+                {/* Video Thumbnail with Play Overlay */}
+                <div className="w-20 h-12 sm:w-24 sm:h-14 rounded-xl overflow-hidden relative shrink-0 border border-white/15 bg-black/60 shadow-md">
+                  <NextImage
+                    src={latestVideo.thumbnail}
+                    alt={latestVideo.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <svg className="w-3 h-3 fill-white ml-0.5" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Video Details */}
+                <div className="flex flex-col min-w-0 grow">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-wider flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                      LATEST UPLOAD
+                    </span>
+                    <span className="text-[10px] text-zinc-400 font-mono">
+                      • {latestVideo.publishedAt}
+                    </span>
+                  </div>
+                  <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-red-300 transition-colors line-clamp-1 leading-snug">
+                    {latestVideo.title}
+                  </h4>
+                </div>
+
+                <span className="text-xs text-zinc-400 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0 pr-1">
+                  ↗
+                </span>
+              </a>
+            </div>
+          )}
+
+          {/* Real-time YouTube Sync Indicator */}
+          <div className="flex items-center justify-center gap-2 text-[10px] font-mono text-zinc-400/90 pt-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="text-emerald-300 font-semibold">LIVE YOUTUBE DATA SYNC</span>
+            {lastSync && (
+              <span className="text-zinc-500">
+                (Updated {lastSync})
+              </span>
+            )}
           </div>
 
         </div>

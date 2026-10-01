@@ -16,82 +16,128 @@ function AnimatedCounter({
   duration?: number; 
   suffix?: string;
 }) {
-  const numericTarget = typeof value === 'number' 
-    ? value 
-    : parseInt(String(value).replace(/[^0-9]/g, '')) || 0;
+  const parseTarget = (val: string | number): number => {
+    if (typeof val === 'number') return val;
+    const cleaned = String(val).replace(/,/g, '').replace(/[^\d.]/g, '');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+  };
 
-  const [displayValue, setDisplayValue] = useState(numericTarget);
+  const numericTarget = parseTarget(value);
+  const [displayValue, setDisplayValue] = useState<number>(numericTarget);
   const [isFinished, setIsFinished] = useState(false);
+  const [hasUpdated, setHasUpdated] = useState(false);
+
   const elementRef = useRef<HTMLSpanElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const currentValRef = useRef<number>(numericTarget);
   const hasStartedRef = useRef(false);
+  const prevTargetRef = useRef<number>(numericTarget);
+
+  currentValRef.current = displayValue;
 
   useEffect(() => {
     const el = elementRef.current;
     if (!el) return;
 
-    const startRoll = () => {
-      if (hasStartedRef.current) {
-        setDisplayValue(numericTarget);
+    const animateTo = (from: number, to: number, animDuration: number, isSubsequent = false) => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+
+      if (from === to) {
+        setDisplayValue(to);
+        setIsFinished(true);
         return;
       }
-      hasStartedRef.current = true;
-      const startTime = performance.now();
 
-      const update = (now: number) => {
+      const startTime = performance.now();
+      const diff = to - from;
+
+      const step = (now: number) => {
         const elapsed = now - startTime;
-        const progress = Math.min(1, elapsed / duration);
+        const progress = Math.min(1, elapsed / animDuration);
         const easeOut = 1 - Math.pow(2, -10 * progress);
-        const current = Math.floor(easeOut * numericTarget);
-        setDisplayValue(current);
+        const nextVal = from + diff * easeOut;
+
+        setDisplayValue(nextVal);
 
         if (progress < 1) {
-          requestAnimationFrame(update);
+          rafRef.current = requestAnimationFrame(step);
         } else {
-          setDisplayValue(numericTarget);
+          setDisplayValue(to);
           setIsFinished(true);
+          rafRef.current = null;
+          if (isSubsequent) {
+            setHasUpdated(true);
+            setTimeout(() => setHasUpdated(false), 2000);
+          }
         }
       };
 
-      setDisplayValue(0);
-      requestAnimationFrame(update);
+      rafRef.current = requestAnimationFrame(step);
     };
 
-    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        if (entries[0]?.isIntersecting) {
-          startRoll();
-          observer.disconnect();
-        }
-      }, { threshold: 0.05 });
-
-      observer.observe(el);
-      const fallbackTimer = setTimeout(() => {
-        if (!hasStartedRef.current) startRoll();
-      }, 250);
-
-      return () => {
-        observer.disconnect();
-        clearTimeout(fallbackTimer);
+    if (!hasStartedRef.current) {
+      const triggerStart = () => {
+        if (hasStartedRef.current) return;
+        hasStartedRef.current = true;
+        setDisplayValue(0);
+        animateTo(0, numericTarget, duration, false);
       };
+
+      if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          if (entries[0]?.isIntersecting) {
+            triggerStart();
+            observer.disconnect();
+          }
+        }, { threshold: 0.05 });
+
+        observer.observe(el);
+        const timer = setTimeout(triggerStart, 250);
+
+        return () => {
+          observer.disconnect();
+          clearTimeout(timer);
+          if (rafRef.current !== null) {
+            cancelAnimationFrame(rafRef.current);
+          }
+        };
+      } else {
+        triggerStart();
+        return () => {
+          if (rafRef.current !== null) {
+            cancelAnimationFrame(rafRef.current);
+          }
+        };
+      }
     } else {
-      startRoll();
+      if (prevTargetRef.current !== numericTarget) {
+        prevTargetRef.current = numericTarget;
+        animateTo(currentValRef.current, numericTarget, 800, true);
+      }
+      return () => {
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+        }
+      };
     }
   }, [numericTarget, duration]);
 
-  useEffect(() => {
-    if (hasStartedRef.current) {
-      setDisplayValue(numericTarget);
-    }
-  }, [numericTarget]);
+  const formattedDisplay = numericTarget % 1 !== 0
+    ? displayValue.toFixed(1)
+    : Math.round(displayValue).toLocaleString();
 
   return (
     <span 
       ref={elementRef} 
-      className={`inline-block font-mono tracking-tight transition-transform duration-300 ${
+      className={`inline-block font-mono tracking-tight transition-all duration-300 ${
         isFinished ? 'animate-counter-finish' : ''
-      }`}
+      } ${hasUpdated ? 'text-lime-300 scale-105 drop-shadow-[0_0_12px_rgba(163,230,53,0.8)]' : ''}`}
     >
-      {(displayValue || numericTarget).toLocaleString()}{suffix}
+      {formattedDisplay}{suffix}
     </span>
   );
 }
@@ -155,9 +201,9 @@ export default function Home() {
 
   // Live YouTube Subscribers State (Real-time count for Floor Frost)
   const [subStats, setSubStats] = useState({
-    subscriberCount: "1,520",
-    viewCount: "534K",
-    videoCount: "95",
+    subscriberCount: "1,530",
+    viewCount: "538K",
+    videoCount: "96",
     demoMode: false
   });
 
@@ -187,8 +233,15 @@ export default function Home() {
     };
 
     fetchSubscribers();
-    const interval = setInterval(fetchSubscribers, 30000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchSubscribers, 15000);
+
+    const handleFocus = () => fetchSubscribers();
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // Live YouTube Videos State (Fetched automatically from @FloorFrost channel)

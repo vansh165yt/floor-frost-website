@@ -19,7 +19,7 @@ export default function Header({
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [subStats, setSubStats] = useState({
-    subscriberCount: "1,520"
+    subscriberCount: "1,530"
   });
 
   // Fetch Live Subscribers
@@ -42,8 +42,15 @@ export default function Header({
     };
 
     fetchSubscribers();
-    const interval = setInterval(fetchSubscribers, 30000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchSubscribers, 15000);
+
+    const handleFocus = () => fetchSubscribers();
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // Close menu on pressing Escape key
