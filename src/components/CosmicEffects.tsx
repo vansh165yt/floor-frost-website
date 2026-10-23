@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function CosmicEffects() {
+  const pathname = usePathname();
   const [isScrolling, setIsScrolling] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isPointerDevice, setIsPointerDevice] = useState(false);
@@ -252,7 +254,7 @@ export default function CosmicEffects() {
     };
   }, []);
 
-  // 3. Automated IntersectionObserver Scroll Reveal Engine
+  // 3. Automated IntersectionObserver Scroll Reveal Engine (Reacts instantly to Route Changes)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -268,30 +270,51 @@ export default function CosmicEffects() {
         });
       },
       {
-        threshold: 0.05,
-        rootMargin: '0px 0px 50px 0px'
+        threshold: 0.01,
+        rootMargin: '0px 0px 100px 0px'
       }
     );
 
     const observeElements = () => {
       const elements = document.querySelectorAll(revealSelectors);
+      const viewportHeight = window.innerHeight || 800;
       elements.forEach((el) => {
-        if (!el.classList.contains('is-revealed')) {
+        const rect = el.getBoundingClientRect();
+        // If element is already in or near viewport, reveal immediately
+        if (rect.top < viewportHeight + 150 && rect.bottom > -50) {
+          el.classList.add('is-revealed');
+        } else if (!el.classList.contains('is-revealed')) {
           observer.observe(el);
         }
       });
     };
 
     observeElements();
-    const t1 = setTimeout(observeElements, 500);
-    const t2 = setTimeout(observeElements, 1500);
+    const t0 = setTimeout(observeElements, 50);
+    const t1 = setTimeout(observeElements, 200);
+    const t2 = setTimeout(observeElements, 600);
+    const t3 = setTimeout(observeElements, 1200);
+
+    // Mutation observer for dynamically rendered client components
+    let mutationObserver: MutationObserver | null = null;
+    try {
+      mutationObserver = new MutationObserver(() => {
+        observeElements();
+      });
+      mutationObserver.observe(document.body, { childList: true, subtree: true });
+    } catch {
+      // fallback
+    }
 
     return () => {
+      clearTimeout(t0);
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
+      if (mutationObserver) mutationObserver.disconnect();
       observer.disconnect();
     };
-  }, []);
+  }, [pathname]);
 
   // 4. Interactive 3D Perspective Tilt & Specular Glare (Pointer Devices Only)
   useEffect(() => {

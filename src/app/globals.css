@@ -456,6 +456,21 @@ html {
   will-change: auto !important;
 }
 
+/* Foolproof Auto-Reveal Fallback to Guarantee Zero Blank Page Navigation */
+@keyframes autoRevealFallback {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.scroll-fade-up,
+.scroll-scale-in,
+.scroll-slide-left,
+.scroll-slide-right {
+  animation: autoRevealFallback 0.01s ease 0.45s forwards;
+}
+
 /* Off-screen Render Optimizer */
 .content-auto {
   content-visibility: auto;

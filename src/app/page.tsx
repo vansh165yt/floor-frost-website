@@ -500,6 +500,19 @@ export default function Home() {
     const startTime = Date.now();
     const minVisualTime = 2000; // 2 seconds minimum visual display for buttery-smooth experience
 
+    // Guaranteed failsafe: never block screen longer than 3.5s under slow network
+    const maxSafetyTimeout = setTimeout(() => {
+      setDisplayPercent(100);
+      setIsLoading(false);
+      try {
+        sessionStorage.setItem('frost_home_visited', 'true');
+      } catch (e) {}
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      setIsLoaderVisible(false);
+      renderFrameRef.current?.(1);
+    }, 3500);
+
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const timeRatio = Math.min(1, elapsed / minVisualTime);
@@ -515,6 +528,7 @@ export default function Home() {
 
       // ONLY finish when all 150 frames are fully downloaded AND minimum 2s visual animation complete
       if (loadedCountRef.current >= 150 && elapsed >= minVisualTime) {
+        clearTimeout(maxSafetyTimeout);
         setDisplayPercent(100);
         clearInterval(interval);
 
@@ -538,6 +552,7 @@ export default function Home() {
     }, 30);
 
     return () => {
+      clearTimeout(maxSafetyTimeout);
       clearInterval(interval);
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
