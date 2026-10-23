@@ -9,107 +9,182 @@ const NO_CACHE_HEADERS = {
   'Expires': '0',
 };
 
-// Fallback 10 videos of the last 10 days from @FloorFrost
-const FALLBACK_10_DAYS_VIDEOS = [
+// Helper: parse ISO 8601 duration e.g. PT28S, PT27M49S
+function parseDuration(pt?: string): { formatted: string; seconds: number; isShort: boolean } {
+  if (!pt) return { formatted: '0:28', seconds: 28, isShort: true };
+  const match = pt.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return { formatted: '0:28', seconds: 28, isShort: true };
+  const hours = parseInt(match[1] || '0', 10);
+  const minutes = parseInt(match[2] || '0', 10);
+  const seconds = parseInt(match[3] || '0', 10);
+  const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+  const formatted = hours > 0
+    ? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    : `${minutes}:${String(seconds).padStart(2, '0')}`;
+  // YouTube shorts are under 3 minutes, typically <= 60s
+  const isShort = totalSeconds <= 180;
+  return { formatted, seconds: totalSeconds, isShort };
+}
+
+// Fallback Shorts from @FloorFrost
+const FALLBACK_SHORTS = [
+  {
+    id: "0hD5rlnc0Wo",
+    title: "The Secret To Ultra Graphics In Minecraft 🤫",
+    description: "Insane ultra graphics trick in Minecraft with realistic shaders.",
+    publishedAt: "Uploaded Today",
+    rawPublishedAt: "2026-10-01T07:30:00Z",
+    thumbnail: "https://i.ytimg.com/vi/0hD5rlnc0Wo/hqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=0hD5rlnc0Wo",
+    embedUrl: "https://www.youtube.com/embed/0hD5rlnc0Wo",
+    duration: "0:28",
+    durationSeconds: 28,
+    isShort: true,
+    type: "short"
+  },
+  {
+    id: "8HODRJZltSQ",
+    title: "Vanilla vs Ultra Shaders in Minecraft — The Difference Is Insane 😱",
+    description: "Side by side comparison of default vanilla Minecraft vs ultra realistic shaders.",
+    publishedAt: "1 day ago",
+    rawPublishedAt: "2026-09-30T07:30:00Z",
+    thumbnail: "https://i.ytimg.com/vi/8HODRJZltSQ/hqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=8HODRJZltSQ",
+    embedUrl: "https://www.youtube.com/embed/8HODRJZltSQ",
+    duration: "0:28",
+    durationSeconds: 28,
+    isShort: true,
+    type: "short"
+  },
   {
     id: "Ms4_Smdr5Gw",
     title: "I Tested 50+ Minecraft Shaders — These Are INSANE ✨",
     description: "Testing over 50 Minecraft shaders to find the most visually stunning graphics and realistic lighting in 2026.",
-    publishedAt: "Uploaded Today",
+    publishedAt: "2 days ago",
     rawPublishedAt: "2026-09-29T07:30:26Z",
     thumbnail: "https://i.ytimg.com/vi/Ms4_Smdr5Gw/maxresdefault.jpg",
     url: "https://www.youtube.com/watch?v=Ms4_Smdr5Gw",
-    embedUrl: "https://www.youtube.com/embed/Ms4_Smdr5Gw"
+    embedUrl: "https://www.youtube.com/embed/Ms4_Smdr5Gw",
+    duration: "0:28",
+    durationSeconds: 28,
+    isShort: true,
+    type: "short"
   },
   {
     id: "E0W9b_ROk14",
     title: "Minecraft Shaders Make the Game 100x Better 🤯",
     description: "Watch how Minecraft visuals change completely with these top-tier ultra realistic shader settings.",
-    publishedAt: "1 day ago",
+    publishedAt: "3 days ago",
     rawPublishedAt: "2026-09-28T07:30:17Z",
     thumbnail: "https://i.ytimg.com/vi/E0W9b_ROk14/maxresdefault.jpg",
     url: "https://www.youtube.com/watch?v=E0W9b_ROk14",
-    embedUrl: "https://www.youtube.com/embed/E0W9b_ROk14"
+    embedUrl: "https://www.youtube.com/embed/E0W9b_ROk14",
+    duration: "0:28",
+    durationSeconds: 28,
+    isShort: true,
+    type: "short"
   },
   {
     id: "8ru4SjK_UiY",
     title: "Which Shader Is The Best Part 77! #minecraft #shaders",
     description: "Part 77 of our best shader comparison showdown! Which shader wins your vote?",
-    publishedAt: "2 days ago",
+    publishedAt: "4 days ago",
     rawPublishedAt: "2026-09-27T07:30:15Z",
     thumbnail: "https://i.ytimg.com/vi/8ru4SjK_UiY/maxresdefault.jpg",
     url: "https://www.youtube.com/watch?v=8ru4SjK_UiY",
-    embedUrl: "https://www.youtube.com/embed/8ru4SjK_UiY"
+    embedUrl: "https://www.youtube.com/embed/8ru4SjK_UiY",
+    duration: "0:28",
+    durationSeconds: 28,
+    isShort: true,
+    type: "short"
   },
   {
     id: "J1InW-aepkY",
     title: "I Transformed My Minecraft World With This 1 Shader 😱",
     description: "One single shader pack that completely redefines skies, water reflections, and ray-traced shadows.",
-    publishedAt: "3 days ago",
+    publishedAt: "5 days ago",
     rawPublishedAt: "2026-09-26T07:30:38Z",
     thumbnail: "https://i.ytimg.com/vi/J1InW-aepkY/maxresdefault.jpg",
     url: "https://www.youtube.com/watch?v=J1InW-aepkY",
-    embedUrl: "https://www.youtube.com/embed/J1InW-aepkY"
+    embedUrl: "https://www.youtube.com/embed/J1InW-aepkY",
+    duration: "0:28",
+    durationSeconds: 28,
+    isShort: true,
+    type: "short"
   },
   {
     id: "hX8G4eoiVFc",
     title: "I Found The Most Realistic Minecraft Shader 2026",
     description: "Insane ray tracing lighting, lush foliage swaying, and water caustics in 4K resolution.",
-    publishedAt: "4 days ago",
+    publishedAt: "6 days ago",
     rawPublishedAt: "2026-09-25T07:30:33Z",
     thumbnail: "https://i.ytimg.com/vi/hX8G4eoiVFc/maxresdefault.jpg",
     url: "https://www.youtube.com/watch?v=hX8G4eoiVFc",
-    embedUrl: "https://www.youtube.com/embed/hX8G4eoiVFc"
-  },
-  {
-    id: "EKmMj0sw38E",
-    title: "Minecraft Shader Comparison Which is Truly Most Realistic ?",
-    description: "Head-to-head comparison of the most popular shaders side-by-side with vanilla gameplay.",
-    publishedAt: "5 days ago",
-    rawPublishedAt: "2026-09-24T07:30:38Z",
-    thumbnail: "https://i.ytimg.com/vi/EKmMj0sw38E/maxresdefault.jpg",
-    url: "https://www.youtube.com/watch?v=EKmMj0sw38E",
-    embedUrl: "https://www.youtube.com/embed/EKmMj0sw38E"
+    embedUrl: "https://www.youtube.com/embed/hX8G4eoiVFc",
+    duration: "0:28",
+    durationSeconds: 28,
+    isShort: true,
+    type: "short"
   },
   {
     id: "hh0FgSVHVKk",
     title: "I Tested The Best Minecraft Shaders 😲 #1 Will Surprise You",
     description: "Surprising ranking of top shader packs tested for both performance FPS and visuals.",
-    publishedAt: "6 days ago",
+    publishedAt: "7 days ago",
     rawPublishedAt: "2026-09-23T07:30:31Z",
     thumbnail: "https://i.ytimg.com/vi/hh0FgSVHVKk/maxresdefault.jpg",
     url: "https://www.youtube.com/watch?v=hh0FgSVHVKk",
-    embedUrl: "https://www.youtube.com/embed/hh0FgSVHVKk"
+    embedUrl: "https://www.youtube.com/embed/hh0FgSVHVKk",
+    duration: "0:28",
+    durationSeconds: 28,
+    isShort: true,
+    type: "short"
+  }
+];
+
+// Fallback Long / Full-Length Videos & Series from @FloorFrost
+const FALLBACK_LONG_VIDEOS = [
+  {
+    id: "15jYDYxiqTM",
+    title: "I Bought the McLaren Senna in Forza Horizon 5... Is It Worth It? 🏎️💸",
+    description: "Testing the McLaren Senna with maximum upgrades and extreme high-speed highway testing in Forza Horizon 5 Hindi gameplay.",
+    publishedAt: "Featured Gameplay",
+    rawPublishedAt: "2026-09-10T12:00:00Z",
+    thumbnail: "https://i.ytimg.com/vi/15jYDYxiqTM/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=15jYDYxiqTM",
+    embedUrl: "https://www.youtube.com/embed/15jYDYxiqTM",
+    duration: "27:49",
+    durationSeconds: 1669,
+    isShort: false,
+    type: "video"
   },
   {
-    id: "JiFKmveIiIA",
-    title: "I Tested 20 ULTRA Shaders So You Don't Have To ⚡😱",
-    description: "20 heavy ultra shader packs tested on extreme settings. Which one run smoothest?",
-    publishedAt: "7 days ago",
-    rawPublishedAt: "2026-09-22T07:30:19Z",
-    thumbnail: "https://i.ytimg.com/vi/JiFKmveIiIA/maxresdefault.jpg",
-    url: "https://www.youtube.com/watch?v=JiFKmveIiIA",
-    embedUrl: "https://www.youtube.com/embed/JiFKmveIiIA"
+    id: "c52GnSm2uI0",
+    title: "I Tried Forza Horizon 5 For The First Time! 🏎️ Ep 1 Hindi",
+    description: "First time experience in Mexico festival with supercars, off-roading, and extreme high-speed racing in Hindi.",
+    publishedAt: "Episode 1",
+    rawPublishedAt: "2026-09-08T12:00:00Z",
+    thumbnail: "https://i.ytimg.com/vi/c52GnSm2uI0/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=c52GnSm2uI0",
+    embedUrl: "https://www.youtube.com/embed/c52GnSm2uI0",
+    duration: "22:15",
+    durationSeconds: 1335,
+    isShort: false,
+    type: "video"
   },
   {
-    id: "pBPorvvyxds",
-    title: "Is This the MOST REALISTIC Shader for Minecraft? 🔥 (Test)",
-    description: "In-depth graphics analysis and biome showcase of this realistic shader test.",
-    publishedAt: "8 days ago",
-    rawPublishedAt: "2026-09-21T07:30:01Z",
-    thumbnail: "https://i.ytimg.com/vi/pBPorvvyxds/maxresdefault.jpg",
-    url: "https://www.youtube.com/watch?v=pBPorvvyxds",
-    embedUrl: "https://www.youtube.com/embed/pBPorvvyxds"
-  },
-  {
-    id: "4p6T7W9lCkw",
-    title: "I tested the most realistic Minecraft shader pack ever 🌄",
-    description: "Breathtaking sunset and sunrise lighting showcase with photorealistic clouds.",
-    publishedAt: "9 days ago",
-    rawPublishedAt: "2026-09-20T07:30:38Z",
-    thumbnail: "https://i.ytimg.com/vi/4p6T7W9lCkw/maxresdefault.jpg",
-    url: "https://www.youtube.com/watch?v=4p6T7W9lCkw",
-    embedUrl: "https://www.youtube.com/embed/4p6T7W9lCkw"
+    id: "iCT_nI2IY4s",
+    title: "Minecraft Survival Hindi 🪓🏠 | First House + Tools Setup ⚒️✨",
+    description: "Floor Frost Minecraft survival episode 1 in Hindi. Crafting first stone & iron tools, exploring biomes, and building our base.",
+    publishedAt: "Survival Series",
+    rawPublishedAt: "2026-09-05T12:00:00Z",
+    thumbnail: "https://i.ytimg.com/vi/iCT_nI2IY4s/maxresdefault.jpg",
+    url: "https://www.youtube.com/watch?v=iCT_nI2IY4s",
+    embedUrl: "https://www.youtube.com/embed/iCT_nI2IY4s",
+    duration: "18:32",
+    durationSeconds: 1112,
+    isShort: false,
+    type: "video"
   }
 ];
 
@@ -159,9 +234,28 @@ const FALLBACK_YOUTUBE_POSTS = [
   }
 ];
 
+// In-Memory Server Cache to strictly protect YouTube API Quota (10,000 units/day)
+// Cache for 5 minutes (300,000ms): At most 288 calls to YouTube API in 24 hours (only ~864 units/day out of 10,000!)
+let cachedVideoResponse: any = null;
+let lastVideoFetchTime = 0;
+const VIDEOS_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 export async function GET(request: NextRequest) {
   const apiKey = process.env.YOUTUBE_API_KEY || 'AIzaSyBUsCHTIIfcuUOG1FIFbNLZSfKVimEsqJM';
   const channelId = process.env.YOUTUBE_CHANNEL_ID || 'UCRmkfvlZjgkCOZUqJenJC3A';
+
+  const nowMs = Date.now();
+
+  // If cached data is still fresh (under 5 mins), return immediately with ZERO quota usage
+  if (cachedVideoResponse && (nowMs - lastVideoFetchTime) < VIDEOS_CACHE_DURATION) {
+    return NextResponse.json({
+      ...cachedVideoResponse,
+      cached: true,
+      cacheRemainingSeconds: Math.round((VIDEOS_CACHE_DURATION - (nowMs - lastVideoFetchTime)) / 1000)
+    }, {
+      headers: NO_CACHE_HEADERS
+    });
+  }
 
   const searchParams = request.nextUrl.searchParams;
   const limitParam = searchParams.get('limit');
@@ -175,15 +269,35 @@ export async function GET(request: NextRequest) {
     const tenDaysMs = 10 * 24 * 60 * 60 * 1000;
 
     // 1. Fetch channel uploads playlist items
+    let allVideos: any[] = [];
     const videosRes = await fetch(
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&key=${apiKey}&maxResults=${maxResults}`,
       { cache: 'no-store' }
     );
 
-    let allVideos: any[] = [];
     if (videosRes.ok) {
       const vData = await videosRes.json();
       const items = vData.items || [];
+      const videoIds = items.map((i: any) => i.contentDetails?.videoId || i.snippet?.resourceId?.videoId).filter(Boolean);
+
+      // Fetch video details (duration, statistics)
+      const detailsMap = new Map<string, any>();
+      if (videoIds.length > 0) {
+        try {
+          const detRes = await fetch(
+            `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${videoIds.join(',')}&key=${apiKey}`,
+            { cache: 'no-store' }
+          );
+          if (detRes.ok) {
+            const detData = await detRes.json();
+            for (const item of detData.items || []) {
+              detailsMap.set(item.id, item);
+            }
+          }
+        } catch (e) {
+          console.error("Failed to fetch video details:", e);
+        }
+      }
 
       allVideos = items.map((item: any) => {
         const videoId = item.contentDetails?.videoId || item.snippet?.resourceId?.videoId;
@@ -205,9 +319,16 @@ export async function GET(request: NextRequest) {
         else if (diffDays > 1 && diffDays < 30) relativeTime = `${diffDays} days ago`;
         else if (diffDays >= 30) relativeTime = pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+        const videoDetail = detailsMap.get(videoId);
+        const durationISO = videoDetail?.contentDetails?.duration;
+        const durInfo = parseDuration(durationISO);
+
+        const titleText = snippet.title || 'Floor Frost Video';
+        const isShort = durInfo.isShort || titleText.toLowerCase().includes('#short') || durInfo.seconds <= 180;
+
         return {
           id: videoId,
-          title: snippet.title || 'Floor Frost Video',
+          title: titleText,
           description: snippet.description || '',
           publishedAt: relativeTime,
           rawPublishedAt: snippet.publishedAt,
@@ -215,18 +336,42 @@ export async function GET(request: NextRequest) {
           isWithin10Days: diffMs <= tenDaysMs,
           thumbnail: thumbnailUrl,
           url: `https://www.youtube.com/watch?v=${videoId}`,
-          embedUrl: `https://www.youtube.com/embed/${videoId}`
+          embedUrl: `https://www.youtube.com/embed/${videoId}`,
+          duration: durInfo.formatted,
+          durationSeconds: durInfo.seconds,
+          isShort: isShort,
+          type: isShort ? 'short' : 'video'
         };
       });
     }
 
-    let last10DaysVideos = allVideos.filter(v => v.isWithin10Days);
-    if (last10DaysVideos.length === 0) {
-      last10DaysVideos = FALLBACK_10_DAYS_VIDEOS;
+    if (allVideos.length === 0) {
+      allVideos = [...FALLBACK_SHORTS, ...FALLBACK_LONG_VIDEOS];
     }
 
-    if (allVideos.length === 0) {
-      allVideos = FALLBACK_10_DAYS_VIDEOS;
+    // Separate into Shorts and Long Videos
+    let shorts = allVideos.filter(v => v.isShort);
+    let longVideos = allVideos.filter(v => !v.isShort);
+
+    // If channel mostly has shorts recently, supplement long videos with fallback long videos
+    if (longVideos.length === 0) {
+      longVideos = FALLBACK_LONG_VIDEOS;
+    } else {
+      // Ensure key series like Forza and Minecraft survival are also accessible if missing
+      for (const fv of FALLBACK_LONG_VIDEOS) {
+        if (!longVideos.some(lv => lv.id === fv.id)) {
+          longVideos.push(fv);
+        }
+      }
+    }
+
+    if (shorts.length === 0) {
+      shorts = FALLBACK_SHORTS;
+    }
+
+    let last10DaysVideos = allVideos.filter(v => v.isWithin10Days);
+    if (last10DaysVideos.length === 0) {
+      last10DaysVideos = allVideos.slice(0, 10);
     }
 
     // 2. Fetch Channel Playlists
@@ -260,9 +405,8 @@ export async function GET(request: NextRequest) {
       playlists = FALLBACK_PLAYLISTS;
     }
 
-    // 3. Fetch YouTube Community Posts ONLY (Max 5, or whatever is available)
+    // 3. Fetch YouTube Community Posts ONLY (Max 5)
     const fetchedPosts: any[] = [];
-
     try {
       const ytPostsRes = await fetch('https://www.youtube.com/@floorfrost/posts', {
         headers: {
@@ -308,24 +452,35 @@ export async function GET(request: NextRequest) {
       console.error("YT Community posts fetch error:", e);
     }
 
-    // Only return available real posts, capped at max 5 (no padding with dummy posts)
     const finalPosts = (fetchedPosts.length > 0 ? fetchedPosts : FALLBACK_YOUTUBE_POSTS).slice(0, 5);
 
-    return NextResponse.json({
-      latestVideo: last10DaysVideos[0] || allVideos[0] || null,
+    const responseData = {
+      latestVideo: allVideos[0] || FALLBACK_SHORTS[0],
       videos: allVideos,
+      shorts: shorts,
+      longVideos: longVideos,
       last10DaysVideos: last10DaysVideos,
       playlists: playlists,
       posts: finalPosts
-    }, {
+    };
+
+    cachedVideoResponse = responseData;
+    lastVideoFetchTime = now.getTime();
+
+    return NextResponse.json(responseData, {
       headers: NO_CACHE_HEADERS
     });
   } catch (error: any) {
     console.error("Failed to fetch videos and ecosystem data:", error);
+    if (cachedVideoResponse) {
+      return NextResponse.json({ ...cachedVideoResponse, fromFallback: true }, { status: 200, headers: NO_CACHE_HEADERS });
+    }
     return NextResponse.json({
-      latestVideo: FALLBACK_10_DAYS_VIDEOS[0],
-      videos: FALLBACK_10_DAYS_VIDEOS,
-      last10DaysVideos: FALLBACK_10_DAYS_VIDEOS,
+      latestVideo: FALLBACK_SHORTS[0],
+      videos: [...FALLBACK_SHORTS, ...FALLBACK_LONG_VIDEOS],
+      shorts: FALLBACK_SHORTS,
+      longVideos: FALLBACK_LONG_VIDEOS,
+      last10DaysVideos: FALLBACK_SHORTS,
       playlists: FALLBACK_PLAYLISTS,
       posts: FALLBACK_YOUTUBE_POSTS.slice(0, 5),
       error: error.message || "Using fallback videos data"

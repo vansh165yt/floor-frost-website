@@ -19,23 +19,27 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/logo.png",
+        source: "/:all*(svg|jpg|jpeg|png|webp|avif|ico|woff|woff2)",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=86400, stale-while-revalidate=604800",
+            value: "public, max-age=31536000, stale-while-revalidate=86400",
           },
         ],
       },
       {
-        source: "/pingu-logo.png",
+        source: "/:path*",
         headers: [
           {
-            key: "Cache-Control",
-            value: "public, max-age=86400, stale-while-revalidate=604800",
+            key: "X-DNS-Prefetch-Control",
+            value: "on"
           },
-        ],
-      },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff"
+          }
+        ]
+      }
     ];
   },
   experimental: {

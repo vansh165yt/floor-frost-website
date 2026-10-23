@@ -2,9 +2,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import NextImage from 'next/image';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import DiscordAnnouncements from '@/components/DiscordAnnouncements';
-import Frost3DScene from '@/components/Frost3DScene';
+
+const Frost3DScene = dynamic(() => import('@/components/Frost3DScene'), {
+  ssr: false,
+});
 
 // High-Tech Slot/Roll-up Number Counter with Finish Flash
 function AnimatedCounter({ 
@@ -151,7 +155,6 @@ export default function Home() {
   const descRef = useRef<HTMLParagraphElement>(null);
   const btnContainerRef = useRef<HTMLDivElement>(null);
   const scrollHintRef = useRef<HTMLDivElement>(null);
-  const [activeCategory, setActiveCategory] = useState('All');
 
   // Dedicated Preloader and Image References
   const imagesRef = useRef<HTMLImageElement[]>([]);
@@ -164,28 +167,9 @@ export default function Home() {
   const [actualLoaded, setActualLoaded] = useState(0);
   const [displayPercent, setDisplayPercent] = useState(0);
 
-  // Only show loader if user has never visited home page in this session
-  const [isLoading, setIsLoading] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        return sessionStorage.getItem('frost_home_visited') !== 'true';
-      } catch (e) {
-        return true;
-      }
-    }
-    return true;
-  });
-
-  const [isLoaderVisible, setIsLoaderVisible] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        return sessionStorage.getItem('frost_home_visited') !== 'true';
-      } catch (e) {
-        return true;
-      }
-    }
-    return true;
-  });
+  // Both server and client start with identical initial state to eliminate hydration mismatch
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoaderVisible, setIsLoaderVisible] = useState(true);
 
   // Immediate check on mount to ensure return visits never display the loader
   useEffect(() => {
@@ -233,14 +217,23 @@ export default function Home() {
     };
 
     fetchSubscribers();
-    const interval = setInterval(fetchSubscribers, 15000);
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      fetchSubscribers();
+    }, 45000);
 
-    const handleFocus = () => fetchSubscribers();
+    const handleFocus = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        fetchSubscribers();
+      }
+    };
     window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
 
     return () => {
       clearInterval(interval);
       window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
 
@@ -248,6 +241,10 @@ export default function Home() {
   const [videoList, setVideoList] = useState<any[]>([]);
   const [featuredVideo, setFeaturedVideo] = useState<any>(null);
   const [isPlayingFeatured, setIsPlayingFeatured] = useState(false);
+  const [shortsList, setShortsList] = useState<any[]>([]);
+  const [longVideosList, setLongVideosList] = useState<any[]>([]);
+  const [playlistsList, setPlaylistsList] = useState<any[]>([]);
+  const [activeMediaFilter, setActiveMediaFilter] = useState<'shorts' | 'videos' | 'playlists'>('shorts');
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -259,6 +256,15 @@ export default function Home() {
             setVideoList(data.videos);
             setFeaturedVideo(data.latestVideo || data.videos[0]);
           }
+          if (data.shorts && data.shorts.length > 0) {
+            setShortsList(data.shorts);
+          }
+          if (data.longVideos && data.longVideos.length > 0) {
+            setLongVideosList(data.longVideos);
+          }
+          if (data.playlists && data.playlists.length > 0) {
+            setPlaylistsList(data.playlists);
+          }
         }
       } catch (e) {
         console.error("Videos fetch error:", e);
@@ -266,8 +272,22 @@ export default function Home() {
     };
 
     fetchVideos();
-    const interval = setInterval(fetchVideos, 60000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      fetchVideos();
+    }, 60000);
+
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        fetchVideos();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   // Smooth Instant-Response Auto-Scroll to Welcome Text when returning from other pages
@@ -358,55 +378,6 @@ export default function Home() {
     { name: "NINTENDO", icon: "🍄" },
     { name: "FLOOR FROST HQ", icon: "❄️" }
   ];
-
-  const videoCategories = ['All', 'Walkthroughs', 'Pro Strategies', 'Challenges', 'Live Streams'];
-
-  const videos = [
-    {
-      id: 1,
-      title: "Ultimate Survival & World Building Ep. 1 - Frost Kingdom!",
-      game: "Walkthroughs",
-      views: "24K views",
-      duration: "24:15",
-      category: "Walkthroughs",
-      badge: "CREATIVE SERIES",
-      color: "from-emerald-900 to-teal-900"
-    },
-    {
-      id: 2,
-      title: "Unlocking The Secret Realm - Epic Walkthrough & Secrets",
-      game: "Pro Strategies",
-      views: "18K views",
-      duration: "18:40",
-      category: "Pro Strategies",
-      badge: "EPIC EXPLORATION",
-      color: "from-purple-900 to-pink-900"
-    },
-    {
-      id: 3,
-      title: "Conquering The Final Boss - Pro Tips & Tricks",
-      game: "Challenges",
-      views: "12K views",
-      duration: "32:10",
-      category: "Challenges",
-      badge: "PRO CHALLENGE",
-      color: "from-[#200b3b] to-[#40125c]"
-    },
-    {
-      id: 4,
-      title: "Funny Gaming Moments & High-Energy Stream Compilation",
-      game: "Live Streams",
-      views: "35K views",
-      duration: "15:00",
-      category: "Live Streams",
-      badge: "FUNNY MOMENTS",
-      color: "from-blue-900 to-indigo-900"
-    }
-  ];
-
-  const filteredVideos = activeCategory === 'All' 
-    ? videos 
-    : videos.filter(v => v.category === activeCategory);
 
   // 1. Unconditional Immediate Preload of all 150 Frames with Frame 1 Priority
   useEffect(() => {
@@ -1418,76 +1389,248 @@ export default function Home() {
             </div>
           )}
 
-          {/* Grid of 7 Recent YouTube Uploads (Excludes the #1 Latest Video) */}
-          <div className="w-full flex flex-col gap-4 mt-6">
-            <div className="flex items-center justify-between scroll-fade-up">
-              <h3 className="text-xl font-bold uppercase text-zinc-300 font-mono tracking-wider flex items-center gap-2">
-                <span>RECENT UPLOADS</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-900/60 border border-purple-500/30 text-purple-300 font-mono">
-                  7 VIDEOS
-                </span>
-              </h3>
+          {/* Interactive Media Tabs: Shorts, Long Videos, and Playlists (No Endless Scroll) */}
+          <div className="w-full flex flex-col gap-6 mt-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#120a22]/80 border border-purple-500/30 backdrop-blur-md">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                {/* Shorts Button */}
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaFilter('shorts')}
+                  className={`px-4 py-2 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                    activeMediaFilter === 'shorts'
+                      ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] border border-red-400'
+                      : 'bg-white/5 border border-white/10 text-zinc-300 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <span>⚡ Shorts</span>
+                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px]">
+                    {shortsList.length > 0 ? shortsList.length : '8'}
+                  </span>
+                </button>
+
+                {/* Long Videos Button */}
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaFilter('videos')}
+                  className={`px-4 py-2 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                    activeMediaFilter === 'videos'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.6)] border border-purple-400'
+                      : 'bg-white/5 border border-white/10 text-zinc-300 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <span>🎬 Long Videos</span>
+                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px]">
+                    {longVideosList.length > 0 ? longVideosList.length : '3'}
+                  </span>
+                </button>
+
+                {/* Playlists Button */}
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaFilter('playlists')}
+                  className={`px-4 py-2 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                    activeMediaFilter === 'playlists'
+                      ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.6)] border border-indigo-400'
+                      : 'bg-white/5 border border-white/10 text-zinc-300 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <span>📁 Playlists</span>
+                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px]">
+                    {playlistsList.length > 0 ? playlistsList.length : '2'}
+                  </span>
+                </button>
+              </div>
+
+              <a
+                href="/videos"
+                className="text-xs font-mono text-purple-300 hover:text-white px-3 py-1.5 rounded-xl bg-purple-500/20 border border-purple-400/30 hover:bg-purple-500/30 transition-all flex items-center gap-1.5"
+              >
+                <span>Full Videos Hub ↗</span>
+              </a>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-              {(videoList.length > 0 
-                ? videoList.filter((v: any) => v.id !== videoList[0]?.id).slice(0, 7) 
-                : [
-                  { id: 'J1InW-aepkY', title: 'I Transformed My Minecraft World With This 1 Shader 😱', publishedAt: '1 day ago', thumbnail: 'https://img.youtube.com/vi/J1InW-aepkY/maxresdefault.jpg' },
-                  { id: 'hX8G4eoiVFc', title: 'I Found The Most Realistic Minecraft Shader 2026', publishedAt: '2 days ago', thumbnail: 'https://img.youtube.com/vi/hX8G4eoiVFc/maxresdefault.jpg' },
-                  { id: 'EKmMj0sw38E', title: 'Minecraft Shader Comparison Which is Truly Most Realistic ?', publishedAt: '3 days ago', thumbnail: 'https://img.youtube.com/vi/EKmMj0sw38E/maxresdefault.jpg' },
-                  { id: 'hh0FgSVHVKk', title: 'I Tested The Best Minecraft Shaders 😲 #1 Will Surprise You', publishedAt: '4 days ago', thumbnail: 'https://img.youtube.com/vi/hh0FgSVHVKk/maxresdefault.jpg' },
-                  { id: 'JiFKmveIiIA', title: "I Tested 20 ULTRA Shaders So You Don't Have To ⚡😱", publishedAt: '5 days ago', thumbnail: 'https://img.youtube.com/vi/JiFKmveIiIA/maxresdefault.jpg' },
-                  { id: '8ru4SjK_UiY_7', title: 'Which Shader Is The Best Part 76! #minecraft', publishedAt: '6 days ago', thumbnail: 'https://img.youtube.com/vi/8ru4SjK_UiY/hqdefault.jpg' },
-                  { id: 'J1InW-aepkY_8', title: 'ULTRA Realistic Minecraft Gameplay & Shaders Guide', publishedAt: '7 days ago', thumbnail: 'https://img.youtube.com/vi/J1InW-aepkY/hqdefault.jpg' }
-                ]
-              ).map((video: any, idx: number) => (
-                <div
-                  key={video.id}
-                  data-reveal-delay={String(Math.min(500, (idx + 1) * 75))}
-                  data-cursor="play"
-                  onClick={() => {
-                    setFeaturedVideo(video);
-                    setIsPlayingFeatured(true);
-                    window.scrollTo({ top: (document.getElementById('videos')?.offsetTop || 0) + 100, behavior: 'smooth' });
-                  }}
-                  className="group relative rounded-2xl overflow-hidden bg-zinc-950 border border-purple-900/40 hover:border-purple-400/80 hover:shadow-[0_0_35px_rgba(168,85,247,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer tilt-card scroll-fade-up shimmer-glass-card"
-                >
-                  <div className="tilt-glare" />
-                  <div className="h-44 w-full relative overflow-hidden bg-black">
-                    <img
-                      src={video.thumbnail}
-                      alt={video.title}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
-                    
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-12 h-12 rounded-full bg-red-600 text-white flex items-center justify-center shadow-[0_0_25px_rgba(239,68,68,0.7)] group-hover:scale-110 transition-transform">
-                        <span className="text-xl ml-0.5">▶</span>
+            {/* Content view depending on activeMediaFilter */}
+            {activeMediaFilter === 'shorts' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 w-full animate-portal-fade">
+                {(shortsList.length > 0 
+                  ? shortsList.slice(0, 8) 
+                  : [
+                    { id: '0hD5rlnc0Wo', title: 'The Secret To Ultra Graphics In Minecraft 🤫', publishedAt: 'Today', duration: '0:28', thumbnail: 'https://img.youtube.com/vi/0hD5rlnc0Wo/hqdefault.jpg' },
+                    { id: '8HODRJZltSQ', title: 'Vanilla vs Ultra Shaders in Minecraft — The Difference Is Insane 😱', publishedAt: '1 day ago', duration: '0:28', thumbnail: 'https://img.youtube.com/vi/8HODRJZltSQ/hqdefault.jpg' },
+                    { id: 'Ms4_Smdr5Gw', title: 'I Tested 50+ Minecraft Shaders — These Are INSANE ✨', publishedAt: '2 days ago', duration: '0:28', thumbnail: 'https://img.youtube.com/vi/Ms4_Smdr5Gw/hqdefault.jpg' },
+                    { id: 'E0W9b_ROk14', title: 'Minecraft Shaders Make the Game 100x Better 🤯', publishedAt: '3 days ago', duration: '0:28', thumbnail: 'https://img.youtube.com/vi/E0W9b_ROk14/hqdefault.jpg' },
+                    { id: '8ru4SjK_UiY', title: 'Which Shader Is The Best Part 77! #minecraft', publishedAt: '4 days ago', duration: '0:28', thumbnail: 'https://img.youtube.com/vi/8ru4SjK_UiY/hqdefault.jpg' },
+                    { id: 'J1InW-aepkY', title: 'I Transformed My Minecraft World With This 1 Shader 😱', publishedAt: '5 days ago', duration: '0:28', thumbnail: 'https://img.youtube.com/vi/J1InW-aepkY/hqdefault.jpg' },
+                    { id: 'hX8G4eoiVFc', title: 'I Found The Most Realistic Minecraft Shader 2026', publishedAt: '6 days ago', duration: '0:28', thumbnail: 'https://img.youtube.com/vi/hX8G4eoiVFc/hqdefault.jpg' },
+                    { id: 'hh0FgSVHVKk', title: 'I Tested The Best Minecraft Shaders 😲 #1 Will Surprise You', publishedAt: '7 days ago', duration: '0:28', thumbnail: 'https://img.youtube.com/vi/hh0FgSVHVKk/hqdefault.jpg' }
+                  ]
+                ).map((short: any, idx: number) => (
+                  <div
+                    key={short.id}
+                    data-reveal-delay={String(Math.min(500, (idx + 1) * 75))}
+                    data-cursor="play"
+                    onClick={() => {
+                      setFeaturedVideo(short);
+                      setIsPlayingFeatured(true);
+                      window.scrollTo({ top: (document.getElementById('videos')?.offsetTop || 0) + 100, behavior: 'smooth' });
+                    }}
+                    className="group relative rounded-2xl overflow-hidden bg-zinc-950 border border-red-950/60 hover:border-red-500/80 hover:shadow-[0_0_30px_rgba(239,68,68,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer tilt-card scroll-fade-up shimmer-glass-card"
+                  >
+                    <div className="tilt-glare" />
+                    <div className="h-48 w-full relative overflow-hidden bg-black">
+                      <img
+                        src={short.thumbnail}
+                        alt={short.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                      
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-12 h-12 rounded-full bg-red-600 text-white flex items-center justify-center shadow-[0_0_25px_rgba(239,68,68,0.8)] group-hover:scale-110 transition-transform">
+                          <span className="text-xl ml-0.5">▶</span>
+                        </div>
+                      </div>
+
+                      <div className="absolute top-2.5 left-2.5">
+                        <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider shadow-md border border-red-400/40">
+                          ⚡ SHORT
+                        </span>
+                      </div>
+
+                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/85 text-[10px] font-mono text-red-300 border border-red-500/30">
+                        {short.duration || '0:28'}
+                      </span>
+                    </div>
+
+                    <div className="p-3.5 flex flex-col gap-2">
+                      <h4 className="text-xs font-bold text-white group-hover:text-red-300 transition-colors line-clamp-2 leading-relaxed">
+                        {short.title}
+                      </h4>
+                      
+                      <div className="flex items-center justify-between text-[10px] font-mono text-red-400 font-semibold pt-1 border-t border-white/10">
+                        <span>Click to Play</span>
+                        <span>▶</span>
                       </div>
                     </div>
-
-                    <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-mono text-zinc-300">
-                      {video.publishedAt}
-                    </span>
                   </div>
+                ))}
+              </div>
+            )}
 
-                  <div className="p-4 flex flex-col gap-2">
-                    <h4 className="text-xs font-bold text-white group-hover:text-purple-300 transition-colors line-clamp-2 leading-relaxed">
-                      {video.title}
-                    </h4>
-                    
-                    <div className="flex items-center justify-between text-[10px] font-mono text-purple-400 font-semibold pt-1">
-                      <span>Click to Play</span>
-                      <span>▶</span>
+            {activeMediaFilter === 'videos' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full animate-portal-fade">
+                {(longVideosList.length > 0 
+                  ? longVideosList 
+                  : [
+                    { id: '15jYDYxiqTM', title: 'I Bought the McLaren Senna in Forza Horizon 5... Is It Worth It? 🏎️💸', duration: '27:49', publishedAt: 'Featured Gameplay', thumbnail: 'https://img.youtube.com/vi/15jYDYxiqTM/maxresdefault.jpg' },
+                    { id: 'c52GnSm2uI0', title: 'I Tried Forza Horizon 5 For The First Time! 🏎️ Ep 1 Hindi', duration: '22:15', publishedAt: 'Episode 1', thumbnail: 'https://img.youtube.com/vi/c52GnSm2uI0/maxresdefault.jpg' },
+                    { id: 'iCT_nI2IY4s', title: 'Minecraft Survival Hindi 🪓🏠 | First House + Tools Setup ⚒️✨', duration: '18:32', publishedAt: 'Survival Series', thumbnail: 'https://img.youtube.com/vi/iCT_nI2IY4s/maxresdefault.jpg' }
+                  ]
+                ).map((video: any, idx: number) => (
+                  <div
+                    key={video.id}
+                    data-reveal-delay={String(Math.min(500, (idx + 1) * 75))}
+                    data-cursor="play"
+                    onClick={() => {
+                      setFeaturedVideo(video);
+                      setIsPlayingFeatured(true);
+                      window.scrollTo({ top: (document.getElementById('videos')?.offsetTop || 0) + 100, behavior: 'smooth' });
+                    }}
+                    className="group relative rounded-2xl overflow-hidden bg-zinc-950 border border-purple-900/40 hover:border-purple-400/80 hover:shadow-[0_0_35px_rgba(168,85,247,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer tilt-card scroll-fade-up shimmer-glass-card"
+                  >
+                    <div className="tilt-glare" />
+                    <div className="h-44 w-full relative overflow-hidden bg-black">
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                      
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.8)] group-hover:scale-110 transition-transform">
+                          <span className="text-xl ml-0.5">▶</span>
+                        </div>
+                      </div>
+
+                      <div className="absolute top-2.5 left-2.5">
+                        <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider shadow-md border border-purple-400/40">
+                          🎬 FULL VIDEO
+                        </span>
+                      </div>
+
+                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/85 text-[10px] font-mono text-purple-300 border border-purple-500/30">
+                        ⏱️ {video.duration || '20:00+'}
+                      </span>
+                    </div>
+
+                    <div className="p-4 flex flex-col gap-2">
+                      <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-purple-300 transition-colors line-clamp-2 leading-relaxed">
+                        {video.title}
+                      </h4>
+                      
+                      <div className="flex items-center justify-between text-[10px] font-mono text-purple-400 font-semibold pt-1 border-t border-white/10">
+                        <span>Click to Play</span>
+                        <span>▶</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+
+            {activeMediaFilter === 'playlists' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full animate-portal-fade">
+                {(playlistsList.length > 0
+                  ? playlistsList
+                  : [
+                    { id: 'PLH2CdBxERGq8', title: 'Forza Horizon 5: The Hindi Racing Journey 🚗💨', itemCount: 2, url: 'https://www.youtube.com/playlist?list=PLH2CdBxERGq8', thumbnail: 'https://i.ytimg.com/vi/15jYDYxiqTM/mqdefault.jpg', description: 'High-speed Hindi gameplay and track runs in Forza Horizon 5 with Floor Frost.' },
+                    { id: 'PLWzRHC_PVfI0', title: 'Minecraft Survival Hindi Series 🪓🏠⚒️', itemCount: 1, url: 'https://www.youtube.com/playlist?list=PLWzRHC_PVfI0', thumbnail: 'https://i.ytimg.com/vi/iCT_nI2IY4s/mqdefault.jpg', description: 'Epic Minecraft survival series with hyper-realistic shaders and architecture.' }
+                  ]
+                ).map((playlist: any) => (
+                  <a
+                    key={playlist.id}
+                    href={playlist.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#120a24] to-[#080512] border-2 border-indigo-500/30 hover:border-indigo-400 p-5 flex flex-col sm:flex-row gap-4 shadow-[0_10px_35px_rgba(99,102,241,0.15)] hover:shadow-[0_0_40px_rgba(99,102,241,0.35)] transition-all duration-300 hover-lift"
+                  >
+                    <div className="sm:w-36 h-28 sm:h-auto rounded-xl overflow-hidden relative bg-black shrink-0 border border-indigo-500/30">
+                      <img
+                        src={playlist.thumbnail}
+                        alt={playlist.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-indigo-900/90 text-[10px] font-mono text-indigo-200">
+                        📁 {playlist.itemCount} Videos
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col justify-between gap-2 grow">
+                      <h4 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-2">
+                        {playlist.title}
+                      </h4>
+                      {playlist.description && (
+                        <p className="text-xs text-zinc-300 line-clamp-2 font-light">
+                          {playlist.description}
+                        </p>
+                      )}
+                      <span className="text-xs font-mono font-bold text-indigo-400 group-hover:text-indigo-300 pt-1 flex items-center justify-between">
+                        <span>Open Playlist</span>
+                        <span>↗</span>
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
         </div>
