@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import NextImage from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export default function ProjectsPage() {
   // Live YouTube Subscribers State
@@ -218,12 +219,10 @@ export default function ProjectsPage() {
 
         </div>
 
-        {/* Footer Signature */}
-        <div className="text-center pt-4 text-xs font-mono tracking-widest text-zinc-500 uppercase">
-          FLOOR FROST PROJECTS & ECOSYSTEM
-        </div>
-
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

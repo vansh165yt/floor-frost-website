@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 interface Video {
   id: string;
@@ -1191,13 +1192,10 @@ export default function VideosPage() {
 
         </div>
 
-        {/* Footer Signature */}
-        <div className="text-center pt-8 text-xs font-mono tracking-widest text-zinc-500 uppercase border-t border-white/5 flex flex-col items-center gap-2">
-          <span>FLOOR FROST VIDEOS, SHORTS &amp; PLAYLISTS // {new Date().getFullYear()}</span>
-          <span className="text-[10px] text-zinc-600">ENGINEERED FOR ULTRA PERFORMANCE &amp; ZERO-LATENCY PLAYBACK</span>
-        </div>
-
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

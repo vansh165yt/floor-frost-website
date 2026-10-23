@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import NextImage from 'next/image';
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import DiscordAnnouncements from '@/components/DiscordAnnouncements';
 
 const Frost3DScene = dynamic(() => import('@/components/Frost3DScene'), {
@@ -1769,15 +1770,7 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-8 sm:py-12 px-4 border-t border-purple-950 bg-[#040207] text-center text-[11px] sm:text-xs text-zinc-500 font-mono flex flex-col items-center gap-2 scroll-fade-up">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden relative shrink-0">
-            <NextImage src="/logo.png" alt="Floor Frost" fill className="object-cover" />
-          </div>
-          <span className="font-bold text-zinc-300">FLOOR FROST GAMING (@FloorFrost)</span>
-        </div>
-        <p>© 2026 Floor Frost. All rights reserved. Crafted for High Quality Gaming Content.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }

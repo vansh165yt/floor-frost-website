@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 interface Announcement {
   id: string;
@@ -313,12 +314,10 @@ export default function AnnouncementsPage() {
           )}
         </div>
 
-        {/* Footer Signature */}
-        <div className="text-center pt-8 text-xs font-mono tracking-widest text-zinc-500 uppercase border-t border-white/5">
-          FLOOR FROST DISCORD LEGION DISPATCH // {new Date().getFullYear()}
-        </div>
-
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

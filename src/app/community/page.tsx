@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import NextImage from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 // High-Tech Slot/Roll-up Number Counter with Finish Flash & Live Update Support
 function AnimatedCounter({ 
@@ -440,10 +441,8 @@ export default function CommunityPage() {
 
       </main>
 
-      {/* Footer Signature */}
-      <footer className="py-4 text-center text-xs text-white/70 font-sans relative z-10">
-        © {new Date().getFullYear()} FLOOR FROST SOCIAL CREATOR HUB
-      </footer>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
