@@ -237,6 +237,53 @@ export default function Home() {
     };
   }, []);
 
+  // Live Discord Stats State (Real-time online count for Floor Frost Discord)
+  const [discordStats, setDiscordStats] = useState({
+    onlineCount: 13,
+    memberCount: 27,
+    isLive: false,
+  });
+
+  useEffect(() => {
+    const fetchDiscordStats = async () => {
+      try {
+        const res = await fetch(`/api/discord-stats?t=${Date.now()}`, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (typeof data.onlineCount === 'number') {
+            setDiscordStats({
+              onlineCount: data.onlineCount,
+              memberCount: data.memberCount || 27,
+              isLive: Boolean(data.isLive),
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Discord stats fetch error:", e);
+      }
+    };
+
+    fetchDiscordStats();
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      fetchDiscordStats();
+    }, 45000);
+
+    const handleFocus = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        fetchDiscordStats();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, []);
+
   // Live YouTube Videos State (Fetched automatically from @FloorFrost channel)
   const [videoList, setVideoList] = useState<any[]>([]);
   const [featuredVideo, setFeaturedVideo] = useState<any>(null);
@@ -1647,8 +1694,8 @@ export default function Home() {
 
           {/* Floating Cyber Status Badges */}
           <div className="hidden lg:flex absolute top-10 left-10 px-4 py-2 rounded-2xl bg-black/60 border border-purple-400/40 backdrop-blur-md items-center gap-2 text-xs font-mono text-purple-200 animate-float shadow-lg pointer-events-none">
-            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
-            <span>DISCORD // 500+ ONLINE</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span>DISCORD // {discordStats.onlineCount} ONLINE</span>
           </div>
           <div className="hidden lg:flex absolute bottom-10 right-10 px-4 py-2 rounded-2xl bg-black/60 border border-pink-400/40 backdrop-blur-md items-center gap-2 text-xs font-mono text-pink-200 animate-float-slow shadow-lg pointer-events-none">
             <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />

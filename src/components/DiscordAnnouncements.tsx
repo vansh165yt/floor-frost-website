@@ -19,6 +19,10 @@ export default function DiscordAnnouncements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [isLive, setIsLive] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [discordStats, setDiscordStats] = useState<{ onlineCount: number; memberCount: number }>({
+    onlineCount: 13,
+    memberCount: 27,
+  });
   
   // Interactive Reaction Counters (Cute community feedback)
   const [reactions, setReactions] = useState<{ [key: string]: { [emoji: string]: number } }>({
@@ -35,6 +39,12 @@ export default function DiscordAnnouncements() {
           if (data.announcements && data.announcements.length > 0) {
             setAnnouncements(data.announcements);
             setIsLive(Boolean(data.isLive));
+          }
+          if (typeof data.onlineCount === 'number') {
+            setDiscordStats({
+              onlineCount: data.onlineCount,
+              memberCount: data.memberCount || 27,
+            });
           }
         }
       } catch (e) {
@@ -109,9 +119,9 @@ export default function DiscordAnnouncements() {
                 <span>💬</span>
                 <span>{isLive ? 'LIVE DISCORD FEED' : 'DISCORD LEGION BROADCASTS'}</span>
               </span>
-              <span className="text-xs font-mono text-emerald-300 bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+              <span className="text-xs font-mono text-emerald-300 bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-[0_0_15px_rgba(52,211,153,0.25)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>500+ ONLINE NOW</span>
+                <span>{discordStats.onlineCount} ONLINE NOW</span>
               </span>
             </div>
             
@@ -302,11 +312,11 @@ export default function DiscordAnnouncements() {
                 <div className="grid grid-cols-2 gap-3 text-xs font-mono">
                   <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col gap-1">
                     <span className="text-[10px] text-zinc-400 uppercase">ONLINE MEMBERS</span>
-                    <span className="text-base font-bold text-emerald-300">500+ Active</span>
+                    <span className="text-base font-bold text-emerald-300">{discordStats.onlineCount} Active</span>
                   </div>
                   <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col gap-1">
-                    <span className="text-[10px] text-zinc-400 uppercase">SERVER ACCESS</span>
-                    <span className="text-base font-bold text-indigo-300">Open 24/7</span>
+                    <span className="text-[10px] text-zinc-400 uppercase">TOTAL LEGION</span>
+                    <span className="text-base font-bold text-indigo-300">{discordStats.memberCount} Members</span>
                   </div>
                 </div>
 

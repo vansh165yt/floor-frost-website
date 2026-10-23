@@ -21,6 +21,8 @@ export async function GET(request: NextRequest) {
   if (!botToken || !channelId) {
     return NextResponse.json({
       isLive: false,
+      onlineCount: 15,
+      memberCount: 30,
       announcements: [
         {
           id: 'demo-1',
@@ -108,8 +110,35 @@ export async function GET(request: NextRequest) {
         };
       });
 
+    // Fetch Guild presence and member count
+    let onlineCount = 13;
+    let memberCount = 27;
+    try {
+      const guildId = process.env.DISCORD_GUILD_ID || '1367366420135936010';
+      const guildRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, {
+        headers: {
+          Authorization: `Bot ${botToken}`,
+          'Content-Type': 'application/json',
+        },
+        next: { revalidate: 30 },
+      });
+      if (guildRes.ok) {
+        const guildData = await guildRes.json();
+        if (typeof guildData.approximate_presence_count === 'number') {
+          onlineCount = guildData.approximate_presence_count;
+        }
+        if (typeof guildData.approximate_member_count === 'number') {
+          memberCount = guildData.approximate_member_count;
+        }
+      }
+    } catch {
+      // Ignore count fetch errors
+    }
+
     return NextResponse.json({
       isLive: true,
+      onlineCount,
+      memberCount,
       announcements: announcements
     }, {
       headers: NO_CACHE_HEADERS
@@ -118,6 +147,8 @@ export async function GET(request: NextRequest) {
     console.error("Discord API fetch error:", error);
     return NextResponse.json({
       isLive: false,
+      onlineCount: 15,
+      memberCount: 30,
       error: error.message || "Failed to fetch Discord announcements",
       announcements: [
         {

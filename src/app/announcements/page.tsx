@@ -26,6 +26,10 @@ export default function AnnouncementsPage() {
     default: { '❤️': 142, '🔥': 288, '🚀': 195, '🎮': 110 }
   });
   const [userReacted, setUserReacted] = useState<{ [key: string]: string[] }>({});
+  const [discordStats, setDiscordStats] = useState({
+    onlineCount: 13,
+    memberCount: 27,
+  });
 
   useEffect(() => {
     const fetchAllAnnouncements = async () => {
@@ -36,6 +40,12 @@ export default function AnnouncementsPage() {
           if (data.announcements && data.announcements.length > 0) {
             setAnnouncements(data.announcements);
             setIsLive(Boolean(data.isLive));
+          }
+          if (typeof data.onlineCount === 'number') {
+            setDiscordStats({
+              onlineCount: data.onlineCount,
+              memberCount: data.memberCount || 27,
+            });
           }
         }
       } catch (e) {
@@ -133,8 +143,9 @@ export default function AnnouncementsPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               {announcements.length} BROADCASTS LOADED
             </span>
-            <span className="px-3.5 py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase backdrop-blur-md">
-              💬 500+ ACTIVE LEGION
+            <span className="px-3.5 py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase backdrop-blur-md flex items-center gap-1.5 shadow-[0_0_15px_rgba(236,72,153,0.2)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>💬 {discordStats.onlineCount} ONLINE NOW</span>
             </span>
           </div>
 
