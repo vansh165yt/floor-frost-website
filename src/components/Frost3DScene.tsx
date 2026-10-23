@@ -453,6 +453,7 @@ export default function Frost3DScene() {
     const uvs = wingGeo.attributes.uv;
     const pos = wingGeo.attributes.position;
     const baseZ = new Float32Array(pos.count);
+    const spanPower = new Float32Array(pos.count);
 
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
@@ -465,6 +466,7 @@ export default function Frost3DScene() {
       const camberZ = 0.22 * Math.sin(nx * Math.PI) * Math.cos(ny * Math.PI * 0.6);
       pos.setZ(i, camberZ);
       baseZ[i] = camberZ;
+      spanPower[i] = Math.pow(Math.max(0, x / 2.7), 1.8);
     }
     uvs.needsUpdate = true;
     pos.needsUpdate = true;
@@ -1165,14 +1167,14 @@ export default function Frost3DScene() {
       rightWingHinge.rotation.z = -wingTwist;
 
       // Aeroelastic wingtip flexing (attenuated when landed)
-      const flexFactor = Math.sin(flapPhase + 0.3) * 0.24 * (1.0 - landFactor);
-      const posAttr = wingGeo.attributes.position;
-      for (let i = 0; i < posAttr.count; i++) {
-        const x = posAttr.getX(i);
-        const spanFraction = Math.max(0, x / 2.7);
-        posAttr.setZ(i, baseZ[i] + flexFactor * Math.pow(spanFraction, 1.8));
+      if (landFactor < 0.95) {
+        const flexFactor = Math.sin(flapPhase + 0.3) * 0.24 * (1.0 - landFactor);
+        const posAttr = wingGeo.attributes.position;
+        for (let i = 0; i < posAttr.count; i++) {
+          posAttr.setZ(i, baseZ[i] + flexFactor * spanPower[i]);
+        }
+        posAttr.needsUpdate = true;
       }
-      posAttr.needsUpdate = true;
 
       // --- FLIGHT ATTITUDE & PERCHED ORIENTATION ---
       let targetPitch = 0.12;

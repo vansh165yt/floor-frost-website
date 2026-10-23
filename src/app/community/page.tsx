@@ -304,28 +304,28 @@ export default function CommunityPage() {
             </div>
           </div>
 
-          {/* 4 Statistics Grid with Roll-Up Counter Animation */}
-          <div className="grid grid-cols-4 gap-2 sm:gap-3 w-full py-5 border-y border-white/10 my-1 bg-white/[0.03] rounded-2xl backdrop-blur-md">
-            <div className="flex flex-col items-center">
-              <span className="text-lg sm:text-xl font-black text-white font-mono drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
+          {/* 4 Statistics Grid with Roll-Up Counter Animation (2x2 on mobile, 4 in a row on desktop) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-3 w-full py-4 sm:py-5 border-y border-white/10 my-1 bg-white/[0.03] rounded-2xl backdrop-blur-md">
+            <div className="flex flex-col items-center p-1 sm:p-0">
+              <span className="text-base sm:text-xl font-black text-white font-mono drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
                 <AnimatedCounter value={subStats.subscriberCount} />
               </span>
               <span className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">Subscribers</span>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-lg sm:text-xl font-black text-pink-300 font-mono drop-shadow-[0_0_12px_rgba(244,114,182,0.4)]">
+            <div className="flex flex-col items-center p-1 sm:p-0">
+              <span className="text-base sm:text-xl font-black text-pink-300 font-mono drop-shadow-[0_0_12px_rgba(244,114,182,0.4)]">
                 <AnimatedCounter value={subStats.viewCount} suffix={subStats.viewCount.includes('M') ? 'M' : 'K'} />
               </span>
               <span className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">Total Views</span>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-lg sm:text-xl font-black text-cyan-300 font-mono drop-shadow-[0_0_12px_rgba(34,211,238,0.4)]">
+            <div className="flex flex-col items-center p-1 sm:p-0">
+              <span className="text-base sm:text-xl font-black text-cyan-300 font-mono drop-shadow-[0_0_12px_rgba(34,211,238,0.4)]">
                 <AnimatedCounter value={subStats.videoCount} />
               </span>
               <span className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">Videos</span>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-lg sm:text-xl font-black text-lime-400 font-mono drop-shadow-[0_0_12px_rgba(163,230,53,0.4)]">
+            <div className="flex flex-col items-center p-1 sm:p-0">
+              <span className="text-base sm:text-xl font-black text-lime-400 font-mono drop-shadow-[0_0_12px_rgba(163,230,53,0.4)]">
                 <AnimatedCounter value={100} suffix="%" />
               </span>
               <span className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">Gaming</span>

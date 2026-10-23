@@ -7,6 +7,7 @@ export default function CosmicEffects() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isPointerDevice, setIsPointerDevice] = useState(false);
   const [cursorMode, setCursorMode] = useState<'default' | 'hover' | 'play'>('default');
+  const cursorModeRef = useRef<'default' | 'hover' | 'play'>('default');
   const [isCursorVisible, setIsCursorVisible] = useState(false);
   const customCursorRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
@@ -18,6 +19,7 @@ export default function CosmicEffects() {
   const verticalPercentRef = useRef<HTMLSpanElement>(null);
   const waypointRefs = useRef<(HTMLDivElement | null)[]>([]);
   const mouseCanvasPosRef = useRef({ x: -1000, y: -1000 });
+  const isScrollingRef = useRef(false);
   const cursorSparklesRef = useRef<Array<{
     x: number;
     y: number;
@@ -52,8 +54,8 @@ export default function CosmicEffects() {
 
     const animateGlow = () => {
       // Smooth responsive lerp for cursor follower
-      currentX += (targetX - currentX) * 0.18;
-      currentY += (targetY - currentY) * 0.18;
+      currentX += (targetX - currentX) * 0.22;
+      currentY += (targetY - currentY) * 0.22;
 
       if (customCursorRef.current) {
         customCursorRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
@@ -64,7 +66,7 @@ export default function CosmicEffects() {
           spotlightRef.current.style.opacity = '0';
         } else {
           spotlightRef.current.style.opacity = '1';
-          spotlightRef.current.style.background = `radial-gradient(550px circle at ${Math.round(currentX)}px ${Math.round(currentY)}px, rgba(168, 85, 247, 0.08), rgba(236, 72, 153, 0.03) 40%, transparent 80%)`;
+          spotlightRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
         }
       }
 
@@ -86,18 +88,22 @@ export default function CosmicEffects() {
       // Detect hover target for morphing cursor
       if (isPointer) {
         const targetEl = e.target as HTMLElement | null;
+        let targetMode: 'default' | 'hover' | 'play' = 'default';
         if (targetEl?.closest('[data-cursor="play"], .video-card-thumb, .featured-player, .cursor-play')) {
-          setCursorMode('play');
+          targetMode = 'play';
         } else if (targetEl?.closest('button, a, [role="button"], .magnetic-btn, .cursor-pointer, input, select, [data-cursor="hover"]')) {
-          setCursorMode('hover');
-        } else {
-          setCursorMode('default');
+          targetMode = 'hover';
+        }
+
+        if (cursorModeRef.current !== targetMode) {
+          cursorModeRef.current = targetMode;
+          setCursorMode(targetMode);
         }
 
         // Spawn ethereal micro-stardust particles into zero-garbage canvas particle buffer
         const now = performance.now();
         const distMoved = Math.hypot(e.clientX - lastSparkleX, e.clientY - lastSparkleY);
-        if (now - lastSparkleTime > 32 && distMoved > 12) {
+        if (now - lastSparkleTime > 40 && distMoved > 16) {
           lastSparkleTime = now;
           lastSparkleX = e.clientX;
           lastSparkleY = e.clientY;
@@ -105,7 +111,7 @@ export default function CosmicEffects() {
           const sparkColors = ['rgba(244, 63, 94, ', 'rgba(236, 72, 153, ', 'rgba(192, 132, 252, ', 'rgba(56, 189, 248, ', 'rgba(255, 255, 255, '];
           const c = sparkColors[Math.floor(Math.random() * sparkColors.length)];
 
-          if (cursorSparklesRef.current.length < 35) {
+          if (cursorSparklesRef.current.length < 25) {
             cursorSparklesRef.current.push({
               x: e.clientX,
               y: e.clientY,
@@ -159,6 +165,7 @@ export default function CosmicEffects() {
     let isLerping = false;
     let rafId: number | null = null;
     let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+    const activeWaypointsState = [false, false, false, false, false];
 
     const updateDOM = (p: number) => {
       const pClamped = Math.min(100, Math.max(0, p));
@@ -176,17 +183,20 @@ export default function CosmicEffects() {
         verticalPercentRef.current.textContent = pInt;
       }
 
-      // Update waypoint diamond indicators
+      // Update waypoint diamond indicators only when crossing boundary
       const waypointCount = 5;
       for (let idx = 0; idx < waypointCount; idx++) {
         const nodeEl = waypointRefs.current[idx];
         if (!nodeEl) continue;
         const nodeProgress = (idx / (waypointCount - 1)) * 100;
         const isActive = Math.abs(pClamped - nodeProgress) < 14;
-        if (isActive) {
-          nodeEl.className = 'transition-all duration-300 rounded-sm w-2.5 h-2.5 bg-gradient-to-tr from-pink-400 to-cyan-300 rotate-45 shadow-[0_0_12px_#ec4899] scale-125';
-        } else {
-          nodeEl.className = 'transition-all duration-300 rounded-sm w-1.5 h-1.5 bg-white/40 rotate-45 group-hover:bg-purple-300 group-hover:scale-125 group-hover:shadow-[0_0_8px_#a855f7]';
+        if (isActive !== activeWaypointsState[idx]) {
+          activeWaypointsState[idx] = isActive;
+          if (isActive) {
+            nodeEl.className = 'transition-all duration-300 rounded-sm w-2.5 h-2.5 bg-gradient-to-tr from-pink-400 to-cyan-300 rotate-45 shadow-[0_0_12px_#ec4899] scale-125';
+          } else {
+            nodeEl.className = 'transition-all duration-300 rounded-sm w-1.5 h-1.5 bg-white/40 rotate-45 group-hover:bg-purple-300 group-hover:scale-125 group-hover:shadow-[0_0_8px_#a855f7]';
+          }
         }
       }
     };
@@ -194,8 +204,7 @@ export default function CosmicEffects() {
     const animate = () => {
       const diff = targetProgress - currentProgress;
       if (Math.abs(diff) > 0.03) {
-        // 0.13 fluid inertia damping: natural glide deceleration with 0 latency
-        currentProgress += diff * 0.13;
+        currentProgress += diff * 0.15;
         updateDOM(currentProgress);
         rafId = requestAnimationFrame(animate);
       } else {
@@ -207,9 +216,13 @@ export default function CosmicEffects() {
     };
 
     const handleScroll = () => {
-      setIsScrolling(true);
+      if (!isScrollingRef.current) {
+        isScrollingRef.current = true;
+        setIsScrolling(true);
+      }
       if (scrollTimeout) clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
+        isScrollingRef.current = false;
         setIsScrolling(false);
       }, 750);
 
@@ -220,7 +233,8 @@ export default function CosmicEffects() {
         targetProgress = 0;
       }
 
-      setShowBackToTop(window.scrollY > 400);
+      const shouldShowBackToTop = window.scrollY > 400;
+      setShowBackToTop(prev => (prev !== shouldShowBackToTop ? shouldShowBackToTop : prev));
 
       if (!isLerping) {
         isLerping = true;
@@ -238,7 +252,7 @@ export default function CosmicEffects() {
     };
   }, []);
 
-  // 3. Automated IntersectionObserver Scroll Reveal Engine (Debounced)
+  // 3. Automated IntersectionObserver Scroll Reveal Engine
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -249,12 +263,13 @@ export default function CosmicEffects() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
           }
         });
       },
       {
-        threshold: 0.08,
-        rootMargin: '0px 0px -20px 0px'
+        threshold: 0.05,
+        rootMargin: '0px 0px 50px 0px'
       }
     );
 
@@ -268,22 +283,13 @@ export default function CosmicEffects() {
     };
 
     observeElements();
-
-    let debounceTimer: ReturnType<typeof setTimeout>;
-    const mutationObserver = new MutationObserver(() => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(observeElements, 100);
-    });
-
-    mutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    const t1 = setTimeout(observeElements, 500);
+    const t2 = setTimeout(observeElements, 1500);
 
     return () => {
-      clearTimeout(debounceTimer);
+      clearTimeout(t1);
+      clearTimeout(t2);
       observer.disconnect();
-      mutationObserver.disconnect();
     };
   }, []);
 
@@ -501,13 +507,7 @@ export default function CosmicEffects() {
         p.alpha = p.baseAlpha + Math.sin(tick * p.twinkleSpeed + i) * 0.2;
         p.alpha = Math.max(0.05, Math.min(0.8, p.alpha));
 
-        // Soft outer blooming aura
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 2.2, 0, Math.PI * 2);
-        ctx.fillStyle = `${p.color}${p.alpha * 0.28})`;
-        ctx.fill();
-
-        // Intense crystalline core
+        // Intense crystalline core with ethereal aura
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = `${p.color}${p.alpha})`;
@@ -538,12 +538,6 @@ export default function CosmicEffects() {
 
         const emberAlpha = em.alpha * (0.8 + Math.sin(tick * 0.05 + j) * 0.2);
 
-        // Soft outer blooming halo
-        ctx.beginPath();
-        ctx.arc(em.x, em.y, em.size * 2.6, 0, Math.PI * 2);
-        ctx.fillStyle = `${em.color}${emberAlpha * 0.25})`;
-        ctx.fill();
-
         // Glowing core
         ctx.beginPath();
         ctx.arc(em.x, em.y, em.size, 0, Math.PI * 2);
@@ -564,12 +558,6 @@ export default function CosmicEffects() {
           sparkles.splice(s, 1);
           continue;
         }
-
-        // Soft outer stardust aura
-        ctx.beginPath();
-        ctx.arc(sp.x, sp.y, sp.size * 2.4, 0, Math.PI * 2);
-        ctx.fillStyle = `${sp.color}${sp.alpha * 0.35})`;
-        ctx.fill();
 
         // Brilliant Diamond core
         ctx.beginPath();
@@ -692,7 +680,12 @@ export default function CosmicEffects() {
         <>
           <div
             ref={spotlightRef}
-            className="fixed inset-0 pointer-events-none z-10 transition-opacity duration-300 ease-out opacity-0"
+            className="fixed top-0 left-0 w-[550px] h-[550px] rounded-full pointer-events-none z-10 transition-opacity duration-300 ease-out opacity-0"
+            style={{
+              background: 'radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, rgba(236, 72, 153, 0.03) 40%, transparent 70%)',
+              willChange: 'transform',
+              transform: 'translate3d(-1000px, -1000px, 0) translate(-50%, -50%)'
+            }}
           />
 
           {/* Morphing Dynamic Custom Cursor Follower */}
@@ -727,9 +720,9 @@ export default function CosmicEffects() {
       )}
 
       {/* 3. Cosmic Aurora Ambient Glow Drift in Background */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30">
-        <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-br from-purple-900/30 via-pink-900/20 to-transparent blur-[140px] animate-aurora-drift" />
-        <div className="absolute top-[40%] -right-[15%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-bl from-indigo-900/25 via-purple-900/20 to-transparent blur-[160px] animate-aurora-drift" style={{ animationDirection: 'reverse', animationDuration: '38s' }} />
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-35">
+        <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] rounded-full bg-[radial-gradient(circle,rgba(147,51,234,0.22)_0%,rgba(236,72,153,0.1)_45%,transparent_70%)] animate-aurora-drift" />
+        <div className="absolute top-[40%] -right-[15%] w-[50vw] h-[50vw] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.18)_0%,rgba(168,85,247,0.12)_45%,transparent_70%)] animate-aurora-drift" style={{ animationDirection: 'reverse', animationDuration: '38s' }} />
       </div>
 
       {/* 4. Subtle Twinkling Cosmic Micro-Stars Canvas */}
@@ -739,13 +732,13 @@ export default function CosmicEffects() {
         style={{ mixBlendMode: 'screen' }}
       />
 
-      {/* 5. Floating Back to Top Glass Orb Button */}
+      {/* 5. Floating Back to Top Glass Orb Button (Desktop / Tablet) */}
       {showBackToTop && (
         <button
           onClick={scrollToTop}
           aria-label="Back to Top"
           title="Back to Top"
-          className="fixed bottom-6 right-6 z-50 p-3 sm:p-3.5 rounded-full bg-[#120a24]/85 border-2 border-purple-500/50 hover:border-pink-400 text-white shadow-[0_0_30px_rgba(168,85,247,0.4),0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-xl hover:scale-110 active:scale-95 transition-all duration-300 group cursor-pointer animate-portal-fade flex items-center justify-center magnetic-btn"
+          className="fixed bottom-6 right-6 z-50 hidden md:flex p-3 sm:p-3.5 rounded-full bg-[#120a24]/85 border-2 border-purple-500/50 hover:border-pink-400 text-white shadow-[0_0_30px_rgba(168,85,247,0.4),0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-xl hover:scale-110 active:scale-95 transition-all duration-300 group cursor-pointer animate-portal-fade items-center justify-center magnetic-btn"
         >
           <div className="relative flex items-center justify-center">
             <span className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 opacity-60 blur-sm group-hover:opacity-100 transition-opacity" />

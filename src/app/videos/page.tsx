@@ -754,19 +754,19 @@ export default function VideosPage() {
                 </a>
               </div>
 
-              {/* Grid of Shorts with 3D Tilt & Glare */}
+              {/* Grid of Shorts with 3D Tilt & Glare (2-cols on mobile, 4-cols on desktop) */}
               {filteredShorts.length === 0 ? (
                 <div className="p-12 text-center rounded-2xl bg-white/[0.02] border border-white/10 text-zinc-400 font-mono text-xs">
                   No shorts found matching &quot;{searchQuery}&quot;. Try another search keyword!
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-5 w-full">
                   {filteredShorts.map((short, idx) => (
                     <div
                       key={short.id}
                       data-reveal-delay={String(Math.min(500, (idx % 4 + 1) * 75))}
                       onClick={() => handlePlayVideo(short)}
-                      className={`group relative rounded-2xl overflow-hidden bg-zinc-950 border transition-all duration-500 shadow-xl flex flex-col cursor-pointer hover-lift tilt-card scroll-fade-up shimmer-glass-card ${
+                      className={`group relative rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-950 border transition-all duration-500 shadow-xl flex flex-col cursor-pointer hover-lift tilt-card scroll-fade-up shimmer-glass-card ${
                         activeVideo.id === short.id
                           ? 'border-red-400 shadow-[0_0_40px_rgba(239,68,68,0.6)] ring-2 ring-red-400/60 scale-[1.02]'
                           : 'border-red-950/70 hover:border-red-500/90 hover:shadow-[0_0_35px_rgba(239,68,68,0.4)]'
@@ -775,7 +775,7 @@ export default function VideosPage() {
                       <div className="tilt-glare" />
 
                       {/* Thumbnail Container */}
-                      <div className="h-60 w-full relative overflow-hidden bg-black">
+                      <div className="h-44 sm:h-60 w-full relative overflow-hidden bg-black">
                         <img
                           src={short.thumbnail}
                           alt={short.title}
@@ -787,46 +787,46 @@ export default function VideosPage() {
                         
                         {/* Center Hover Play Button with Halo */}
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                          <div className="w-14 h-14 rounded-full bg-red-600 text-white font-bold flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,1)] group-hover:scale-110 transition-transform border border-white/50">
-                            <span className="text-xl ml-0.5">▶</span>
+                          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-red-600 text-white font-bold flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,1)] group-hover:scale-110 transition-transform border border-white/50">
+                            <span className="text-base sm:text-xl ml-0.5">▶</span>
                           </div>
                         </div>
 
                         {/* Top Badges */}
-                        <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                          <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider shadow-md flex items-center gap-1 border border-red-400/50 backdrop-blur-md">
+                        <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 flex items-center gap-1.5">
+                          <span className="px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full bg-red-600 text-white text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider shadow-md flex items-center gap-1 border border-red-400/50 backdrop-blur-md">
                             <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                             SHORT
                           </span>
                         </div>
 
                         {/* Duration Pill */}
-                        <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded bg-black/85 text-[10px] font-mono text-red-300 border border-red-500/40 backdrop-blur-md font-bold">
+                        <span className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded bg-black/85 text-[9px] sm:text-[10px] font-mono text-red-300 border border-red-500/40 backdrop-blur-md font-bold">
                           ⚡ {short.duration || '0:28'}
                         </span>
 
-                        <span className="absolute bottom-2.5 left-2.5 text-[10px] font-mono text-zinc-400">
+                        <span className="hidden sm:block absolute bottom-2.5 left-2.5 text-[10px] font-mono text-zinc-400">
                           {short.publishedAt}
                         </span>
                       </div>
 
                       {/* Content Details */}
-                      <div className="p-4 flex flex-col justify-between gap-3 grow bg-gradient-to-b from-[#130717] to-[#09040c]">
-                        <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-red-300 transition-colors line-clamp-2 leading-relaxed">
+                      <div className="p-2.5 sm:p-4 flex flex-col justify-between gap-2 sm:gap-3 grow bg-gradient-to-b from-[#130717] to-[#09040c]">
+                        <h3 className="text-[11px] sm:text-sm font-bold text-white group-hover:text-red-300 transition-colors line-clamp-2 leading-tight sm:leading-relaxed">
                           {short.title}
                         </h3>
                         
-                        <div className="flex items-center justify-between text-[10px] font-mono text-red-400 font-semibold pt-2 border-t border-white/10">
+                        <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono text-red-400 font-semibold pt-1.5 sm:pt-2 border-t border-white/10">
                           <span className="flex items-center gap-1 group-hover:text-red-300 transition-colors">
                             <span>▶</span>
-                            <span>Play In Spotlight</span>
+                            <span>Play</span>
                           </span>
                           <a
                             href={short.url}
                             target="_blank"
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="text-zinc-400 hover:text-white px-2 py-0.5 rounded hover:bg-white/10 transition-colors"
+                            className="text-zinc-400 hover:text-white px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors"
                           >
                             YouTube ↗
                           </a>

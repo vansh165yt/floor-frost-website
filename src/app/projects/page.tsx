@@ -79,11 +79,11 @@ export default function ProjectsPage() {
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tight text-white">
+          <h1 className="text-3xl sm:text-6xl font-black uppercase tracking-tight text-white">
             FLOOR FROST <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-cyan-200">PROJECTS</span>
           </h1>
 
-          <p className="max-w-2xl text-sm sm:text-base text-zinc-300 leading-relaxed font-light">
+          <p className="max-w-2xl text-xs sm:text-base text-zinc-300 leading-relaxed font-light">
             Explore official web applications and interactive software built by <strong className="text-white font-medium">Floor Frost</strong>. Click on any project card below to launch the live web app directly.
           </p>
         </div>
@@ -93,26 +93,26 @@ export default function ProjectsPage() {
           href="https://pingu.xo.je"
           target="_blank"
           rel="noreferrer"
-          className="rounded-[2.5rem] bg-gradient-to-b from-[#120b24]/95 to-[#0c0817]/95 border-2 border-purple-500/40 p-8 sm:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 shadow-[0_15px_50px_rgba(168,85,247,0.25)] relative overflow-hidden group hover:border-pink-400 hover:shadow-[0_0_65px_rgba(236,72,153,0.45)] hover-lift shimmer-hover transition-all duration-300 cursor-pointer tilt-card scroll-scale-in border-beam-card"
+          className="rounded-2xl sm:rounded-[2.5rem] bg-gradient-to-b from-[#120b24]/95 to-[#0c0817]/95 border-2 border-purple-500/40 p-5 sm:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 sm:gap-8 shadow-[0_15px_50px_rgba(168,85,247,0.25)] relative overflow-hidden group hover:border-pink-400 hover:shadow-[0_0_65px_rgba(236,72,153,0.45)] hover-lift shimmer-hover transition-all duration-300 cursor-pointer tilt-card scroll-scale-in border-beam-card"
         >
           <div className="tilt-glare" />
           {/* Animated Background Glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-600/20 via-pink-600/15 to-transparent rounded-full blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-500" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
-          <div className="flex flex-col gap-5 max-w-xl z-10">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="px-3.5 py-1 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider backdrop-blur-md">
+          <div className="flex flex-col gap-4 sm:gap-5 max-w-xl z-10">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <span className="px-3 py-1 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider backdrop-blur-md">
                 FEATURED AI APP
               </span>
-              <span className="px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase backdrop-blur-md flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+              <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase backdrop-blur-md flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                 pingu.xo.je 🚀
               </span>
             </div>
 
-            <div className="flex items-center gap-4 mt-1">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border-2 border-white/20 shadow-xl relative group-hover:scale-110 animate-float transition-transform duration-300 shrink-0 bg-[#a5b4fc]">
+            <div className="flex items-center gap-3 sm:gap-4 mt-1">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl overflow-hidden border-2 border-white/20 shadow-xl relative group-hover:scale-110 animate-float transition-transform duration-300 shrink-0 bg-[#a5b4fc]">
                 <NextImage
                   src="/pingu-logo.png"
                   alt="Pingu AI Official Logo"
@@ -121,25 +121,25 @@ export default function ProjectsPage() {
                 />
               </div>
               <div>
-                <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-white group-hover:text-pink-300 transition-colors flex items-center gap-3">
+                <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white group-hover:text-pink-300 transition-colors flex items-center gap-2 sm:gap-3">
                   <span>PINGU AI</span>
-                  <span className="text-xl opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5 transition-all duration-300">↗</span>
+                  <span className="text-lg sm:text-xl opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5 transition-all duration-300">↗</span>
                 </h2>
-                <p className="text-xs font-mono text-purple-300 uppercase tracking-widest">
+                <p className="text-[10px] sm:text-xs font-mono text-purple-300 uppercase tracking-widest">
                   NEXT-GEN AI LEARNING & STUDY ASSISTANT
                 </p>
               </div>
             </div>
 
-            <p className="text-sm sm:text-base text-zinc-300 leading-relaxed font-light mt-1">
+            <p className="text-xs sm:text-base text-zinc-300 leading-relaxed font-light mt-0.5 sm:mt-1">
               Pingu AI is a powerful, interactive AI-powered learning web app designed to help students master subjects, generate instant study guides, solve complex problems, and accelerate learning.
             </p>
 
-            <div className="flex flex-wrap gap-2 pt-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-1 sm:pt-2">
               {['AI Tutor', 'Smart Notes', 'Quiz Generator', 'Concept Explainer', 'pingu.xo.je'].map((tag) => (
                 <span
                   key={tag}
-                  className="px-3.5 py-1 rounded-full bg-white/[0.06] border border-white/15 text-xs font-mono text-zinc-300 group-hover:border-purple-400/40 group-hover:bg-white/10 transition-colors"
+                  className="px-2.5 py-0.5 sm:px-3.5 sm:py-1 rounded-full bg-white/[0.06] border border-white/15 text-[11px] sm:text-xs font-mono text-zinc-300 group-hover:border-purple-400/40 group-hover:bg-white/10 transition-colors"
                 >
                   {tag}
                 </span>
@@ -148,7 +148,7 @@ export default function ProjectsPage() {
           </div>
 
           <div className="z-10 w-full md:w-auto shrink-0">
-            <div className="px-8 py-4 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 group-hover:from-pink-500 group-hover:to-purple-500 text-sm font-bold uppercase tracking-wider text-white shadow-[0_0_35px_rgba(219,39,119,0.6)] group-hover:scale-105 active:scale-95 transition-all duration-300 text-center border border-pink-400/50 flex items-center justify-center gap-2.5 magnetic-btn">
+            <div className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 group-hover:from-pink-500 group-hover:to-purple-500 text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-[0_0_35px_rgba(219,39,119,0.6)] group-hover:scale-105 active:scale-95 transition-all duration-300 text-center border border-pink-400/50 flex items-center justify-center gap-2.5 magnetic-btn">
               <span>Launch pingu.xo.je</span>
               <span>🚀</span>
             </div>

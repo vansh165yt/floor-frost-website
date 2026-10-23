@@ -164,7 +164,6 @@ export default function Home() {
   const hasDrawnInitialRef = useRef(false);
   const currentFrameRef = useRef(1);
 
-  const [actualLoaded, setActualLoaded] = useState(0);
   const [displayPercent, setDisplayPercent] = useState(0);
 
   // Both server and client start with identical initial state to eliminate hydration mismatch
@@ -439,19 +438,16 @@ export default function Home() {
       loadedImagesRef.current.add(1);
       count++;
       loadedCountRef.current = count;
-      setActualLoaded(count);
       renderFrameRef.current?.(1);
     };
     img1.onerror = () => {
       count++;
       loadedCountRef.current = count;
-      setActualLoaded(count);
     };
     if (img1.complete && img1.naturalWidth > 0) {
       loadedImagesRef.current.add(1);
       count++;
       loadedCountRef.current = count;
-      setActualLoaded(count);
       renderFrameRef.current?.(1);
     }
     imagesRef.current[1] = img1;
@@ -466,7 +462,6 @@ export default function Home() {
         loadedImagesRef.current.add(i);
         count++;
         loadedCountRef.current = count;
-        setActualLoaded(count);
 
         if (!hasDrawnInitialRef.current || Math.round(currentFrameRef.current) === i) {
           renderFrameRef.current?.();
@@ -476,7 +471,6 @@ export default function Home() {
       img.onerror = () => {
         count++;
         loadedCountRef.current = count;
-        setActualLoaded(count);
       };
 
       if (img.complete && img.naturalWidth > 0) {
@@ -572,8 +566,6 @@ export default function Home() {
       const imgWidth = img.naturalWidth;
       const imgHeight = img.naturalHeight;
       if (!imgWidth || !imgHeight) return false;
-
-      ctx.clearRect(0, 0, cw, ch);
 
       const imgRatio = imgWidth / imgHeight;
       const canvasRatio = cw / ch;
@@ -922,7 +914,7 @@ export default function Home() {
       )}
       
       {/* 1. HERO SECTION WITH CANVAS SCROLL SEQUENCE */}
-      <div ref={containerRef} className="relative h-[400vh]">
+      <div ref={containerRef} className="relative h-[280vh] md:h-[400vh]">
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center items-center">
           {/* Instant First Frame Fallback (Zero delay while canvas initializes) */}
           <NextImage
@@ -954,10 +946,10 @@ export default function Home() {
           </div>
 
           {/* Hero Content */}
-          <main className="relative z-30 w-full max-w-4xl mx-auto px-6 text-center flex flex-col items-center justify-center gap-4 sm:gap-6 mt-6">
+          <main className="relative z-30 w-full max-w-4xl mx-auto px-4 sm:px-6 text-center flex flex-col items-center justify-center gap-3 sm:gap-6 mt-4 sm:mt-6">
             <h3 
               ref={subheadRef}
-              className="text-xl sm:text-2xl md:text-3xl font-bold tracking-[0.25em] text-white/95 uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] transition-all duration-150 ease-out"
+              className="text-lg sm:text-2xl md:text-3xl font-bold tracking-[0.2em] sm:tracking-[0.25em] text-white/95 uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] transition-all duration-150 ease-out"
               style={{
                 opacity: 0,
                 transform: 'translateY(20px) scale(0.85)'
@@ -968,7 +960,7 @@ export default function Home() {
 
             <h1 
               ref={titleRef}
-              className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-100 via-purple-200 to-indigo-200 drop-shadow-[0_8px_24px_rgba(0,0,0,0.95)] leading-tight transition-all duration-150 ease-out animate-chromatic-shimmer"
+              className="font-serif text-3xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-100 via-purple-200 to-indigo-200 drop-shadow-[0_8px_24px_rgba(0,0,0,0.95)] leading-tight transition-all duration-150 ease-out animate-chromatic-shimmer"
               style={{
                 opacity: 0,
                 transform: 'translateY(35px) scale(0.9)'
@@ -979,7 +971,7 @@ export default function Home() {
 
             <p 
               ref={descRef}
-              className="max-w-xl text-xs sm:text-sm md:text-base text-white/90 font-normal leading-relaxed drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] mt-1 transition-all duration-150 ease-out"
+              className="max-w-xl text-xs sm:text-sm md:text-base text-white/90 font-normal leading-relaxed drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] mt-0.5 sm:mt-1 px-2 transition-all duration-150 ease-out"
               style={{
                 opacity: 0,
                 transform: 'translateY(20px)'
@@ -990,14 +982,14 @@ export default function Home() {
 
             <div
               ref={btnContainerRef}
-              className="transition-all duration-150 ease-out"
+              className="transition-all duration-150 ease-out mt-1 sm:mt-3"
               style={{
                 opacity: 0,
                 transform: 'scale(0.85)',
                 pointerEvents: 'none'
               }}
             >
-              <a href="#videos" className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:px-9 sm:py-4 font-medium text-sm sm:text-base text-white transition-all duration-300 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 hover:scale-[1.05] shadow-[0_0_25px_rgba(219,39,119,0.7)] hover:shadow-[0_0_40px_rgba(219,39,119,1)] border border-pink-400/50 backdrop-blur-md active:scale-95 mt-3 neon-glow-btn magnetic-btn">
+              <a href="#videos" className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3 sm:px-9 sm:py-4 font-medium text-sm sm:text-base text-white transition-all duration-300 rounded-full bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 hover:scale-[1.05] shadow-[0_0_25px_rgba(219,39,119,0.7)] hover:shadow-[0_0_40px_rgba(219,39,119,1)] border border-pink-400/50 backdrop-blur-md active:scale-95 neon-glow-btn magnetic-btn">
                 <span>Explore Content</span>
                 <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
               </a>
@@ -1008,68 +1000,68 @@ export default function Home() {
           {/* Scroll Down Indicator */}
           <div 
             ref={scrollHintRef}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none transition-opacity duration-300"
+            className="absolute bottom-5 sm:bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1.5 sm:gap-2 pointer-events-none transition-opacity duration-300"
             style={{ opacity: 1 }}
           >
-            <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase text-pink-200/90 animate-pulse drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            <span className="text-[9px] sm:text-xs font-bold tracking-[0.25em] sm:tracking-[0.3em] uppercase text-pink-200/90 animate-pulse drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               Scroll Down
             </span>
-            <div className="w-5 h-9 rounded-full border-2 border-pink-300/50 flex items-start justify-center p-1 backdrop-blur-sm bg-black/30 shadow-lg">
-              <div className="w-1.5 h-2 rounded-full bg-pink-400 animate-float" />
+            <div className="w-4 h-7 sm:w-5 sm:h-9 rounded-full border-2 border-pink-300/50 flex items-start justify-center p-1 backdrop-blur-sm bg-black/30 shadow-lg">
+              <div className="w-1 sm:w-1.5 h-1.5 sm:h-2 rounded-full bg-pink-400 animate-float" />
             </div>
           </div>
         </div>
       </div>
 
       {/* 2. INFINITE LOGO CAROUSEL WITH FULL-WIDTH PERSPECTIVE RIBBON & VERTICAL DIVIDERS */}
-      <section id="marquee" className="relative py-20 bg-[#050308] overflow-hidden border-t border-purple-900/30 scroll-fade-up">
+      <section id="marquee" className="relative py-12 sm:py-20 bg-[#050308] overflow-hidden border-t border-purple-900/30 scroll-fade-up">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-96 bg-purple-900/10 rounded-full blur-[180px] pointer-events-none" />
 
         {/* Edge Fade Gradients */}
-        <div className="absolute top-0 bottom-0 left-0 w-24 sm:w-48 bg-gradient-to-r from-[#050308] via-[#050308]/80 to-transparent pointer-events-none z-30" />
-        <div className="absolute top-0 bottom-0 right-0 w-24 sm:w-48 bg-gradient-to-l from-[#050308] via-[#050308]/80 to-transparent pointer-events-none z-30" />
+        <div className="absolute top-0 bottom-0 left-0 w-12 sm:w-48 bg-gradient-to-r from-[#050308] via-[#050308]/80 to-transparent pointer-events-none z-30" />
+        <div className="absolute top-0 bottom-0 right-0 w-12 sm:w-48 bg-gradient-to-l from-[#050308] via-[#050308]/80 to-transparent pointer-events-none z-30" />
 
         <div className="w-full relative z-30">
           
-          {/* Perspective 3D Carousel Strip Container */}
-          <div className="w-full overflow-hidden [perspective:1400px] marquee-mask">
-            <div className="flex flex-col gap-6 [transform:rotateY(-4deg)_rotateX(2deg)] transition-transform duration-500 hover:[transform:rotateY(0deg)_rotateX(0deg)]">
+          {/* Perspective 3D Carousel Strip Container (3D perspective on PC, ultra-clean flat on mobile) */}
+          <div className="w-full overflow-hidden md:[perspective:1400px]">
+            <div className="flex flex-col gap-3.5 sm:gap-6 md:[transform:rotateY(-4deg)_rotateX(2deg)] transform-none transition-transform duration-500 hover:[transform:rotateY(0deg)_rotateX(0deg)]">
               
               {/* Top Row Marquee */}
-              <div className="relative py-4 border-y border-white/20 bg-white/[0.02] backdrop-blur-md overflow-hidden flex shadow-lg">
+              <div className="relative py-2.5 sm:py-4 border-y border-purple-500/20 bg-[#080411]/90 overflow-hidden flex shadow-lg">
                 <div className="animate-marquee flex items-center">
                   {[...topLogos, ...topLogos, ...topLogos, ...topLogos].map((logo, idx) => (
                     <div key={idx} className="flex items-center shrink-0">
-                      <div className="px-8 sm:px-12 py-2 rounded-xl group cursor-pointer flex flex-col justify-center marquee-item">
-                        <span className="font-sans font-black tracking-[0.2em] text-sm sm:text-lg text-zinc-100 uppercase group-hover:text-purple-300 transition-colors">
+                      <div className="px-5 sm:px-12 py-1.5 sm:py-2 rounded-xl group cursor-pointer flex flex-col justify-center marquee-item">
+                        <span className="font-sans font-black tracking-[0.15em] sm:tracking-[0.2em] text-xs sm:text-lg text-zinc-100 uppercase group-hover:text-purple-300 transition-colors">
                           {logo.name}
                         </span>
-                        <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-0.5">
+                        <span className="text-[8px] sm:text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-0.5">
                           OFFICIAL ECOSYSTEM
                         </span>
                       </div>
                       {/* Vertical Divider Line from Reference Image */}
-                      <div className="h-10 sm:h-12 w-[1px] bg-white/20 shrink-0" />
+                      <div className="h-8 sm:h-12 w-[1px] bg-white/20 shrink-0" />
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Bottom Row Marquee */}
-              <div className="relative py-4 border-y border-white/20 bg-white/[0.02] backdrop-blur-md overflow-hidden flex shadow-lg">
+              <div className="relative py-2.5 sm:py-4 border-y border-purple-500/20 bg-[#080411]/90 overflow-hidden flex shadow-lg">
                 <div className="animate-marquee-reverse flex items-center">
                   {[...bottomLogos, ...bottomLogos, ...bottomLogos, ...bottomLogos].map((logo, idx) => (
                     <div key={idx} className="flex items-center shrink-0">
-                      <div className="px-8 sm:px-12 py-2 rounded-xl group cursor-pointer flex flex-col justify-center marquee-item">
-                        <span className="font-sans font-black tracking-[0.2em] text-sm sm:text-lg text-zinc-100 uppercase group-hover:text-pink-300 transition-colors">
+                      <div className="px-5 sm:px-12 py-1.5 sm:py-2 rounded-xl group cursor-pointer flex flex-col justify-center marquee-item">
+                        <span className="font-sans font-black tracking-[0.15em] sm:tracking-[0.2em] text-xs sm:text-lg text-zinc-100 uppercase group-hover:text-pink-300 transition-colors">
                           {logo.name}
                         </span>
-                        <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-0.5">
+                        <span className="text-[8px] sm:text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-0.5">
                           FLOOR FROST HQ
                         </span>
                       </div>
                       {/* Vertical Divider Line from Reference Image */}
-                      <div className="h-10 sm:h-12 w-[1px] bg-white/20 shrink-0" />
+                      <div className="h-8 sm:h-12 w-[1px] bg-white/20 shrink-0" />
                     </div>
                   ))}
                 </div>
@@ -1082,51 +1074,52 @@ export default function Home() {
       </section>
 
       {/* 3. BENTO GRID SECTION WITH ENHANCED FROSTED GLASSMORPHISM */}
-      <section className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20 content-auto">
+      <section className="relative py-16 sm:py-28 px-4 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20 content-auto">
         <div className="absolute top-1/4 right-1/4 w-[30rem] h-[30rem] bg-purple-600/20 rounded-full blur-[180px] pointer-events-none" />
         <div className="absolute bottom-1/4 left-1/4 w-[30rem] h-[30rem] bg-pink-600/20 rounded-full blur-[180px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto flex flex-col gap-12 relative z-30">
-          <div className="flex flex-col items-start gap-3 scroll-fade-up">
-            <span className="text-pink-400 font-mono text-xs uppercase tracking-[0.25em] font-bold">
+        <div className="max-w-7xl mx-auto flex flex-col gap-8 sm:gap-12 relative z-30">
+          <div className="flex flex-col items-start gap-2 sm:gap-3 scroll-fade-up">
+            <span className="text-pink-400 font-mono text-[11px] sm:text-xs uppercase tracking-[0.25em] font-bold">
               Ecosystem & Metrics ~
             </span>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight">
+            <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black uppercase tracking-tight">
               NEXT-GEN GAMING ARCHITECTURE
             </h2>
-            <p className="max-w-xl text-sm sm:text-base text-zinc-400 font-light leading-relaxed">
+            <p className="max-w-xl text-xs sm:text-base text-zinc-400 font-light leading-relaxed">
               Explore the technology, community impact, and content universe driving Floor Frost.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 w-full">
+            {/* Bento Card 1: 4K Broadcast Tech */}
             <div 
               data-reveal-delay="100" 
-              className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col justify-between gap-8 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-purple-400/70 hover:shadow-[0_0_55px_rgba(168,85,247,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in border-beam-card"
+              className="md:col-span-2 order-2 md:order-1 rounded-2xl sm:rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-8 md:p-10 flex flex-col justify-between gap-6 sm:gap-8 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-purple-400/70 hover:shadow-[0_0_55px_rgba(168,85,247,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in border-beam-card"
             >
               <div className="tilt-glare" />
               <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/35 transition-all pointer-events-none" />
               
               <div className="flex justify-between items-start z-10">
-                <span className="px-3.5 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-300 font-mono text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-300 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md">
                   01 / BROADCAST TECH
                 </span>
-                <span className="text-2xl">📡</span>
+                <span className="text-xl sm:text-2xl">📡</span>
               </div>
 
-              <div className="flex flex-col gap-3 z-10">
-                <h3 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white group-hover:text-purple-200 transition-colors">
+              <div className="flex flex-col gap-2 sm:gap-3 z-10">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-tight text-white group-hover:text-purple-200 transition-colors">
                   4K 60FPS IMMERSIVE BROADCASTING
                 </h3>
-                <p className="text-sm text-zinc-300/90 leading-relaxed font-light max-w-lg">
+                <p className="text-xs sm:text-sm text-zinc-300/90 leading-relaxed font-light max-w-lg">
                   Streamed with ultra-low latency, custom RTX ray-tracing shaders, and spatial audio processing for the ultimate viewer experience.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/[0.06] border border-white/20 backdrop-blur-xl flex flex-col sm:flex-row justify-between items-center gap-4 z-10 shadow-lg">
+              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.06] border border-white/20 backdrop-blur-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 z-10 shadow-lg">
                 <div className="flex items-center gap-3">
                   {/* Dynamic Realistic Equalizer Bars */}
-                  <div className="flex items-end gap-1.5 h-8">
+                  <div className="flex items-end gap-1.5 h-7 sm:h-8">
                     <div className="w-1.5 bg-pink-400 rounded-full animate-eq-1 shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
                     <div className="w-1.5 bg-purple-400 rounded-full animate-eq-2 shadow-[0_0_8px_rgba(192,132,252,0.8)]" />
                     <div className="w-1.5 bg-cyan-400 rounded-full animate-eq-3 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
@@ -1136,23 +1129,23 @@ export default function Home() {
                   </div>
                   <span className="text-xs font-mono text-zinc-200 font-semibold">Live Stream Output</span>
                 </div>
-                <div className="flex gap-4 text-xs font-mono text-zinc-300">
+                <div className="flex flex-wrap gap-3 sm:gap-4 text-[11px] sm:text-xs font-mono text-zinc-300">
                   <span>Bitrate: <strong className="text-lime-400">45.8 Mbps</strong></span>
                   <span>Res: <strong className="text-cyan-300">3840x2160</strong></span>
                 </div>
               </div>
             </div>
 
-            {/* Bento Card 2: Live Subscriber Count */}
+            {/* Bento Card 2: Live Subscriber Count (Order 1 on mobile: Hero metric comes first!) */}
             <div 
               data-reveal-delay="200"
-              className="rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
+              className="order-1 md:order-2 rounded-2xl sm:rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-8 flex flex-col justify-between gap-5 sm:gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
             >
               <div className="tilt-glare" />
               <div className="absolute -top-10 -left-10 w-44 h-44 bg-pink-500/15 rounded-full blur-2xl group-hover:bg-pink-500/30 transition-all pointer-events-none" />
 
               <div className="flex justify-between items-start z-10">
-                <span className="px-3.5 py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 font-mono text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md">
                   02 / AUDIENCE
                 </span>
                 <span className="px-2.5 py-1 rounded-full bg-red-600/30 border border-red-500/50 text-red-400 text-[10px] font-mono font-bold animate-pulse flex items-center gap-1 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
@@ -1161,18 +1154,18 @@ export default function Home() {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-2 my-auto z-10">
-                <span className="text-4xl sm:text-5xl font-black text-white tracking-tight font-mono drop-shadow-[0_0_20px_rgba(236,72,153,0.6)]">
+              <div className="flex flex-col gap-1.5 sm:gap-2 my-auto z-10">
+                <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight font-mono drop-shadow-[0_0_20px_rgba(236,72,153,0.6)]">
                   <AnimatedCounter value={subStats.subscriberCount} />
                 </span>
-                <h4 className="text-lg font-bold text-white uppercase tracking-wider">COMMUNITY LEGION</h4>
+                <h4 className="text-base sm:text-lg font-bold text-white uppercase tracking-wider">COMMUNITY LEGION</h4>
                 <p className="text-xs text-zinc-300/90 leading-relaxed font-light">
                   Real-time @FloorFrost YouTube subscribers updating live every 15s.
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 pt-4 border-t border-white/15 z-10">
-                <div className="w-10 h-10 rounded-full overflow-hidden border border-purple-400 relative shadow-md">
+              <div className="flex items-center gap-3 pt-3.5 sm:pt-4 border-t border-white/15 z-10">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-purple-400 relative shadow-md shrink-0">
                   <NextImage src="/logo.png" alt="Floor Frost" fill className="object-cover" />
                 </div>
                 <div>
@@ -1182,30 +1175,31 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Bento Card 3: Supported Platforms */}
             <div 
               data-reveal-delay="300"
-              className="rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-indigo-400/70 hover:shadow-[0_0_55px_rgba(129,140,248,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
+              className="order-3 rounded-2xl sm:rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-8 flex flex-col justify-between gap-5 sm:gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-indigo-400/70 hover:shadow-[0_0_55px_rgba(129,140,248,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
             >
               <div className="tilt-glare" />
               <div className="flex justify-between items-start z-10">
-                <span className="px-3.5 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 font-mono text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md">
                   03 / ECOSYSTEM
                 </span>
-                <span className="text-2xl">🕹️</span>
+                <span className="text-xl sm:text-2xl">🕹️</span>
               </div>
 
-              <div className="flex flex-col gap-3 z-10">
-                <h4 className="text-xl font-bold uppercase tracking-wider text-white">SUPPORTED PLATFORMS</h4>
+              <div className="flex flex-col gap-2 sm:gap-3 z-10">
+                <h4 className="text-lg sm:text-xl font-bold uppercase tracking-wider text-white">SUPPORTED PLATFORMS</h4>
                 <p className="text-xs text-zinc-300/90 leading-relaxed font-light">
                   Multi-platform content optimization across top gaming devices.
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-2 pt-2 z-10">
+              <div className="flex flex-wrap gap-2 pt-1 sm:pt-2 z-10">
                 {["PC Master Race", "PlayStation 5", "Steam Deck", "Mobile 4K", "Telegram Web3"].map((platform) => (
                   <span 
                     key={platform}
-                    className="px-3 py-1.5 rounded-full bg-white/[0.08] border border-white/15 text-xs font-mono text-zinc-200 font-medium hover:border-pink-400/60 hover:bg-white/15 hover:scale-105 transition-all backdrop-blur-md shadow-sm"
+                    className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-white/[0.08] border border-white/15 text-[11px] sm:text-xs font-mono text-zinc-200 font-medium hover:border-pink-400/60 hover:bg-white/15 hover:scale-105 transition-all backdrop-blur-md shadow-sm"
                   >
                     {platform}
                   </span>
@@ -1213,16 +1207,17 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Bento Card 4: Vision & Legion Call to Action */}
             <div 
               data-reveal-delay="400"
-              className="md:col-span-2 rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-8 sm:p-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
+              className="md:col-span-2 order-4 rounded-2xl sm:rounded-3xl bg-white/[0.03] border border-white/20 backdrop-blur-2xl p-5 sm:p-8 md:p-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 sm:gap-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] group hover:border-pink-400/70 hover:shadow-[0_0_55px_rgba(236,72,153,0.35)] hover-lift shimmer-hover transition-all duration-300 tilt-card scroll-scale-in"
             >
               <div className="tilt-glare" />
-              <div className="flex flex-col gap-3 max-w-lg z-10">
-                <span className="px-3.5 py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 font-mono text-xs font-bold uppercase tracking-wider self-start backdrop-blur-md">
+              <div className="flex flex-col gap-2 sm:gap-3 max-w-lg z-10">
+                <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider self-start backdrop-blur-md">
                   04 / VISION
                 </span>
-                <h3 className="text-2xl font-bold uppercase tracking-tight text-white">
+                <h3 className="text-xl sm:text-2xl font-bold uppercase tracking-tight text-white">
                   FLOOR FROST CONTENT REVOLUTION
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-300/90 leading-relaxed font-light">
@@ -1234,7 +1229,7 @@ export default function Home() {
                 href="https://discord.gg/aN5CCRT6CS" 
                 target="_blank"
                 rel="noreferrer"
-                className="px-8 py-4 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 font-bold text-xs sm:text-sm text-white shadow-[0_0_30px_rgba(219,39,119,0.5)] hover:scale-105 active:scale-95 transition-all shrink-0 border border-pink-400/40 z-10 magnetic-btn"
+                className="w-full sm:w-auto text-center px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 font-bold text-xs sm:text-sm text-white shadow-[0_0_30px_rgba(219,39,119,0.5)] hover:scale-105 active:scale-95 transition-all shrink-0 border border-pink-400/40 z-10 magnetic-btn"
               >
                 Join The Legion →
               </a>
@@ -1244,15 +1239,27 @@ export default function Home() {
       </section>
 
       {/* 4. ABOUT CREATOR SECTION WITH REAL CHANNEL BIO & DISCORD */}
-      <section id="about" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20 content-auto">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-30">
+      <section id="about" className="relative py-16 sm:py-28 px-4 sm:px-12 lg:px-20 bg-[#06030a] overflow-hidden border-t border-purple-900/20 content-auto">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 items-center relative z-30">
           
-          <div className="relative flex justify-center items-center scroll-slide-left">
-            <div className="absolute w-80 h-80 bg-purple-600/30 rounded-full blur-3xl animate-pulse" />
+          <div className="relative flex flex-col items-center justify-center scroll-slide-left w-full">
+            <div className="absolute w-72 sm:w-80 h-72 sm:h-80 bg-purple-600/30 rounded-full blur-3xl animate-pulse pointer-events-none" />
             
-            <div className="relative z-10 w-80 sm:w-96 rounded-3xl overflow-hidden border-2 border-purple-500/50 shadow-[0_0_50px_rgba(168,85,247,0.4)] bg-gradient-to-b from-purple-950 to-zinc-950 p-4 tilt-card">
+            {/* Mobile-only Quick Status Badges above Avatar (Prevents side-overflow on narrow phones) */}
+            <div className="flex sm:hidden items-center justify-between gap-2 w-full max-w-[280px] mb-3 z-20">
+              <div className="px-3 py-1.5 rounded-xl bg-zinc-900/90 border border-purple-500/40 backdrop-blur-xl text-[10px] flex items-center gap-1.5 shadow-md">
+                <span>🎮</span>
+                <span className="text-lime-400 font-bold">Pro Walkthroughs</span>
+              </div>
+              <div className="px-3 py-1.5 rounded-xl bg-zinc-900/90 border border-purple-500/40 backdrop-blur-xl text-[10px] flex items-center gap-1.5 shadow-md">
+                <span>🔥</span>
+                <span className="text-purple-300 font-bold">Frost Legion</span>
+              </div>
+            </div>
+
+            <div className="relative z-10 w-full max-w-[280px] sm:w-80 md:w-96 rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-purple-500/50 shadow-[0_0_50px_rgba(168,85,247,0.4)] bg-gradient-to-b from-purple-950 to-zinc-950 p-3 sm:p-4 tilt-card">
               <div className="tilt-glare" />
-              <div className="relative w-full aspect-square rounded-2xl overflow-hidden border border-purple-400/30">
+              <div className="relative w-full aspect-square rounded-xl sm:rounded-2xl overflow-hidden border border-purple-400/30">
                 <NextImage 
                   src="/logo.png" 
                   alt="Floor Frost Avatar" 
@@ -1260,18 +1267,19 @@ export default function Home() {
                   className="object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <div className="mt-4 flex justify-between items-center px-2 font-mono">
+              <div className="mt-3 sm:mt-4 flex justify-between items-center px-1 sm:px-2 font-mono">
                 <div>
-                  <h4 className="font-bold text-lg text-white">FLOOR FROST</h4>
-                  <p className="text-xs text-purple-400">@FloorFrost</p>
+                  <h4 className="font-bold text-base sm:text-lg text-white">FLOOR FROST</h4>
+                  <p className="text-[11px] sm:text-xs text-purple-400">@FloorFrost</p>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-red-600/30 border border-red-500/50 text-red-400 text-xs font-bold">
+                <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-red-600/30 border border-red-500/50 text-red-400 text-[10px] sm:text-xs font-bold">
                   LIVE CREATOR
                 </span>
               </div>
             </div>
 
-            <div className="absolute top-6 -left-4 sm:-left-6 z-20 px-4 py-3 rounded-2xl bg-zinc-900/90 border border-purple-500/40 backdrop-blur-xl shadow-2xl text-xs flex items-center gap-3">
+            {/* Desktop Floating Badges (Identical on sm screens and above) */}
+            <div className="hidden sm:flex absolute top-6 -left-4 sm:-left-6 z-20 px-4 py-3 rounded-2xl bg-zinc-900/90 border border-purple-500/40 backdrop-blur-xl shadow-2xl text-xs items-center gap-3">
               <span className="text-2xl">🎮</span>
               <div>
                 <p className="text-zinc-400 text-[10px] uppercase font-mono">Gaming Content</p>
@@ -1279,7 +1287,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="absolute bottom-6 -right-4 sm:-right-6 z-20 px-4 py-3 rounded-2xl bg-zinc-900/90 border border-purple-500/40 backdrop-blur-xl shadow-2xl text-xs flex items-center gap-3">
+            <div className="hidden sm:flex absolute bottom-6 -right-4 sm:-right-6 z-20 px-4 py-3 rounded-2xl bg-zinc-900/90 border border-purple-500/40 backdrop-blur-xl shadow-2xl text-xs items-center gap-3">
               <span className="text-2xl">🔥</span>
               <div>
                 <p className="text-zinc-400 text-[10px] uppercase font-mono">Community</p>
@@ -1288,35 +1296,35 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex flex-col items-start gap-6 scroll-slide-right">
-            <span className="text-purple-400 font-mono text-sm tracking-wider uppercase font-bold">
+          <div className="flex flex-col items-start gap-4 sm:gap-6 scroll-slide-right">
+            <span className="text-purple-400 font-mono text-xs sm:text-sm tracking-wider uppercase font-bold">
               Meet The Creator ~
             </span>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.05]">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-tight sm:leading-[1.05]">
               CRAFTING UNFORGETTABLE<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">GAMING STORIES</span>
             </h2>
-            <p className="text-base text-zinc-300 leading-relaxed font-light max-w-lg">
+            <p className="text-sm sm:text-base text-zinc-300 leading-relaxed font-light max-w-lg">
               Namaste Gamers! Swagat hai <span className="text-white font-bold">Floor Frost</span> par! 🎮 Main hoon Floor Frost aur is channel par hum top-tier epic games ke adrenaline-pumping walkthroughs, secret hacks, strategies aur funny moments explore karte hain.
             </p>
 
-            <div className="grid grid-cols-3 gap-6 w-full max-w-lg mt-2 pt-6 border-t border-purple-900/40">
-              <div>
-                <p className="text-3xl font-black text-white">
+            <div className="grid grid-cols-3 gap-2 sm:gap-6 w-full max-w-lg mt-1 sm:mt-2 pt-4 sm:pt-6 border-t border-purple-900/40 p-3 sm:p-0 rounded-2xl sm:rounded-none bg-white/[0.03] sm:bg-transparent border sm:border-t sm:border-x-0 sm:border-b-0 border-white/10">
+              <div className="text-center sm:text-left">
+                <p className="text-2xl sm:text-3xl font-black text-white">
                   <AnimatedCounter value={subStats.subscriberCount} />
                 </p>
-                <p className="text-xs text-zinc-400 font-mono uppercase mt-1">Live Subscribers</p>
+                <p className="text-[10px] sm:text-xs text-zinc-400 font-mono uppercase mt-0.5 sm:mt-1">Live Subscribers</p>
               </div>
-              <div>
-                <p className="text-3xl font-black text-pink-400">
+              <div className="text-center sm:text-left">
+                <p className="text-2xl sm:text-3xl font-black text-pink-400">
                   <AnimatedCounter value={100} suffix="%" />
                 </p>
-                <p className="text-xs text-zinc-400 font-mono uppercase mt-1">Pure Gameplay</p>
+                <p className="text-[10px] sm:text-xs text-zinc-400 font-mono uppercase mt-0.5 sm:mt-1">Pure Gameplay</p>
               </div>
-              <div>
-                <p className="text-3xl font-black text-purple-400">
+              <div className="text-center sm:text-left">
+                <p className="text-2xl sm:text-3xl font-black text-purple-400">
                   <AnimatedCounter value={4} suffix="K" />
                 </p>
-                <p className="text-xs text-zinc-400 font-mono uppercase mt-1">Ultra Quality</p>
+                <p className="text-[10px] sm:text-xs text-zinc-400 font-mono uppercase mt-0.5 sm:mt-1">Ultra Quality</p>
               </div>
             </div>
           </div>
@@ -1325,18 +1333,18 @@ export default function Home() {
       </section>
 
       {/* 5. FEATURED LATEST YOUTUBE VIDEOS & SPOTLIGHT PLAYER */}
-      <section id="videos" className="relative py-28 px-6 sm:px-12 lg:px-20 bg-[#07040d] overflow-hidden border-t border-purple-900/20 content-auto">
-        <div className="max-w-7xl mx-auto flex flex-col items-start gap-10 relative z-30">
+      <section id="videos" className="relative py-16 sm:py-28 px-4 sm:px-12 lg:px-20 bg-[#07040d] overflow-hidden border-t border-purple-900/20 content-auto">
+        <div className="max-w-7xl mx-auto flex flex-col items-start gap-8 sm:gap-10 relative z-30">
           
-          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-6 scroll-fade-up">
+          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-4 sm:gap-6 scroll-fade-up">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-                <span className="text-red-400 font-mono text-xs font-bold tracking-widest uppercase bg-red-950/60 border border-red-500/30 px-3 py-1 rounded-full">
+                <span className="text-red-400 font-mono text-[10px] sm:text-xs font-bold tracking-widest uppercase bg-red-950/60 border border-red-500/30 px-3 py-1 rounded-full">
                   LIVE YOUTUBE FEED
                 </span>
               </div>
-              <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white">
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-white">
                 LATEST <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-pink-400 to-purple-400">UPLOADS</span>
               </h2>
             </div>
@@ -1345,7 +1353,7 @@ export default function Home() {
               href="https://youtube.com/@floorfrost"
               target="_blank"
               rel="noreferrer"
-              className="px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.4)] magnetic-btn"
+              className="w-full sm:w-auto justify-center text-center px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.4)] magnetic-btn"
             >
               <span>Visit @FloorFrost YouTube</span>
               <span>↗</span>
@@ -1358,7 +1366,7 @@ export default function Home() {
               {/* Ambient Theater Backlight Glow */}
               <div className="absolute -inset-1.5 bg-gradient-to-r from-red-600/30 via-purple-600/30 to-pink-600/30 rounded-[2.5rem] blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none -z-10" />
 
-              <div className="w-full rounded-3xl bg-gradient-to-b from-[#140b24] to-[#0c0817] border-2 border-purple-500/40 overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.25)] flex flex-col lg:flex-row group-hover:border-pink-400/80 transition-all duration-300 border-beam-card fluid-energy-border">
+              <div className="w-full rounded-2xl sm:rounded-3xl bg-gradient-to-b from-[#140b24] to-[#0c0817] border-2 border-purple-500/40 overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.25)] flex flex-col lg:flex-row group-hover:border-pink-400/80 transition-all duration-300 border-beam-card fluid-energy-border">
                 
                 {/* Left Video Player Container */}
                 <div className="lg:w-3/5 relative aspect-video bg-black flex items-center justify-center overflow-hidden">
@@ -1385,11 +1393,11 @@ export default function Home() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
                       {/* Big Glowing Play Button */}
-                      <div className="absolute w-20 h-20 rounded-full bg-red-600/90 border-2 border-white text-white flex items-center justify-center shadow-[0_0_40px_rgba(239,68,68,0.8)] group-hover/thumb:scale-110 group-hover/thumb:bg-red-500 transition-all">
-                        <span className="text-3xl ml-1">▶</span>
+                      <div className="absolute w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-red-600/90 border-2 border-white text-white flex items-center justify-center shadow-[0_0_40px_rgba(239,68,68,0.8)] group-hover/thumb:scale-110 group-hover/thumb:bg-red-500 transition-all">
+                        <span className="text-2xl sm:text-3xl ml-0.5 sm:ml-1">▶</span>
                       </div>
 
-                      <span className="absolute bottom-4 left-4 px-3 py-1 rounded-md bg-black/80 text-white font-mono text-xs font-bold border border-white/20">
+                      <span className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md bg-black/80 text-white font-mono text-[10px] sm:text-xs font-bold border border-white/20">
                         CLICK TO PLAY LIVE
                       </span>
                     </div>
@@ -1397,19 +1405,19 @@ export default function Home() {
                 </div>
 
                 {/* Right Video Information */}
-                <div className="lg:w-2/5 p-8 flex flex-col justify-between gap-6">
-                  <div className="flex flex-col gap-4">
+                <div className="lg:w-2/5 p-4 sm:p-7 md:p-8 flex flex-col justify-between gap-4 sm:gap-6">
+                  <div className="flex flex-col gap-2.5 sm:gap-4">
                     <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-full bg-red-600/30 border border-red-500/40 text-red-300 font-mono text-[11px] font-bold uppercase tracking-wider animate-pulse flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-red-400" />
+                      <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-red-600/30 border border-red-500/40 text-red-300 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider animate-pulse flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-400" />
                         LATEST UPLOAD
                       </span>
-                      <span className="text-xs font-mono text-zinc-400">
+                      <span className="text-[11px] sm:text-xs font-mono text-zinc-400">
                         {featuredVideo.publishedAt}
                       </span>
                     </div>
 
-                    <h3 className="text-2xl font-bold text-white leading-snug group-hover:text-purple-200 transition-colors">
+                    <h3 className="text-lg sm:text-2xl font-bold text-white leading-snug group-hover:text-purple-200 transition-colors">
                       {featuredVideo.title}
                     </h3>
 
@@ -1420,12 +1428,12 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
+                  <div className="flex flex-col gap-3 pt-3.5 sm:pt-4 border-t border-white/10">
                     <a
                       href={featuredVideo.url || `https://www.youtube.com/watch?v=${featuredVideo.id}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider text-center transition-all shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 magnetic-btn"
+                      className="w-full py-2.5 sm:py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider text-center transition-all shadow-[0_0_25px_rgba(168,85,247,0.45)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 magnetic-btn"
                     >
                       <span>Watch on YouTube</span>
                       <span>↗</span>
@@ -1437,21 +1445,21 @@ export default function Home() {
           )}
 
           {/* Interactive Media Tabs: Shorts, Long Videos, and Playlists (No Endless Scroll) */}
-          <div className="w-full flex flex-col gap-6 mt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#120a22]/80 border border-purple-500/30 backdrop-blur-md">
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="w-full flex flex-col gap-4 sm:gap-6 mt-2 sm:mt-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#120a22]/80 border border-purple-500/30 backdrop-blur-md">
+              <div className="flex items-center gap-1.5 sm:gap-3 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
                 {/* Shorts Button */}
                 <button
                   type="button"
                   onClick={() => setActiveMediaFilter('shorts')}
-                  className={`px-4 py-2 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 ${
                     activeMediaFilter === 'shorts'
                       ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] border border-red-400'
                       : 'bg-white/5 border border-white/10 text-zinc-300 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <span>⚡ Shorts</span>
-                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px]">
+                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[9px] sm:text-[10px]">
                     {shortsList.length > 0 ? shortsList.length : '8'}
                   </span>
                 </button>
@@ -1460,14 +1468,14 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setActiveMediaFilter('videos')}
-                  className={`px-4 py-2 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 ${
                     activeMediaFilter === 'videos'
                       ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.6)] border border-purple-400'
                       : 'bg-white/5 border border-white/10 text-zinc-300 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <span>🎬 Long Videos</span>
-                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px]">
+                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[9px] sm:text-[10px]">
                     {longVideosList.length > 0 ? longVideosList.length : '3'}
                   </span>
                 </button>
@@ -1476,14 +1484,14 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setActiveMediaFilter('playlists')}
-                  className={`px-4 py-2 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 ${
                     activeMediaFilter === 'playlists'
                       ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.6)] border border-indigo-400'
                       : 'bg-white/5 border border-white/10 text-zinc-300 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <span>📁 Playlists</span>
-                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px]">
+                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[9px] sm:text-[10px]">
                     {playlistsList.length > 0 ? playlistsList.length : '2'}
                   </span>
                 </button>
@@ -1491,15 +1499,16 @@ export default function Home() {
 
               <a
                 href="/videos"
-                className="text-xs font-mono text-purple-300 hover:text-white px-3 py-1.5 rounded-xl bg-purple-500/20 border border-purple-400/30 hover:bg-purple-500/30 transition-all flex items-center gap-1.5"
+                className="text-xs font-mono text-purple-300 hover:text-white px-3 py-1.5 rounded-lg sm:rounded-xl bg-purple-500/20 border border-purple-400/30 hover:bg-purple-500/30 transition-all flex items-center justify-center gap-1.5 shrink-0"
               >
                 <span>Full Videos Hub ↗</span>
               </a>
             </div>
 
             {/* Content view depending on activeMediaFilter */}
+            {/* REARRANGED FOR MOBILE: 2-COLUMN YOUTUBE APP STYLE ON MOBILE SCREENS */}
             {activeMediaFilter === 'shorts' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 w-full animate-portal-fade">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-5 w-full animate-portal-fade">
                 {(shortsList.length > 0 
                   ? shortsList.slice(0, 8) 
                   : [
@@ -1522,10 +1531,10 @@ export default function Home() {
                       setIsPlayingFeatured(true);
                       window.scrollTo({ top: (document.getElementById('videos')?.offsetTop || 0) + 100, behavior: 'smooth' });
                     }}
-                    className="group relative rounded-2xl overflow-hidden bg-zinc-950 border border-red-950/60 hover:border-red-500/80 hover:shadow-[0_0_30px_rgba(239,68,68,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer tilt-card scroll-fade-up shimmer-glass-card"
+                    className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-950 border border-red-950/60 hover:border-red-500/80 hover:shadow-[0_0_30px_rgba(239,68,68,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer tilt-card scroll-fade-up shimmer-glass-card"
                   >
                     <div className="tilt-glare" />
-                    <div className="h-48 w-full relative overflow-hidden bg-black">
+                    <div className="h-40 sm:h-48 w-full relative overflow-hidden bg-black">
                       <img
                         src={short.thumbnail}
                         alt={short.title}
@@ -1536,28 +1545,28 @@ export default function Home() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                       
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-12 h-12 rounded-full bg-red-600 text-white flex items-center justify-center shadow-[0_0_25px_rgba(239,68,68,0.8)] group-hover:scale-110 transition-transform">
-                          <span className="text-xl ml-0.5">▶</span>
+                        <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-red-600 text-white flex items-center justify-center shadow-[0_0_25px_rgba(239,68,68,0.8)] group-hover:scale-110 transition-transform">
+                          <span className="text-sm sm:text-xl ml-0.5">▶</span>
                         </div>
                       </div>
 
-                      <div className="absolute top-2.5 left-2.5">
-                        <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider shadow-md border border-red-400/40">
+                      <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5">
+                        <span className="px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full bg-red-600 text-white text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider shadow-md border border-red-400/40">
                           ⚡ SHORT
                         </span>
                       </div>
 
-                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/85 text-[10px] font-mono text-red-300 border border-red-500/30">
+                      <span className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded bg-black/85 text-[9px] sm:text-[10px] font-mono text-red-300 border border-red-500/30">
                         {short.duration || '0:28'}
                       </span>
                     </div>
 
-                    <div className="p-3.5 flex flex-col gap-2">
-                      <h4 className="text-xs font-bold text-white group-hover:text-red-300 transition-colors line-clamp-2 leading-relaxed">
+                    <div className="p-2.5 sm:p-3.5 flex flex-col gap-1.5 sm:gap-2">
+                      <h4 className="text-[11px] sm:text-xs font-bold text-white group-hover:text-red-300 transition-colors line-clamp-2 leading-tight">
                         {short.title}
                       </h4>
                       
-                      <div className="flex items-center justify-between text-[10px] font-mono text-red-400 font-semibold pt-1 border-t border-white/10">
+                      <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono text-red-400 font-semibold pt-1 border-t border-white/10">
                         <span>Click to Play</span>
                         <span>▶</span>
                       </div>
@@ -1568,7 +1577,7 @@ export default function Home() {
             )}
 
             {activeMediaFilter === 'videos' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full animate-portal-fade">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6 w-full animate-portal-fade">
                 {(longVideosList.length > 0 
                   ? longVideosList 
                   : [
@@ -1586,10 +1595,10 @@ export default function Home() {
                       setIsPlayingFeatured(true);
                       window.scrollTo({ top: (document.getElementById('videos')?.offsetTop || 0) + 100, behavior: 'smooth' });
                     }}
-                    className="group relative rounded-2xl overflow-hidden bg-zinc-950 border border-purple-900/40 hover:border-purple-400/80 hover:shadow-[0_0_35px_rgba(168,85,247,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer tilt-card scroll-fade-up shimmer-glass-card"
+                    className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-950 border border-purple-900/40 hover:border-purple-400/80 hover:shadow-[0_0_35px_rgba(168,85,247,0.35)] hover-lift transition-all duration-300 shadow-xl flex flex-col cursor-pointer tilt-card scroll-fade-up shimmer-glass-card"
                   >
                     <div className="tilt-glare" />
-                    <div className="h-44 w-full relative overflow-hidden bg-black">
+                    <div className="h-40 sm:h-44 w-full relative overflow-hidden bg-black">
                       <img
                         src={video.thumbnail}
                         alt={video.title}
@@ -1600,8 +1609,8 @@ export default function Home() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                       
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.8)] group-hover:scale-110 transition-transform">
-                          <span className="text-xl ml-0.5">▶</span>
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.8)] group-hover:scale-110 transition-transform">
+                          <span className="text-base sm:text-xl ml-0.5">▶</span>
                         </div>
                       </div>
 
@@ -1616,7 +1625,7 @@ export default function Home() {
                       </span>
                     </div>
 
-                    <div className="p-4 flex flex-col gap-2">
+                    <div className="p-3.5 sm:p-4 flex flex-col gap-2">
                       <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-purple-300 transition-colors line-clamp-2 leading-relaxed">
                         {video.title}
                       </h4>
@@ -1632,7 +1641,7 @@ export default function Home() {
             )}
 
             {activeMediaFilter === 'playlists' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full animate-portal-fade">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-6 w-full animate-portal-fade">
                 {(playlistsList.length > 0
                   ? playlistsList
                   : [
@@ -1645,9 +1654,9 @@ export default function Home() {
                     href={playlist.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#120a24] to-[#080512] border-2 border-indigo-500/30 hover:border-indigo-400 p-5 flex flex-col sm:flex-row gap-4 shadow-[0_10px_35px_rgba(99,102,241,0.15)] hover:shadow-[0_0_40px_rgba(99,102,241,0.35)] transition-all duration-300 hover-lift"
+                    className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-[#120a24] to-[#080512] border-2 border-indigo-500/30 hover:border-indigo-400 p-3.5 sm:p-5 flex flex-col sm:flex-row gap-3 sm:gap-4 shadow-[0_10px_35px_rgba(99,102,241,0.15)] hover:shadow-[0_0_40px_rgba(99,102,241,0.35)] transition-all duration-300 hover-lift"
                   >
-                    <div className="sm:w-36 h-28 sm:h-auto rounded-xl overflow-hidden relative bg-black shrink-0 border border-indigo-500/30">
+                    <div className="w-full sm:w-36 h-28 sm:h-auto rounded-lg sm:rounded-xl overflow-hidden relative bg-black shrink-0 border border-indigo-500/30">
                       <img
                         src={playlist.thumbnail}
                         alt={playlist.title}
@@ -1661,15 +1670,15 @@ export default function Home() {
                     </div>
 
                     <div className="flex flex-col justify-between gap-2 grow">
-                      <h4 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-2">
+                      <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-2">
                         {playlist.title}
                       </h4>
                       {playlist.description && (
-                        <p className="text-xs text-zinc-300 line-clamp-2 font-light">
+                        <p className="text-[11px] sm:text-xs text-zinc-300 line-clamp-2 font-light">
                           {playlist.description}
                         </p>
                       )}
-                      <span className="text-xs font-mono font-bold text-indigo-400 group-hover:text-indigo-300 pt-1 flex items-center justify-between">
+                      <span className="text-[11px] sm:text-xs font-mono font-bold text-indigo-400 group-hover:text-indigo-300 pt-1 flex items-center justify-between">
                         <span>Open Playlist</span>
                         <span>↗</span>
                       </span>
@@ -1687,12 +1696,12 @@ export default function Home() {
       <DiscordAnnouncements />
 
       {/* 6. COMMUNITY & DISCORD BANNER WITH REAL LINKS */}
-      <section id="community" className="relative py-24 px-6 sm:px-12 lg:px-20 bg-[#06030a] border-t border-purple-900/20 content-auto">
-        <div className="max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-10 sm:p-16 relative overflow-hidden flex flex-col items-center text-center gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)] z-30 tilt-card scroll-scale-in border-beam-card">
+      <section id="community" className="relative py-16 sm:py-24 px-4 sm:px-12 lg:px-20 bg-[#06030a] border-t border-purple-900/20 content-auto">
+        <div className="max-w-6xl mx-auto rounded-2xl sm:rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-zinc-950 border border-purple-500/30 p-6 sm:p-10 md:p-16 relative overflow-hidden flex flex-col items-center text-center gap-6 sm:gap-8 shadow-[0_0_60px_rgba(147,51,234,0.3)] z-30 tilt-card scroll-scale-in border-beam-card">
           <div className="tilt-glare" />
           <div className="absolute w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Floating Cyber Status Badges */}
+          {/* Floating Cyber Status Badges (Desktop) */}
           <div className="hidden lg:flex absolute top-10 left-10 px-4 py-2 rounded-2xl bg-black/60 border border-purple-400/40 backdrop-blur-md items-center gap-2 text-xs font-mono text-purple-200 animate-float shadow-lg pointer-events-none">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             <span>DISCORD // {discordStats.onlineCount} ONLINE</span>
@@ -1702,44 +1711,56 @@ export default function Home() {
             <span>YOUTUBE // 4K 60FPS</span>
           </div>
 
-          <div className="relative z-10 flex flex-col items-center gap-4 max-w-2xl">
+          {/* Mobile-only status pill (Ensures mobile users get real-time status without desktop off-screen clutter) */}
+          <div className="flex lg:hidden items-center justify-center gap-2 mb-1 flex-wrap">
+            <span className="px-2.5 py-1 rounded-full bg-black/60 border border-purple-400/40 text-[10px] font-mono text-purple-200 flex items-center gap-1.5 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span>DISCORD: {discordStats.onlineCount} ONLINE</span>
+            </span>
+            <span className="px-2.5 py-1 rounded-full bg-black/60 border border-pink-400/40 text-[10px] font-mono text-pink-200 flex items-center gap-1.5 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />
+              <span>YOUTUBE: 4K 60FPS</span>
+            </span>
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center gap-3 sm:gap-4 max-w-2xl">
             {/* Spinning Cyber Avatar Rings */}
-            <div className="relative mb-2 flex items-center justify-center">
+            <div className="relative mb-1 sm:mb-2 flex items-center justify-center">
               <div className="absolute -inset-2.5 rounded-full border border-dashed border-purple-500/50 animate-[spin_8s_linear_infinite]" />
               <div className="absolute -inset-5 rounded-full border border-pink-500/30 animate-[spin_15s_linear_infinite_reverse]" />
-              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.5)] relative">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.5)] relative">
                 <NextImage src="/logo.png" alt="Floor Frost Logo" fill className="object-cover" />
               </div>
             </div>
 
-            <span className="text-xs font-mono uppercase tracking-[0.3em] text-pink-300 font-bold">
+            <span className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.25em] sm:tracking-[0.3em] text-pink-300 font-bold">
               JOIN THE FROST LEGION
             </span>
-            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight animate-chromatic-shimmer">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight animate-chromatic-shimmer">
               NEVER MISS A GAMING ADVENTURE
             </h2>
-            <p className="text-sm sm:text-base text-zinc-300 font-light leading-relaxed">
+            <p className="text-xs sm:text-base text-zinc-300 font-light leading-relaxed">
               Subscribe to @FloorFrost for Minecraft and gaming walkthroughs, and join our official Discord server to connect with Floor Frost!
             </p>
           </div>
 
-          <div className="relative z-10 flex flex-wrap gap-5 justify-center">
+          <div className="relative z-10 flex flex-col sm:flex-row gap-3 sm:gap-5 justify-center w-full sm:w-auto">
             <a 
               href="https://youtube.com/@floorfrost" 
               target="_blank" 
               rel="noreferrer"
-              className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 font-bold text-sm text-white shadow-[0_0_30px_rgba(220,38,38,0.5)] hover:shadow-[0_0_45px_rgba(220,38,38,0.8)] transition-all flex items-center gap-3 magnetic-btn border border-red-400/40"
+              className="group relative w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 font-bold text-xs sm:text-sm text-white shadow-[0_0_30px_rgba(220,38,38,0.5)] hover:shadow-[0_0_45px_rgba(220,38,38,0.8)] transition-all flex items-center justify-center gap-2.5 sm:gap-3 magnetic-btn border border-red-400/40 text-center"
             >
-              <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">▶</span>
+              <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">▶</span>
               <span>Subscribe (<AnimatedCounter value={subStats.subscriberCount} />)</span>
             </a>
             <a 
               href="https://discord.gg/aN5CCRT6CS" 
               target="_blank" 
               rel="noreferrer"
-              className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 font-bold text-sm text-white shadow-[0_0_30px_rgba(79,70,229,0.5)] hover:shadow-[0_0_45px_rgba(79,70,229,0.8)] transition-all flex items-center gap-3 magnetic-btn border border-indigo-400/40"
+              className="group relative w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 font-bold text-xs sm:text-sm text-white shadow-[0_0_30px_rgba(79,70,229,0.5)] hover:shadow-[0_0_45px_rgba(79,70,229,0.8)] transition-all flex items-center justify-center gap-2.5 sm:gap-3 magnetic-btn border border-indigo-400/40 text-center"
             >
-              <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">💬</span>
+              <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">💬</span>
               <span>Join Official Discord</span>
             </a>
           </div>
@@ -1748,9 +1769,9 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-12 border-t border-purple-950 bg-[#040207] text-center text-xs text-zinc-500 font-mono flex flex-col items-center gap-2 scroll-fade-up">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-6 h-6 rounded-full overflow-hidden relative">
+      <footer className="py-8 sm:py-12 px-4 border-t border-purple-950 bg-[#040207] text-center text-[11px] sm:text-xs text-zinc-500 font-mono flex flex-col items-center gap-2 scroll-fade-up">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden relative shrink-0">
             <NextImage src="/logo.png" alt="Floor Frost" fill className="object-cover" />
           </div>
           <span className="font-bold text-zinc-300">FLOOR FROST GAMING (@FloorFrost)</span>
